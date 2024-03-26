@@ -8,6 +8,6 @@ const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-app.use(router);
+app.use("/api/v1", router);
 
 app.listen(ENV.PORT, () => console.log("Server is running at http://localhost:" + ENV.PORT));
