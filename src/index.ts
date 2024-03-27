@@ -1,6 +1,5 @@
 import express from 'express';
 import { ENV } from './config/environment';
-import axios from 'axios';
 import router from './router/router';
 import cookieParser from 'cookie-parser';
 import connectDB from './connection/connection';
