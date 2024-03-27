@@ -2,9 +2,10 @@ import express from 'express';
 import { ENV } from './config/environment';
 import axios from 'axios';
 import router from './router/router';
+import cookieParser from 'cookie-parser';
 
 const app = express();
-
+app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 

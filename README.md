@@ -31,6 +31,8 @@ npm install
 
 ```env
 PORT=
+REFRESH_TOKEN_SECRET=
+ACCESS_TOKEN_SECRET=
 ```
 
 4. Run the development server

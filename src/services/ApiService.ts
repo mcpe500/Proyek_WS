@@ -1,5 +1,4 @@
 import axios, { Axios } from "axios";
-import { APIs } from "../contracts/vo/ApisRelated.vo";
 
 class ApiService {
   private axiosInstance: Axios;
@@ -9,7 +8,6 @@ class ApiService {
     });
   }
   async get<T>(url: string, headers = {}): Promise<T> {
-    // console.log(import.meta.env.VITE_BACKEND_URL+"/"+url)
     const response = await this.axiosInstance.get<T>(url, { headers });
     return response.data;
   }
@@ -54,4 +52,4 @@ class ApiService {
   }
 }
 
-export const Apis: APIs = {}
+export const Apis = {}
