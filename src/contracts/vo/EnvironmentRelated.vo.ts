@@ -6,4 +6,5 @@ export interface EnvironmentStructure {
     ACCESS_TOKEN_AGE: string;
     REMEMBER_ME_REFRESH_TOKEN_AGE: string;
     REMEMBER_ME_ACCESS_TOKEN_AGE: string;
+    MONGODB_URI: string;
 }

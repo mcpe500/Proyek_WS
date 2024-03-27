@@ -11,4 +11,5 @@ export const ENV: EnvironmentStructure = {
     ACCESS_TOKEN_AGE: process.env.ACCESS_TOKEN_AGE ?? "",
     REMEMBER_ME_REFRESH_TOKEN_AGE: process.env.REMEMBER_ME_REFRESH_TOKEN_AGE ?? "",
     REMEMBER_ME_ACCESS_TOKEN_AGE: process.env.REMEMBER_ME_ACCESS_TOKEN_AGE ?? "",
+    MONGODB_URI: process.env.MONGODB_URI ?? ""
 };
