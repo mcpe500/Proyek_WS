@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import { verifyRefreshToken } from "../utils/AuthUtils";
+import { RESPONSE_STATUS } from "../contracts/enum/ResponseRelated.enum";
 
 export const registerUser = async (req: Request, res: Response) => {
     const { name, username, email, password } = req.body;
@@ -22,7 +23,7 @@ export const newRefreshToken = async (req: Request, res: Response) => {
 export const generateNewAccessToken = async (req: Request, res: Response) => {
     const refreshToken = req.cookies.refreshToken;
     if (!refreshToken) {
-        return res.status(403).json({ message: 'Refresh token is required' });
+        return res.status(RESPONSE_STATUS.FORBIDDEN).json({ message: 'Refresh token is required' });
     }
 
     // try {
