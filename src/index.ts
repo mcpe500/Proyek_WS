@@ -17,16 +17,6 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 
-/**
- * @swagger
- * /:
- *   get:
- *     summary: Test api runs
- *     description: Returns a Hello World message
- *     responses:
- *       200:
- *         description: Successful operation
- */
 app.get("/", (req: Request, res: Response) => {
     // res.cookie("jwt", "", {
     //     httpOnly: true,
