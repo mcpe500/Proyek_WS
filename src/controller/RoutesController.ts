@@ -2,14 +2,21 @@ import { Request, Response } from "express";
 import * as BuiltInUtils from "../utils/BuiltInUtils";
 const routers: string[] = [];
 
+enum CONTROLLER_MODE {
+    CODE = "CODE",
+    JSON = "JSON"
+}
+
 const responses: any[] = [];
 export const addRoutes = (req: Request, res: Response) => {
     const { routes } = req.params;
-    const { responseValue } = req.body;
+    const { mode, responseValue }: { mode: CONTROLLER_MODE, responseValue: any } = req.body;
     routers.push(routes);
-    // if(Object.keys(BuiltInUtils).indexOf(responseValue) != -1)
+    if (mode == CONTROLLER_MODE.CODE) {
+        eval(responseValue);
+    } else if (mode == CONTROLLER_MODE.JSON) {
 
-
+    }
     responses.push(responseValue);
     console.log(routers, responses);
     res.status(200).send("Success");
