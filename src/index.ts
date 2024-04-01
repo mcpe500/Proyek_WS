@@ -32,3 +32,5 @@ app.get(ROUTES.ROOT, (req: Request, res: Response) => {
 app.listen(ENV.PORT, () =>
   console.log("Server is running at http://localhost:" + ENV.PORT)
 );
+
+export default app;
