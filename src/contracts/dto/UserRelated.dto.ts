@@ -1,3 +1,4 @@
+import { Document } from "mongoose";
 import { FITNESS_GOALS } from "../enum/FitnessRelated.enum";
 
 export interface IUser extends Document {

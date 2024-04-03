@@ -19,6 +19,8 @@ const UserSchema: Schema = new Schema({
   },
   healthInformation: { type: String, required: true },
   refreshToken: { type: String },
+  isEmailVerified: { type: Boolean, default: false },
+  emailVerificationToken: { type: String },
 });
 
 export const User = mongoose.model<IUser>("User", UserSchema);

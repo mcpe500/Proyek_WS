@@ -1,5 +1,5 @@
 import request from "supertest";
-import app from "../src/index"; // replace with the path to your Express application
+import app from "../src/index";
 
 describe("GET /", () => {
   it('responds with "hello world"', async () => {

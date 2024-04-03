@@ -8,7 +8,9 @@ export const validateBody = (schema: Schema) => {
       await schema.validateAsync(req.body);
       next();
     } catch (err: any) {
-      res.status(RESPONSE_STATUS.BAD_REQUEST).send(err.details[0].message);
+      res
+        .status(RESPONSE_STATUS.BAD_REQUEST)
+        .send({ error: err.details[0].message });
     }
   };
 };
