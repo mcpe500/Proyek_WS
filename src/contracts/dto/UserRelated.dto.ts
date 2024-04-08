@@ -14,4 +14,6 @@ export interface IUser extends Document {
   fitnessGoals: typeof FITNESS_GOALS;
   healthInformation: string;
   refreshToken: string;
+  isEmailVerified: boolean;
+  emailVerificationToken: string;
 }

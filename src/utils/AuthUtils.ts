@@ -2,7 +2,7 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { ENV } from "../config/environment";
 
-import nodemailer, { SendMailOptions } from 'nodemailer';
+import nodemailer, { SendMailOptions } from "nodemailer";
 import ejs from "ejs";
 import path from "path";
 
@@ -75,24 +75,31 @@ export const verifyEmailVerificationToken = (token: string) => {
   }
 };
 
-export const sendVerificationEmail = async (email: string, token: string) => {
+export const sendVerificationEmail = async (
+  email: string,
+  token: string,
+  username: string
+) => {
   let transporter = nodemailer.createTransport({
-    service: "gmail",
+    host: "smtp.ethereal.email",
+    port: 587,
+    secure: false,
     auth: {
-      user: "your-email@gmail.com",
-      pass: "your-password",
+      user: "cara.cassin54@ethereal.email",
+      pass: "sa1eN3haQ3vpTAweud",
     },
   });
 
   let mailOptions: SendMailOptions = {
-    from: "your-email@gmail.com",
+    from: "cara.cassin54@ethereal.email",
     to: email, // Use the email parameter
     subject: "Test Mail",
   };
+  console.log(email, token, username)
 
   ejs.renderFile(
-    path.join(__dirname, "/templates", "email-template.ejs"),
-    { name: "Recipient", token: token }, // Pass the token to your template
+    path.join(__dirname, "../templates", "verification_email_template.ejs"),
+    { name: username, token: `http://localhost:3000/api/v1/auth/verify/${token}` },
     (err, data) => {
       if (err) {
         console.log(err);

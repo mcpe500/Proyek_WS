@@ -18,93 +18,93 @@ paths["/"] = {
     },
   },
 };
-paths["/api/v1/routes/{routes}"] = {
-  post: {
-    summary: "Add route",
-    description: "Adds a new route",
-    parameters: [
-      {
-        name: "routes",
-        in: "path",
-        required: true,
-        description: "Name of the route",
-        schema: {
-          type: "string",
-        },
-      },
-    ],
-    requestBody: {
-      content: {
-        "application/json": {
-          schema: {
-            type: "object",
-            properties: {
-              responseValue: {
-                type: "string",
-              },
-            },
-          },
-        },
-      },
-    },
-    responses: {
-      "200": {
-        description: "Successful operation",
-      },
-    },
-  },
-};
-paths["/api/v1/showBuiltInModules"] = {
-  get: {
-    summary: "Show built-in modules",
-    description: "Returns a list of built-in modules",
-    responses: {
-      "200": {
-        description: "Successful operation",
-        content: {
-          "application/json": {
-            schema: {
-              type: "object",
-              properties: {
-                modules: {
-                  type: "array",
-                  items: {
-                    type: "string",
-                  },
-                },
-              },
-            },
-          },
-        },
-      },
-    },
-  },
-};
-paths["/api/v1/dynamic/{routes}"] = {
-  get: {
-    summary: "Access dynamic route",
-    description: "Accesses a dynamic route",
-    parameters: [
-      {
-        name: "routes",
-        in: "path",
-        required: true,
-        description: "Name of the route",
-        schema: {
-          type: "string",
-        },
-      },
-    ],
-    responses: {
-      "200": {
-        description: "Successful operation",
-      },
-      default: {
-        description: "Endpoint doesn't exist",
-      },
-    },
-  },
-};
+// paths["/api/v1/routes/{routes}"] = {
+//   post: {
+//     summary: "Add route",
+//     description: "Adds a new route",
+//     parameters: [
+//       {
+//         name: "routes",
+//         in: "path",
+//         required: true,
+//         description: "Name of the route",
+//         schema: {
+//           type: "string",
+//         },
+//       },
+//     ],
+//     requestBody: {
+//       content: {
+//         "application/json": {
+//           schema: {
+//             type: "object",
+//             properties: {
+//               responseValue: {
+//                 type: "string",
+//               },
+//             },
+//           },
+//         },
+//       },
+//     },
+//     responses: {
+//       "200": {
+//         description: "Successful operation",
+//       },
+//     },
+//   },
+// };
+// paths["/api/v1/showBuiltInModules"] = {
+//   get: {
+//     summary: "Show built-in modules",
+//     description: "Returns a list of built-in modules",
+//     responses: {
+//       "200": {
+//         description: "Successful operation",
+//         content: {
+//           "application/json": {
+//             schema: {
+//               type: "object",
+//               properties: {
+//                 modules: {
+//                   type: "array",
+//                   items: {
+//                     type: "string",
+//                   },
+//                 },
+//               },
+//             },
+//           },
+//         },
+//       },
+//     },
+//   },
+// };
+// paths["/api/v1/dynamic/{routes}"] = {
+//   get: {
+//     summary: "Access dynamic route",
+//     description: "Accesses a dynamic route",
+//     parameters: [
+//       {
+//         name: "routes",
+//         in: "path",
+//         required: true,
+//         description: "Name of the route",
+//         schema: {
+//           type: "string",
+//         },
+//       },
+//     ],
+//     responses: {
+//       "200": {
+//         description: "Successful operation",
+//       },
+//       default: {
+//         description: "Endpoint doesn't exist",
+//       },
+//     },
+//   },
+// };
 paths["/api/v1/auth/register"] = {
   post: {
     tags: ["auth"],

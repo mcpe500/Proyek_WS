@@ -3,12 +3,35 @@ import { Request, Response } from "express";
 import {
   createAccessToken,
   createRefreshToken,
+  generateEmailVerificationToken,
   hashPassword,
+  sendVerificationEmail,
   verifyPassword,
   verifyRefreshToken,
 } from "../utils/AuthUtils";
 import { RESPONSE_STATUS } from "../contracts/enum/ResponseRelated.enum";
 import { User } from "../models/User.model";
+
+// const UserSchema: Schema = new Schema({
+//   full_name: { type: String, required: true },
+//   username: { type: String, required: true, unique: true },
+//   email: { type: String, required: true, unique: true },
+//   phone: { type: String, required: true },
+//   password: { type: String, required: true },
+//   age: { type: Number, required: true },
+//   gender: { type: String, required: true },
+//   height: { type: Number, required: true },
+//   weight: { type: Number, required: true },
+//   fitnessGoals: {
+//     type: String,
+//     required: true,
+//     enum: Object.values(FITNESS_GOALS),
+//   },
+//   healthInformation: { type: String, required: true },
+//   refreshToken: { type: String },
+//   isEmailVerified: { type: Boolean, default: false },
+//   emailVerificationToken: { type: String },
+// });
 
 export const registerUser = async (req: Request, res: Response) => {
   const {
@@ -34,6 +57,9 @@ export const registerUser = async (req: Request, res: Response) => {
     }
 
     const hashedPassword = await hashPassword(password);
+
+    const emailToken = generateEmailVerificationToken(email);
+
     const newUser = new User({
       full_name,
       username,
@@ -46,11 +72,15 @@ export const registerUser = async (req: Request, res: Response) => {
       weight,
       fitnessGoals,
       healthInformation,
+      isEmailVerified: false,
+      emailVerificationToken: emailToken,
     });
     const savedUser = await newUser.save();
-    return res
-      .status(RESPONSE_STATUS.CREATED)
-      .json({ msg: "User created successfully", user: savedUser });
+    sendVerificationEmail(email, emailToken, username);
+    return res.status(RESPONSE_STATUS.CREATED).json({
+      msg: "Register Successful, please verify your email!",
+      user: savedUser,
+    });
   } catch (error) {
     return res.status(RESPONSE_STATUS.INTERNAL_SERVER_ERROR).send(error);
   }
@@ -63,6 +93,11 @@ export const loginUser = async (req: Request, res: Response) => {
     return res
       .status(RESPONSE_STATUS.BAD_REQUEST)
       .json({ msg: "Invalid credentials" });
+  }
+  if (!user.isEmailVerified) {
+    return res
+      .status(RESPONSE_STATUS.BAD_REQUEST)
+      .send({ message: "Please verify your email" });
   }
   const isPasswordValid = await verifyPassword(password, user.password);
   if (!isPasswordValid) {
@@ -119,4 +154,9 @@ export const generateNewAccessToken = async (req: Request, res: Response) => {
       .status(RESPONSE_STATUS.FORBIDDEN)
       .json({ message: "Invalid refresh token" });
   }
+};
+
+export const verifyEmail = async (req: Request, res: Response) => {
+  const { emailVerificationToken } = req.params;
+  console.log(emailVerificationToken)
 };

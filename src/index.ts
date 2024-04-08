@@ -7,6 +7,7 @@ import swaggerUi from "swagger-ui-express";
 import { ROUTES } from "./contracts/enum/RoutesRelated.enum";
 import cors from "cors";
 import swaggerDocument from "./router/swagger";
+import { RESPONSE_STATUS } from "./contracts/enum/ResponseRelated.enum";
 
 const app = express();
 
@@ -26,7 +27,7 @@ app.get(ROUTES.ROOT, (req: Request, res: Response) => {
   //     httpOnly: true,
   //     maxAge: 24*60*60*1000 // 1 hari
   // })
-  return res.status(200).send("Hello World");
+  return res.status(RESPONSE_STATUS.SUCCESS).send("Hello World");
 });
 
 app.listen(ENV.PORT, () =>

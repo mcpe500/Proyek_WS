@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <style>
+        body {
+            font-family: 'Helvetica Neue', sans-serif;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 0;
+        }
+
+        .email-container {
+            width: 80%;
+            margin: auto;
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.1);
+            border: 2px solid #4CAF50;
+        }
+
+        .header {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px;
+            text-align: center;
+            font-size: 24px;
+            border-radius: 15px 15px 0 0;
+            border-bottom: 5px solid #388E3C;
+            font-weight: bold;
+        }
+
+        .content {
+            margin: 20px 0;
+            font-size: 18px;
+            border-bottom: 1px solid #4CAF50;
+            padding-bottom: 20px;
+            line-height: 1.6;
+        }
+
+        .footer {
+            background-color: #4CAF50;
+            color: white;
+            text-align: center;
+            padding: 10px;
+            font-size: 14px;
+            border-radius: 0 0 15px 15px;
+            border-top: 5px solid #388E3C;
+        }
+
+        .button {
+            background-color: #4CAF50;
+            border: none;
+            color: white;
+            padding: 15px 32px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 10px 2px;
+            cursor: pointer;
+            border-radius: 5px;
+            box-shadow: 0 5px #388E3C;
+            transition: all 0.3s;
+        }
+
+        .button:hover {
+            background-color: #388E3C;
+            box-shadow: 0 2px #666;
+            transform: translateY(4px);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="email-container">
+        <div class="header">Welcome to Health & Fitness App</div>
+        <div class="content">
+            <p>Dear User, <%= name %>
+            </p>
+            <p>We're excited to have you on board. To get started, please verify your email address and activate your
+                account.</p>
+            <a href="<%= token %>" class="button">Verify Email</a>
+            <p>If you didn’t make this request, please ignore this email. Your security is our top priority.</p>
+        </div>
+        <div class="footer">© 2024 Health & Fitness App. All rights reserved.</div>
+    </div>
+</body>
+
+</html>
