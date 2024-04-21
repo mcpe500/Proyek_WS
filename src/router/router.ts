@@ -14,15 +14,29 @@ import {
   showBuiltInModules,
 } from "../controller/RoutesController";
 import { ROUTES } from "../contracts/enum/RoutesRelated.enum";
-import { validateBody } from "../middleware/ValidateBody";
-import { loginSchemaJoi, registerSchemaJoi } from "../validators/User.validate";
+import { validateBody, validateCookie } from "../middleware/ValidateMiddleware";
+import {
+  loginSchemaJoi,
+  registerSchemaJoi,
+  validationTokenSchemaJoi,
+} from "../validators/User.validate";
 
 const router = Router();
 
 router.post("/auth/register", validateBody(registerSchemaJoi), registerUser);
 router.post("/auth/login", validateBody(loginSchemaJoi), loginUser);
-router.post("/auth/token", generateNewAccessToken);
-router.post("/auth/refresh_token", newRefreshToken);
+
+router.post(
+  "/auth/token",
+  validateCookie(validationTokenSchemaJoi),
+  generateNewAccessToken
+);
+router.post(
+  "/auth/refresh_token",
+  validateCookie(validationTokenSchemaJoi),
+  newRefreshToken
+);
+
 router.get("/auth/verify/:emailVerificationToken", verifyEmail);
 
 router.get("/users/:id", getUser);

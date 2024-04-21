@@ -12,14 +12,17 @@ export const validateAccessToken = async (
   if (!token) {
     return res.status(RESPONSE_STATUS.UNAUTHORIZED).send("Unauthorized");
   }
-  const accessToken = token.split(" ")[1];
-
-  const decodedToken = verifyAccessToken(accessToken);
-
-  if (!decodedToken) {
+  const [prefix, accessToken] = token.split(" ");
+  if (prefix != "Bearer") {
     return res.status(RESPONSE_STATUS.UNAUTHORIZED).send("Unauthorized");
   }
-
-//   req.body.user_data = decodedToken;
-  next();
+  try {
+    const decodedToken = verifyAccessToken(accessToken);
+    if (!decodedToken) {
+      return res.status(RESPONSE_STATUS.UNAUTHORIZED).send("Unauthorized");
+    }
+    next();
+  } catch (error) {
+    return res.status(RESPONSE_STATUS.UNAUTHORIZED).send("Unauthorized");
+  }
 };

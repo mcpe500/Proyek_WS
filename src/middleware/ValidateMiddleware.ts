@@ -14,3 +14,16 @@ export const validateBody = (schema: Schema) => {
     }
   };
 };
+
+export const validateCookie = (schema: Schema) => {
+  return async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      await schema.validateAsync(req.cookies);
+      next();
+    } catch (err: any) {
+      res
+        .status(RESPONSE_STATUS.BAD_REQUEST)
+        .send({ error: err.details[0].message });
+    }
+  };
+};
