@@ -6,11 +6,13 @@ import {
   generateEmailVerificationToken,
   hashPassword,
   sendVerificationEmail,
+  verifyEmailVerificationToken,
   verifyPassword,
   verifyRefreshToken,
 } from "../utils/AuthUtils";
 import { RESPONSE_STATUS } from "../contracts/enum/ResponseRelated.enum";
 import { User } from "../models/User.model";
+import { JwtPayload } from "jsonwebtoken";
 
 // const UserSchema: Schema = new Schema({
 //   full_name: { type: String, required: true },
@@ -76,7 +78,7 @@ export const registerUser = async (req: Request, res: Response) => {
       emailVerificationToken: emailToken,
     });
     const savedUser = await newUser.save();
-    sendVerificationEmail(email, emailToken, username);
+    await sendVerificationEmail(email, emailToken, username);
     return res.status(RESPONSE_STATUS.CREATED).json({
       msg: "Register Successful, please verify your email!",
       user: savedUser,
@@ -158,5 +160,40 @@ export const generateNewAccessToken = async (req: Request, res: Response) => {
 
 export const verifyEmail = async (req: Request, res: Response) => {
   const { emailVerificationToken } = req.params;
-  console.log(emailVerificationToken)
+
+  try {
+    const decoded: JwtPayload | null = verifyEmailVerificationToken(
+      emailVerificationToken
+    ) as JwtPayload;
+
+    const user = await User.findOne({
+      emailVerificationToken: emailVerificationToken,
+    });
+
+    if (user?.email != decoded?.email) {
+      return res
+        .status(RESPONSE_STATUS.FORBIDDEN)
+        .json({ message: "Invalid email verification token" });
+    }
+
+    if (!user) {
+      return res
+        .status(RESPONSE_STATUS.NOT_FOUND)
+        .json({ message: "User not found" });
+    }
+
+    await user.updateOne({
+      isEmailVerified: true,
+      emailVerificationToken: null,
+    });
+
+    return res
+      .status(RESPONSE_STATUS.SUCCESS)
+      .send({ message: "Email verified" });
+  } catch (err) {
+    return res.status(RESPONSE_STATUS.FORBIDDEN).json({
+      message:
+        "Invalid email verification token or your email verification token has expired",
+    });
+  }
 };
