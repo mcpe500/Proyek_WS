@@ -6,7 +6,6 @@ import {
   generateEmailVerificationToken,
   hashPassword,
   sendVerificationEmail,
-  verifyEmailVerificationToken,
   verifyPassword,
   verifyRefreshToken,
 } from "../utils/AuthUtils";
@@ -37,17 +36,17 @@ import { JwtPayload } from "jsonwebtoken";
 
 export const registerUser = async (req: Request, res: Response) => {
   const {
-    full_name,
     username,
     email,
     password,
+    full_name,
     phone,
-    age,
-    gender,
-    height,
-    weight,
-    fitnessGoals,
-    healthInformation,
+    // age,
+    // gender,
+    // height,
+    // weight,
+    // fitnessGoals,
+    // healthInformation,
   } = req.body;
 
   try {
@@ -55,7 +54,7 @@ export const registerUser = async (req: Request, res: Response) => {
     if (existingUser) {
       return res
         .status(RESPONSE_STATUS.BAD_REQUEST)
-        .json({ msg: "Username already exists" });
+        .json({ msg: "Username or email already exists" });
     }
 
     const hashedPassword = await hashPassword(password);
@@ -63,25 +62,32 @@ export const registerUser = async (req: Request, res: Response) => {
     const emailToken = generateEmailVerificationToken(email);
 
     const newUser = new User({
-      full_name,
       username,
       email,
-      phone,
       password: hashedPassword,
-      age,
-      gender,
-      height,
-      weight,
-      fitnessGoals,
-      healthInformation,
+      full_name,
+      phone,
+      //   age,
+      //   gender,
+      //   height,
+      //   weight,
+      //   fitnessGoals,
+      //   healthInformation,
       isEmailVerified: false,
       emailVerificationToken: emailToken,
     });
     const savedUser = await newUser.save();
-    await sendVerificationEmail(email, emailToken, username);
+    const respone = {
+      username: savedUser.username,
+      email: savedUser.email,
+      full_name: savedUser.email,
+      phone: savedUser.phone,
+      _id: savedUser._id,
+    };
+    sendVerificationEmail(email, emailToken, username);
     return res.status(RESPONSE_STATUS.CREATED).json({
       msg: "Register Successful, please verify your email!",
-      user: savedUser,
+      user: respone,
     });
   } catch (error) {
     return res.status(RESPONSE_STATUS.INTERNAL_SERVER_ERROR).send(error);
@@ -160,40 +166,5 @@ export const generateNewAccessToken = async (req: Request, res: Response) => {
 
 export const verifyEmail = async (req: Request, res: Response) => {
   const { emailVerificationToken } = req.params;
-
-  try {
-    const decoded: JwtPayload | null = verifyEmailVerificationToken(
-      emailVerificationToken
-    ) as JwtPayload;
-
-    const user = await User.findOne({
-      emailVerificationToken: emailVerificationToken,
-    });
-
-    if (user?.email != decoded?.email) {
-      return res
-        .status(RESPONSE_STATUS.FORBIDDEN)
-        .json({ message: "Invalid email verification token" });
-    }
-
-    if (!user) {
-      return res
-        .status(RESPONSE_STATUS.NOT_FOUND)
-        .json({ message: "User not found" });
-    }
-
-    await user.updateOne({
-      isEmailVerified: true,
-      emailVerificationToken: null,
-    });
-
-    return res
-      .status(RESPONSE_STATUS.SUCCESS)
-      .send({ message: "Email verified" });
-  } catch (err) {
-    return res.status(RESPONSE_STATUS.FORBIDDEN).json({
-      message:
-        "Invalid email verification token or your email verification token has expired",
-    });
-  }
+  console.log(emailVerificationToken);
 };
