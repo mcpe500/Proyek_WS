@@ -12,6 +12,7 @@ import {
 import { RESPONSE_STATUS } from "../contracts/enum/ResponseRelated.enum";
 import { User } from "../models/User.model";
 import { JwtPayload } from "jsonwebtoken";
+import mongoose from "mongoose";
 
 // const UserSchema: Schema = new Schema({
 //   full_name: { type: String, required: true },
@@ -130,7 +131,26 @@ export const loginUser = async (req: Request, res: Response) => {
   });
 };
 
-export const getUser = async (req: Request, res: Response) => {};
+export const getUser = async (req: Request, res: Response) => {
+    const { id } = req.params
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+        return res
+            .status(RESPONSE_STATUS.BAD_REQUEST)
+            .json({ message: "Invalid user ID" });
+    }
+
+    let user = await User.findById(id).select('-password');
+    if (!user) {
+        return res
+        .status(RESPONSE_STATUS.NOT_FOUND)
+        .json({ message: "User not found" })
+    }
+
+    return res
+        .status(RESPONSE_STATUS.SUCCESS)
+        .json({ user: user })
+};
 
 export const newRefreshToken = async (req: Request, res: Response) => {};
 
