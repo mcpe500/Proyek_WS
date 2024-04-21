@@ -39,7 +39,9 @@ router.post(
 
 router.get("/auth/verify/:emailVerificationToken", verifyEmail);
 
-router.get("/users/:id", getUser);
+router.get("/users/:id", getUser); // TODO : tambahi verifikasi accessToken
+
+
 // router.put("/users/:id", updateUser);
 // router.delete("/users/:id", deleteUser);
 
