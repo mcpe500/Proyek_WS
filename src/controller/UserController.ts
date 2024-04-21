@@ -6,6 +6,7 @@ import {
   generateEmailVerificationToken,
   hashPassword,
   sendVerificationEmail,
+  verifyEmailVerificationToken,
   verifyPassword,
   verifyRefreshToken,
 } from "../utils/AuthUtils";
@@ -84,7 +85,7 @@ export const registerUser = async (req: Request, res: Response) => {
       phone: savedUser.phone,
       _id: savedUser._id,
     };
-    sendVerificationEmail(email, emailToken, username);
+    await sendVerificationEmail(email, emailToken, username);
     return res.status(RESPONSE_STATUS.CREATED).json({
       msg: "Register Successful, please verify your email!",
       user: respone,
@@ -120,7 +121,10 @@ export const loginUser = async (req: Request, res: Response) => {
   const accessToken = createAccessToken(dataToToken, rememberMe);
   const refreshToken = createRefreshToken(dataToToken, rememberMe);
 
-  await user.updateOne({ refreshToken });
+  await user.updateOne({
+    refreshToken: refreshToken,
+    accessToken: accessToken,
+  });
 
   res.cookie("refresh_token", refreshToken, { httpOnly: true });
 
@@ -132,15 +136,36 @@ export const loginUser = async (req: Request, res: Response) => {
 
 export const getUser = async (req: Request, res: Response) => {};
 
-export const newRefreshToken = async (req: Request, res: Response) => {};
+export const newRefreshToken = async (req: Request, res: Response) => {
+  const refreshToken = req.cookies.refreshToken;
+
+  try {
+    const decoded = verifyRefreshToken(refreshToken);
+    const user = await User.findOne({ refreshToken: refreshToken });
+
+    if (!user) {
+      return res
+        .status(RESPONSE_STATUS.NOT_FOUND)
+        .json({ message: "User not found" });
+    }
+
+    const dataToToken = {
+      username: user.username,
+      email: user.email,
+    };
+
+    const newRefreshToken = createRefreshToken(dataToToken, false);
+    await user.updateOne({ refreshToken: newRefreshToken });
+    res.cookie("refresh_token", refreshToken, { httpOnly: true });
+  } catch (err) {
+    return res
+      .status(RESPONSE_STATUS.FORBIDDEN)
+      .json({ message: "Invalid refresh token" });
+  }
+};
 
 export const generateNewAccessToken = async (req: Request, res: Response) => {
   const refreshToken = req.cookies.refreshToken;
-  if (!refreshToken) {
-    return res
-      .status(RESPONSE_STATUS.FORBIDDEN)
-      .json({ message: "Refresh token is required" });
-  }
 
   try {
     const decoded = verifyRefreshToken(refreshToken);
@@ -156,6 +181,7 @@ export const generateNewAccessToken = async (req: Request, res: Response) => {
       email: user.email,
     };
     const accessToken = createAccessToken(dataToToken, false);
+    await user.updateOne({ accessToken: accessToken });
     return res.status(RESPONSE_STATUS.SUCCESS).json({ accessToken });
   } catch (err) {
     return res
@@ -166,5 +192,39 @@ export const generateNewAccessToken = async (req: Request, res: Response) => {
 
 export const verifyEmail = async (req: Request, res: Response) => {
   const { emailVerificationToken } = req.params;
-  console.log(emailVerificationToken);
+  try {
+    const decoded: JwtPayload | null = verifyEmailVerificationToken(
+      emailVerificationToken
+    ) as JwtPayload;
+
+    const user = await User.findOne({
+      emailVerificationToken: emailVerificationToken,
+    });
+
+    if (user?.email != decoded?.email) {
+      return res
+        .status(RESPONSE_STATUS.FORBIDDEN)
+        .json({ message: "Invalid email verification token" });
+    }
+
+    if (!user) {
+      return res
+        .status(RESPONSE_STATUS.NOT_FOUND)
+        .json({ message: "User not found" });
+    }
+
+    await user.updateOne({
+      isEmailVerified: true,
+      emailVerificationToken: null,
+    });
+
+    return res
+      .status(RESPONSE_STATUS.SUCCESS)
+      .send({ message: "Email verified" });
+  } catch (err) {
+    return res.status(RESPONSE_STATUS.FORBIDDEN).json({
+      message:
+        "Invalid email verification token or your email verification token has expired",
+    });
+  }
 };

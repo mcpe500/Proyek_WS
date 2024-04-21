@@ -122,24 +122,24 @@ paths["/api/v1/auth/register"] = {
               password: { type: "string" },
               full_name: { type: "string" },
               phone: { type: "string", pattern: "^[0-9]{10,15}$" },
-            //   age: { type: "integer" },
-            //   gender: { type: "string" },
-            //   height: { type: "number" },
-            //   weight: { type: "number" },
-            //   fitnessGoals: {
-            //     type: "string",
-            //     enum: [
-            //       "WEIGHT_LOSS",
-            //       "WEIGHT_GAIN",
-            //       "BODY_BUILDING",
-            //       "MUSCLE_GAIN",
-            //       "ENDURANCE_TRAINING",
-            //       "FLEXIBILITY_IMPROVEMENT",
-            //       "GENERAL_FITNESS",
-            //       "STRESS_RELIEF",
-            //     ],
-            //   },
-            //   healthInformation: { type: "string" },
+              //   age: { type: "integer" },
+              //   gender: { type: "string" },
+              //   height: { type: "number" },
+              //   weight: { type: "number" },
+              //   fitnessGoals: {
+              //     type: "string",
+              //     enum: [
+              //       "WEIGHT_LOSS",
+              //       "WEIGHT_GAIN",
+              //       "BODY_BUILDING",
+              //       "MUSCLE_GAIN",
+              //       "ENDURANCE_TRAINING",
+              //       "FLEXIBILITY_IMPROVEMENT",
+              //       "GENERAL_FITNESS",
+              //       "STRESS_RELIEF",
+              //     ],
+              //   },
+              //   healthInformation: { type: "string" },
             },
             required: ["full_name", "username", "email", "phone", "password"],
           },
@@ -191,6 +191,163 @@ paths["/api/v1/auth/register"] = {
     },
   },
 };
+
+paths["/api/v1/auth/token"] = {
+  post: {
+    tags: ["auth"],
+    summary: "Generate a new access token using a refresh token",
+    description:
+      "This endpoint generates a new access token by validating the provided refresh token.",
+    operationId: "generateNewAccessToken",
+    requestBody: {
+      description: "Refresh Token required to generate a new access token",
+      content: {
+        "application/json": {
+          schema: {
+            type: "object",
+            properties: {
+              refreshToken: {
+                type: "string",
+                description: "Valid refresh token from the user",
+              },
+            },
+            required: ["refreshToken"],
+          },
+        },
+      },
+      required: true,
+    },
+    responses: {
+      "200": {
+        description: "Access token created successfully",
+        content: {
+          "application/json": {
+            schema: {
+              type: "object",
+              properties: {
+                accessToken: {
+                  type: "string",
+                  description: "Newly created access token for the user",
+                },
+              },
+            },
+          },
+        },
+      },
+      "403": {
+        description: "Invalid refresh token",
+        content: {
+          "application/json": {
+            schema: {
+              type: "object",
+              properties: {
+                message: {
+                  type: "string",
+                },
+              },
+            },
+          },
+        },
+      },
+      "404": {
+        description: "User not found",
+        content: {
+          "application/json": {
+            schema: {
+              type: "object",
+              properties: {
+                message: {
+                  type: "string",
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+  },
+};
+paths["/api/v1/auth/refresh_token"] = {
+  post: {
+    tags: ["auth"],
+    summary: "Generate a new refresh token",
+    description:
+      "This endpoint generates a new refresh token for authenticated users.",
+    operationId: "newRefreshToken",
+    requestBody: {
+      description: "Refresh Token required to generate a new refresh token",
+      content: {
+        "application/json": {
+          schema: {
+            type: "object",
+            properties: {
+              refreshToken: {
+                type: "string",
+                description: "Valid refresh token from the user",
+              },
+            },
+            required: ["refreshToken"],
+          },
+        },
+      },
+      required: true,
+    },
+    responses: {
+      "200": {
+        description: "New refresh token created successfully",
+        content: {
+          "application/json": {
+            schema: {
+              type: "object",
+              properties: {
+                refreshToken: {
+                  type: "string",
+                  description: "Newly created refresh token for the user",
+                },
+              },
+            },
+          },
+        },
+      },
+      "403": {
+        description: "Invalid refresh token",
+        content: {
+          "application/json": {
+            schema: {
+              type: "object",
+              properties: {
+                message: {
+                  type: "string",
+                },
+              },
+            },
+          },
+        },
+      },
+      "404": {
+        description: "User not found",
+        content: {
+          "application/json": {
+            schema: {
+              type: "object",
+              properties: {
+                message: {
+                  type: "string",
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+    security: [
+      {
+        cookieAuth: [],
+      },
+    ],
+  },
+};
+
 paths["/api/v1/auth/verify/{emailVerificationToken}"] = {
   get: {
     tags: ["auth"],
