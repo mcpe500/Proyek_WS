@@ -31,14 +31,31 @@ npm install
 
 ```env
 PORT=
+
+SECRET_KEY=
 REFRESH_TOKEN_SECRET=
 ACCESS_TOKEN_SECRET=
+EMAIL_VERIFICATION_TOKEN_SECRET=
+REFRESH_TOKEN_AGE=
+ACCESS_TOKEN_AGE=
+EMAIL_VERIFICATION_AGE=
+
+REMEMBER_ME_REFRESH_TOKEN_AGE=
+REMEMBER_ME_ACCESS_TOKEN_AGE=
+
+MONGODB_URI=
 ```
 
 4. Run the development server
 
 ```sh
 npm run dev
+```
+
+## Testing
+
+```sh
+npm run test
 ```
 
 ## Deployment
