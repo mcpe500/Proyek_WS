@@ -32,12 +32,12 @@ pipeline {
             }
         }
 
-        stage('Test') {
-            steps {
-                // Run your tests
-                // sh 'npm test'
-            }
-        }
+        // stage('Test') {
+        //     steps {
+        //         // Run your tests
+        //         sh 'npm test'
+        //     }
+        // }
 
         stage('Deploy') {
             steps {
