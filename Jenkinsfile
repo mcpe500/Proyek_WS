@@ -39,6 +39,13 @@ pipeline {
             }
         }
 
+        stage('Deploy') {
+            steps {
+                sh 'docker-compose -f docker-compose.yaml up --build -d'
+            }
+        }
+
+
         stage('Archive') {
             steps {
                 // Archive the built artifacts (e.g., .js files, .d.ts files, etc.)
