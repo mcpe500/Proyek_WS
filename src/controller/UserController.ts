@@ -136,6 +136,7 @@ export const loginUser = async (req: Request, res: Response) => {
 };
 
 export const getUser = async (req: Request, res: Response) => {
+    
     const { id } = req.params
 
     if (!mongoose.Types.ObjectId.isValid(id)) {
@@ -144,13 +145,31 @@ export const getUser = async (req: Request, res: Response) => {
             .json({ message: "Invalid user ID" });
     }
 
-    let user = await User.findById(id).select('-password');
+    const user = await User.findById(id).select('-password');
     if (!user) {
         return res
         .status(RESPONSE_STATUS.NOT_FOUND)
         .json({ message: "User not found" })
     }
 
+    return res
+        .status(RESPONSE_STATUS.SUCCESS)
+        .json({ user: user })
+};
+
+export const getAllUser = async (req: Request, res: Response) => {
+
+    const user = await User.find();
+
+    return res
+        .status(RESPONSE_STATUS.SUCCESS)
+        .json({ user: user })
+};
+
+export const getDashboard = async (req: Request, res: Response) => {
+    const {username, email} = req.body;
+    const user = await User.findOne({ $or: [{ username }, { email }] });
+    
     return res
         .status(RESPONSE_STATUS.SUCCESS)
         .json({ user: user })

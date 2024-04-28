@@ -8,7 +8,6 @@ export const validateAccessToken = async (
   next: NextFunction
 ) => {
   const token = req.headers.authorization;
-
   if (!token) {
     return res.status(RESPONSE_STATUS.UNAUTHORIZED).send("Unauthorized");
   }
@@ -21,6 +20,10 @@ export const validateAccessToken = async (
     if (!decodedToken) {
       return res.status(RESPONSE_STATUS.UNAUTHORIZED).send("Unauthorized");
     }
+    req.body.username = decodedToken.username;
+    req.body.email = decodedToken.email;
+    
+    
     next();
   } catch (error) {
     return res.status(RESPONSE_STATUS.UNAUTHORIZED).send("Unauthorized");
