@@ -98,6 +98,7 @@ export const registerUser = async (req: Request, res: Response) => {
 
 export const loginUser = async (req: Request, res: Response) => {
   const { username, email, password, rememberMe } = req.body;
+  console.log(req.body);
   const user = await User.findOne({ $or: [{ username }, { email }] });
   if (!user) {
     return res
@@ -136,24 +137,35 @@ export const loginUser = async (req: Request, res: Response) => {
 };
 
 export const getUser = async (req: Request, res: Response) => {
-    const { id } = req.params
+  const { id } = req.params;
 
-    if (!mongoose.Types.ObjectId.isValid(id)) {
-        return res
-            .status(RESPONSE_STATUS.BAD_REQUEST)
-            .json({ message: "Invalid user ID" });
-    }
-
-    let user = await User.findById(id).select('-password');
-    if (!user) {
-        return res
-        .status(RESPONSE_STATUS.NOT_FOUND)
-        .json({ message: "User not found" })
-    }
-
+  if (!mongoose.Types.ObjectId.isValid(id)) {
     return res
-        .status(RESPONSE_STATUS.SUCCESS)
-        .json({ user: user })
+      .status(RESPONSE_STATUS.BAD_REQUEST)
+      .json({ message: "Invalid user ID" });
+  }
+
+  const user = await User.findById(id).select("-password");
+  if (!user) {
+    return res
+      .status(RESPONSE_STATUS.NOT_FOUND)
+      .json({ message: "User not found" });
+  }
+
+  return res.status(RESPONSE_STATUS.SUCCESS).json({ user: user });
+};
+
+export const getAllUser = async (req: Request, res: Response) => {
+  const user = await User.find();
+
+  return res.status(RESPONSE_STATUS.SUCCESS).json({ user: user });
+};
+
+export const getDashboard = async (req: Request, res: Response) => {
+  const { username, email } = req.body;
+  const user = await User.findOne({ $or: [{ username }, { email }] });
+
+  return res.status(RESPONSE_STATUS.SUCCESS).json({ user: user });
 };
 
 export const newRefreshToken = async (req: Request, res: Response) => {
@@ -249,7 +261,7 @@ export const verifyEmail = async (req: Request, res: Response) => {
   }
 };
 
-// Mau 1. paket jadi …k per bulan unlimited tembak, 
+// Mau 1. paket jadi …k per bulan unlimited tembak,
 // [Free] rate limit 2 per 5 menit?
 // [Paket 1] rate limit 20 per 10 detik 50k?
 // [Paket 2] rate limit 50 per 10 detik 100k?

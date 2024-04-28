@@ -64,8 +64,14 @@ export const loginSchemaJoi = JoiExtended.object({
   password: JoiExtended.string().required().messages({
     "any.required": "Password is a required field",
   }),
+  rememberMe: JoiExtended.boolean().optional(),
 });
-
+// {
+//   "username": "theuseds",
+//   "email": "usedsthe@gmail.com",
+//   "password": "UsedsThe1234",
+//   "rememberMe": true
+// }
 export const validationTokenSchemaJoi = JoiExtended.object({
   refreshToken: JoiExtended.string().required().messages({
     "string.base": "**refreshToken** must be a string",

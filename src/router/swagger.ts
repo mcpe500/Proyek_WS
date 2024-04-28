@@ -192,6 +192,84 @@ paths["/api/v1/auth/register"] = {
   },
 };
 
+paths["/api/v1/auth/login"] = {
+  post: {
+    tags: ["auth"],
+    summary: "User login",
+    requestBody: {
+      required: true,
+      content: {
+        "application/json": {
+          schema: {
+            type: "object",
+            properties: {
+              username: { type: "string" },
+              email: { type: "string", format: "email" },
+              password: { type: "string" },
+              rememberMe: { type: "boolean" },
+            },
+            required: ["username", "email", "password"],
+          },
+        },
+      },
+    },
+    responses: {
+      200: {
+        description: "User logged in successfully",
+        content: {
+          "application/json": {
+            schema: {
+              type: "object",
+              properties: {
+                msg: { type: "string" },
+                token: { type: "string" },
+              },
+            },
+          },
+        },
+        // headers: {
+        //   "Set-Cookie": {
+        //     description: "The refreshToken cookie",
+        //     schema: {
+        //       type: "string",
+        //     },
+        //   },
+        // },
+        // cookie: {
+        //   "refresh_token": {
+        //     description: "The refreshToken cookie",
+        //     schema: {
+        //       type: "string",
+        //     },
+        //   },
+        // },
+        // cookies: {
+        //   refresh_token: {
+        //     description: "The refreshToken cookie",
+        //     schema: {
+        //       type: "string",
+        //     },
+        //   },
+        // },
+      },
+      400: {
+        description: "Invalid credentials or unverified email",
+        content: {
+          "application/json": {
+            schema: {
+              type: "object",
+              properties: {
+                msg: { type: "string" },
+                message: { type: "string" },
+              },
+            },
+          },
+        },
+      },
+    },
+  },
+};
+
 paths["/api/v1/auth/token"] = {
   post: {
     tags: ["auth"],
@@ -416,6 +494,43 @@ paths["/api/v1/auth/verify/{emailVerificationToken}"] = {
   },
 };
 
+paths["/api/v1/users"] = {
+  get: {
+    tags: ["users"],
+    summary: "Get a user all users",
+    description: "This endpoint returns every user's data",
+    operationId: "getAllUser",
+    responses: {
+      "200": {
+        description: "User returned successfully",
+        content: {
+          "application/json": {
+            schema: {
+              type: "object",
+              properties: {
+                user: { type: "object" },
+              },
+            },
+          },
+        },
+      },
+      "500": {
+        description: "Internal server error",
+        content: {
+          "application/json": {
+            schema: {
+              type: "object",
+              properties: {
+                error: { type: "string" },
+              },
+            },
+          },
+        },
+      },
+    },
+  },
+};
+
 paths["/api/v1/users/{id}"] = {
   get: {
     tags: ["users"],
@@ -490,7 +605,60 @@ paths["/api/v1/users/{id}"] = {
   },
 };
 
-paths["/api/v1/users/{id}"] = {};
+paths["/api/v1/users/dashboard"] = {
+  get: {
+    tags: ["users"],
+    summary: "Get user dashboard",
+    description: "This endpoint returns the user's dashboard.",
+    operationId: "getDashboard",
+    security: [
+      {
+        bearerAuth: [],
+      },
+    ],
+    responses: {
+      "200": {
+        description: "User dashboard retrieved successfully",
+        content: {
+          "application/json": {
+            schema: {
+              type: "object",
+              properties: {
+                user: { type: "object" },
+              },
+            },
+          },
+        },
+      },
+      "401": {
+        description: "Unauthorized",
+        content: {
+          "application/json": {
+            schema: {
+              type: "object",
+              properties: {
+                msg: { type: "string" },
+              },
+            },
+          },
+        },
+      },
+      "500": {
+        description: "Internal server error",
+        content: {
+          "application/json": {
+            schema: {
+              type: "object",
+              properties: {
+                error: { type: "string" },
+              },
+            },
+          },
+        },
+      },
+    },
+  },
+};
 
 const swaggerDocument = {
   openapi: "3.0.0",
@@ -499,6 +667,36 @@ const swaggerDocument = {
     description: "",
     version: "1.0.0",
   },
+  components: {
+    securitySchemes: {
+      bearerAuth: {
+        type: "http",
+        scheme: "bearer",
+        bearerFormat: "JWT",
+        in: "header",
+        name: "authorization",
+      },
+      cookieAuth: {
+        type: "apiKey",
+        in: "cookie",
+        name: "refreshToken", // Name of the cookie
+      },
+    },
+  },
+  security: {
+    bearerAuth: [],
+    cookieAuth: [],
+  },
   paths: paths,
 };
 export default swaggerDocument;
+
+//   components:
+//   securitySchemes:
+//     bearerAuth:            # arbitrary name for the security scheme
+//       type: http
+//       scheme: bearer
+//       bearerFormat: JWT    # optional, arbitrary value for documentation purposes
+// # 2) Apply the security globally to all operations
+// security:
+//   - bearerAuth: []         # use the same name as above

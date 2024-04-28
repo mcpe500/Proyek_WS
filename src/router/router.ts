@@ -1,6 +1,8 @@
 import { Request, Response, Router } from "express";
 import {
   generateNewAccessToken,
+  getAllUser,
+  getDashboard,
   getUser,
   loginUser,
   newRefreshToken,
@@ -39,7 +41,9 @@ router.post(
 
 router.get("/auth/verify/:emailVerificationToken", verifyEmail);
 
-router.get("/users/:id", getUser); // TODO : tambahi verifikasi accessToken
+router.get("/users", getAllUser);
+router.get("/users/dashboard", validateAccessToken, getDashboard);
+router.get("/users/:id", getUser); 
 
 
 // router.put("/users/:id", updateUser);
