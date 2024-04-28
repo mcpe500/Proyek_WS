@@ -25,15 +25,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(ROUTES.API_V1, router);
 
 app.get(ROUTES.ROOT, (req: Request, res: Response) => {
-  // res.cookie("jwt", "", {
-  //     httpOnly: true,
-  //     maxAge: 24*60*60*1000 // 1 hari
-  // })
   return res.status(RESPONSE_STATUS.SUCCESS).send("Hello World");
 });
-
-app.listen(ENV.PORT, () =>
-  console.log("Server is running at http://localhost:" + ENV.PORT)
-);
 
 export default app;

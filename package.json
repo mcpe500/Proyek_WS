@@ -4,10 +4,10 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "ts-node ./src/index.ts",
+    "start": "ts-node ./src/run.ts",
     "build": "tsc",
-    "deploy": "node ./output/index.js",
-    "dev": "nodemon ./src/index.ts",
+    "deploy": "node ./output/run.js",
+    "dev": "nodemon ./src/run.ts",
     "migrate": "ts-node ./database/migrate.ts",
     "seed:production": "npx sequelize-cli db:seed:all --env production",
     "rollback:production": "npx sequelize-cli db:seed:undo:all --env production",
