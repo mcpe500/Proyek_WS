@@ -1,5 +1,6 @@
 import { Request, Response, Router } from "express";
 import {
+    editProfile,
   generateNewAccessToken,
   getAllUser,
   getDashboard,
@@ -18,6 +19,7 @@ import {
 import { ROUTES } from "../contracts/enum/RoutesRelated.enum";
 import { validateBody, validateCookie } from "../middleware/ValidateMiddleware";
 import {
+    editProfileSchemaJoi,
   loginSchemaJoi,
   registerSchemaJoi,
   validationTokenSchemaJoi,
@@ -43,6 +45,7 @@ router.get("/auth/verify/:emailVerificationToken", verifyEmail);
 
 router.get("/users", getAllUser);
 router.get("/users/dashboard", validateAccessToken, getDashboard);
+router.put("/users/profile", [validateAccessToken, validateBody(editProfileSchemaJoi)], editProfile);
 router.get("/users/:id", getUser); 
 
 
