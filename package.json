@@ -8,6 +8,9 @@
     "build": "tsc",
     "deploy": "node ./output/index.js",
     "dev": "nodemon ./src/index.ts",
+    "migrate": "ts-node ./database/migrate.ts",
+    "seed:production": "npx sequelize-cli db:seed:all --env production",
+    "rollback:production": "npx sequelize-cli db:seed:undo:all --env production",
     "test": "jest --detectOpenHandles"
   },
   "keywords": [],

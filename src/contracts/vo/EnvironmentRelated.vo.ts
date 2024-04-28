@@ -10,4 +10,11 @@ export interface EnvironmentStructure {
   REMEMBER_ME_REFRESH_TOKEN_AGE: string;
   REMEMBER_ME_ACCESS_TOKEN_AGE: string;
   MONGODB_URI: string;
+
+  DB_STATIC_DIALECT: string;
+  DB_STATIC_HOST: string;
+  DB_STATIC_PORT: number;
+  DB_STATIC_USERNAME: string;
+  DB_STATIC_PASSWORD: string;
+  DB_STATIC_DATABASE: string;
 }

@@ -8,6 +8,8 @@ import cors from "cors";
 import swaggerDocument from "./router/swagger";
 import { RESPONSE_STATUS } from "./contracts/enum/ResponseRelated.enum";
 import connectMongoDB from "./connection/connection";
+import sequelize from "./connection/connectionStatic";
+import Paket from "./models/static/Paket.model";
 
 const app = express();
 
