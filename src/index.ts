@@ -2,18 +2,18 @@ import express, { Request, Response } from "express";
 import { ENV } from "./config/environment";
 import router from "./router/router";
 import cookieParser from "cookie-parser";
-import connectDB from "./connection/connection";
 import swaggerUi from "swagger-ui-express";
 import { ROUTES } from "./contracts/enum/RoutesRelated.enum";
 import cors from "cors";
 import swaggerDocument from "./router/swagger";
 import { RESPONSE_STATUS } from "./contracts/enum/ResponseRelated.enum";
+import connectMongoDB from "./connection/connection";
 
 const app = express();
 
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
-connectDB();
+connectMongoDB();
 
 app.use(cors());
 app.use(cookieParser());

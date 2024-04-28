@@ -1,6 +1,6 @@
 import mongoose, { Schema } from "mongoose";
-import { IUser } from "../contracts/dto/UserRelated.dto";
-import { FITNESS_GOALS } from "../contracts/enum/FitnessRelated.enum";
+import { IUser } from "../../contracts/dto/UserRelated.dto";
+import { FITNESS_GOALS } from "../../contracts/enum/FitnessRelated.enum";
 
 const UserSchema: Schema = new Schema({
   username: { type: String, required: true, unique: true },

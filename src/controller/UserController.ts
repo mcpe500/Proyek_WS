@@ -11,7 +11,7 @@ import {
   verifyRefreshToken,
 } from "../utils/AuthUtils";
 import { RESPONSE_STATUS } from "../contracts/enum/ResponseRelated.enum";
-import { User } from "../models/User.model";
+import { User } from "../models/dynamic/User.model";
 import { JwtPayload } from "jsonwebtoken";
 import mongoose from "mongoose";
 
@@ -248,3 +248,10 @@ export const verifyEmail = async (req: Request, res: Response) => {
     });
   }
 };
+
+// Mau 1. paket jadi …k per bulan unlimited tembak, 
+// [Free] rate limit 2 per 5 menit?
+// [Paket 1] rate limit 20 per 10 detik 50k?
+// [Paket 2] rate limit 50 per 10 detik 100k?
+// [Paket 3] rate limit 150 per 10 detik 250k?
+// [Enterprise] rate limit 1000 per detik 2000k?
