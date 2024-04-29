@@ -13,7 +13,7 @@ export const registerSchemaJoi: Schema = JoiExtended.object({
     password: JoiExtended.string().required().messages({
         "any.required": "Password is required",
     }),
-    full_name: JoiExtended.string().required().messages({
+    fullName: JoiExtended.string().required().messages({
         "any.required": "Full name is required",
     }),
     phone: JoiExtended.string()
@@ -57,7 +57,7 @@ export const editProfileSchemaJoi = JoiExtended.object({
     old_password: JoiExtended.string().optional().allow(""),
     new_password: JoiExtended.string().optional().allow(""),
     confirm_password: JoiExtended.string().optional().allow(""),
-    full_name: JoiExtended.string().optional().allow(""),
+    fullName: JoiExtended.string().optional().allow(""),
     phone: JoiExtended.string().optional().allow("")
         .pattern(/^[0-9]{10,15}$/)
         .messages({

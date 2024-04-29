@@ -16,7 +16,7 @@ import { JwtPayload } from "jsonwebtoken";
 import mongoose from "mongoose";
 
 // const UserSchema: Schema = new Schema({
-//   full_name: { type: String, required: true },
+//   fullName: { type: String, required: true },
 //   username: { type: String, required: true, unique: true },
 //   email: { type: String, required: true, unique: true },
 //   phone: { type: String, required: true },
@@ -41,7 +41,7 @@ export const registerUser = async (req: Request, res: Response) => {
         username,
         email,
         password,
-        full_name,
+        fullName,
         phone,
         // age,
         // gender,
@@ -67,7 +67,7 @@ export const registerUser = async (req: Request, res: Response) => {
             username,
             email,
             password: hashedPassword,
-            full_name,
+            fullName,
             phone,
             //   age,
             //   gender,
@@ -82,7 +82,7 @@ export const registerUser = async (req: Request, res: Response) => {
         const respone = {
             username: savedUser.username,
             email: savedUser.email,
-            full_name: savedUser.email,
+            fullName: savedUser.email,
             phone: savedUser.phone,
             _id: savedUser._id,
         };
@@ -169,7 +169,7 @@ export const getDashboard = async (req: Request, res: Response) => {
 };
 
 export const editProfile = async (req: Request, res: Response) => {
-    const { old_password, new_password, confirm_password, full_name, phone, age, gender, height, weight, fitnessGoals, healthInformation, username, email } = req.body;
+    const { old_password, new_password, confirm_password, fullName, phone, age, gender, height, weight, fitnessGoals, healthInformation, username, email } = req.body;
     let user = await User.findOne({ $or: [{ username }, { email }] });
     
     if (!user) {
@@ -203,7 +203,7 @@ export const editProfile = async (req: Request, res: Response) => {
     }
 
     // Update other fields if they are not empty
-    if (full_name != "") user.full_name = full_name;
+    if (fullName != "") user.fullName = fullName;
     if (phone != "") user.phone = phone;
     if (age != "") user.age = age;
     if (gender != "") user.gender = gender;
@@ -309,6 +309,14 @@ export const verifyEmail = async (req: Request, res: Response) => {
                 "Invalid email verification token or your email verification token has expired",
         });
     }
+};
+
+export const subscribePacket = async (req: Request, res: Response) => {
+    const { packetId, username, email } = req.body;
+    // check packet valid
+    // check balance
+    // update balancea
+    // insert subscription
 };
 
 // Mau 1. paket jadi …k per bulan unlimited tembak,
