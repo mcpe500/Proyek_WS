@@ -9,6 +9,8 @@ import {
   newRefreshToken,
   registerUser,
   verifyEmail,
+  getApiKey,
+  resetApiKey,
 } from "../controller/UserController";
 import { validateAccessToken } from "../middleware/AuthMiddleware";
 import {
@@ -51,11 +53,14 @@ router.put(
   [validateAccessToken, validateBody(editProfileSchemaJoi)],
   editProfile
 );
+
+router.get("/users/apikey", validateAccessToken, getApiKey);
+router.put("/users/apikey/reset", validateAccessToken, resetApiKey);
+
 router.get("/users/:id", getUser);
 
 // Pricing
 router.get("/pricing", getAllPricingPackages);
-
 // router.put("/users/:id", updateUser);
 // router.delete("/users/:id", deleteUser);
 

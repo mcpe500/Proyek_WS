@@ -14,6 +14,7 @@ import { RESPONSE_STATUS } from "../contracts/enum/ResponseRelated.enum";
 import { User } from "../models/dynamic/User.model";
 import { JwtPayload } from "jsonwebtoken";
 import mongoose from "mongoose";
+import crypto from "crypto";
 
 // const UserSchema: Schema = new Schema({
 //   fullName: { type: String, required: true },
@@ -62,7 +63,6 @@ export const registerUser = async (req: Request, res: Response) => {
         const hashedPassword = await hashPassword(password);
 
         const emailToken = generateEmailVerificationToken(email);
-
         const newUser = new User({
             username,
             email,
@@ -84,7 +84,7 @@ export const registerUser = async (req: Request, res: Response) => {
             email: savedUser.email,
             fullName: savedUser.email,
             phone: savedUser.phone,
-            _id: savedUser._id,
+            _id: savedUser._id
         };
         await sendVerificationEmail(email, emailToken, username);
         return res.status(RESPONSE_STATUS.CREATED).json({
@@ -98,7 +98,8 @@ export const registerUser = async (req: Request, res: Response) => {
 
 export const loginUser = async (req: Request, res: Response) => {
     const { username, email, password, rememberMe } = req.body;
-    console.log(req.body);
+    console.log(req.body)
+    // console.log(req.body);
     const user = await User.findOne({ $or: [{ username }, { email }] });
     if (!user) {
         return res
@@ -294,20 +295,77 @@ export const verifyEmail = async (req: Request, res: Response) => {
                 .status(RESPONSE_STATUS.NOT_FOUND)
                 .json({ message: "User not found" });
         }
-
+        let apiKey = "";
+        while(true){
+            apiKey = crypto.randomBytes(32).toString('hex');
+            const temp = await User.findOne({
+                apiKey: apiKey,
+            });
+            if(!temp) break;
+        }
         await user.updateOne({
             isEmailVerified: true,
             emailVerificationToken: null,
+            apiKey
         });
 
         return res
             .status(RESPONSE_STATUS.SUCCESS)
-            .send({ message: "Email verified" });
+            .send({ message: "Email verified"});
     } catch (err) {
         return res.status(RESPONSE_STATUS.FORBIDDEN).json({
             message:
                 "Invalid email verification token or your email verification token has expired",
         });
+    }
+};
+
+export const getApiKey = async (req: Request, res: Response) => {
+    const { username, email } = req.body;
+
+    try {
+        const user : any = await User.findOne({ $or: [{ username }, { email }] });
+
+        // Jika pengguna ditemukan, kirimkan API key
+        if (user) {
+            if (user.apiKey) {
+                return res.status(RESPONSE_STATUS.SUCCESS).json({ apiKey: user.apiKey });
+            } else {
+                return res.status(RESPONSE_STATUS.NOT_FOUND).json({ msg: 'API key not found for this user' });
+            }
+        } else {
+            return res.status(RESPONSE_STATUS.NOT_FOUND).json({ msg: 'User not found' });
+        }
+    } catch (error) {
+        console.error(error);
+        return res.status(RESPONSE_STATUS.INTERNAL_SERVER_ERROR).json({ msg: 'Internal server error' });
+    }
+};
+
+export const resetApiKey = async (req: Request, res: Response) => {
+    const { username, email } = req.body;
+
+    try {
+        const user : any = await User.findOne({ $or: [{ username }, { email }] });
+
+        // Jika pengguna ditemukan, kirimkan API key
+        if (user) {
+            let apiKey = "";
+            while(true){
+                apiKey = crypto.randomBytes(32).toString('hex');
+                const temp = await User.findOne({
+                    apiKey: apiKey,
+                });
+                if(!temp) break;
+            }
+            await user.updateOne({apiKey});
+            return res.status(RESPONSE_STATUS.SUCCESS).json({ apiKey: user.apiKey });
+        } else {
+            return res.status(RESPONSE_STATUS.NOT_FOUND).json({ msg: 'User not found' });
+        }
+    } catch (error) {
+        console.error(error);
+        return res.status(RESPONSE_STATUS.INTERNAL_SERVER_ERROR).json({ msg: 'Internal server error' });
     }
 };
 
