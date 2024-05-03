@@ -7,8 +7,9 @@ export const validateAccessToken = async (
   res: Response,
   next: NextFunction
 ) => {
+  console.log(req.headers)
   const token = req.headers.authorization;
-  // console.log(req.headers)
+  console.log(token)
   if (!token) {
     return res.status(RESPONSE_STATUS.UNAUTHORIZED).send("Unauthorized");
   }

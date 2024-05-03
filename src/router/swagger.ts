@@ -1,22 +1,24 @@
+import path from "path";
+
 const paths: any = {};
 paths["/"] = {
-    get: {
-        summary: "Root endpoint",
-        description: "Returns a Hello World message",
-        responses: {
-            "200": {
-                description: "Successful operation",
-                content: {
-                    "text/plain": {
-                        schema: {
-                            type: "string",
-                            example: "Hello World",
-                        },
-                    },
-                },
+  get: {
+    summary: "Root endpoint",
+    description: "Returns a Hello World message",
+    responses: {
+      "200": {
+        description: "Successful operation",
+        content: {
+          "text/plain": {
+            schema: {
+              type: "string",
+              example: "Hello World",
             },
+          },
         },
+      },
     },
+  },
 };
 // paths["/api/v1/routes/{routes}"] = {
 //   post: {
@@ -106,691 +108,812 @@ paths["/"] = {
 //   },
 // };
 paths["/api/v1/auth/register"] = {
-    post: {
-        tags: ["auth"],
-        summary: "Register a new user",
-        description: "This endpoint registers a new user.",
-        operationId: "registerUser",
-        requestBody: {
-            content: {
-                "application/json": {
-                    schema: {
-                        type: "object",
-                        properties: {
-                            username: { type: "string" },
-                            email: { type: "string", format: "email" },
-                            password: { type: "string" },
-                            fullName: { type: "string" },
-                            phone: { type: "string", pattern: "^[0-9]{10,15}$" },
-                            //   age: { type: "integer" },
-                            //   gender: { type: "string" },
-                            //   height: { type: "number" },
-                            //   weight: { type: "number" },
-                            //   fitnessGoals: {
-                            //     type: "string",
-                            //     enum: [
-                            //       "WEIGHT_LOSS",
-                            //       "WEIGHT_GAIN",
-                            //       "BODY_BUILDING",
-                            //       "MUSCLE_GAIN",
-                            //       "ENDURANCE_TRAINING",
-                            //       "FLEXIBILITY_IMPROVEMENT",
-                            //       "GENERAL_FITNESS",
-                            //       "STRESS_RELIEF",
-                            //     ],
-                            //   },
-                            //   healthInformation: { type: "string" },
-                        },
-                        required: ["fullName", "username", "email", "phone", "password"],
-                    },
-                },
+  post: {
+    tags: ["auth"],
+    summary: "Register a new user",
+    description: "This endpoint registers a new user.",
+    operationId: "registerUser",
+    requestBody: {
+      content: {
+        "application/json": {
+          schema: {
+            type: "object",
+            properties: {
+              username: { type: "string" },
+              email: { type: "string", format: "email" },
+              password: { type: "string" },
+              fullName: { type: "string" },
+              phone: { type: "string", pattern: "^[0-9]{10,15}$" },
+              //   age: { type: "integer" },
+              //   gender: { type: "string" },
+              //   height: { type: "number" },
+              //   weight: { type: "number" },
+              //   fitnessGoals: {
+              //     type: "string",
+              //     enum: [
+              //       "WEIGHT_LOSS",
+              //       "WEIGHT_GAIN",
+              //       "BODY_BUILDING",
+              //       "MUSCLE_GAIN",
+              //       "ENDURANCE_TRAINING",
+              //       "FLEXIBILITY_IMPROVEMENT",
+              //       "GENERAL_FITNESS",
+              //       "STRESS_RELIEF",
+              //     ],
+              //   },
+              //   healthInformation: { type: "string" },
             },
-            required: true,
+            required: ["fullName", "username", "email", "phone", "password"],
+          },
         },
-        responses: {
-            "201": {
-                description: "User created successfully",
-                content: {
-                    "application/json": {
-                        schema: {
-                            type: "object",
-                            properties: {
-                                msg: { type: "string" },
-                                user: { type: "object" },
-                            },
-                        },
-                    },
-                },
-            },
-            "400": {
-                description: "Username already exists",
-                content: {
-                    "application/json": {
-                        schema: {
-                            type: "object",
-                            properties: {
-                                msg: { type: "string" },
-                            },
-                        },
-                    },
-                },
-            },
-            "500": {
-                description: "Internal server error",
-                content: {
-                    "application/json": {
-                        schema: {
-                            type: "object",
-                            properties: {
-                                error: { type: "string" },
-                            },
-                        },
-                    },
-                },
-            },
-        },
+      },
+      required: true,
     },
+    responses: {
+      "201": {
+        description: "User created successfully",
+        content: {
+          "application/json": {
+            schema: {
+              type: "object",
+              properties: {
+                msg: { type: "string" },
+                user: { type: "object" },
+              },
+            },
+          },
+        },
+      },
+      "400": {
+        description: "Username already exists",
+        content: {
+          "application/json": {
+            schema: {
+              type: "object",
+              properties: {
+                msg: { type: "string" },
+              },
+            },
+          },
+        },
+      },
+      "500": {
+        description: "Internal server error",
+        content: {
+          "application/json": {
+            schema: {
+              type: "object",
+              properties: {
+                error: { type: "string" },
+              },
+            },
+          },
+        },
+      },
+    },
+  },
 };
 
 paths["/api/v1/auth/login"] = {
-    post: {
-        tags: ["auth"],
-        summary: "User login",
-        requestBody: {
-            required: true,
-            content: {
-                "application/json": {
-                    schema: {
-                        type: "object",
-                        properties: {
-                            username: { type: "string" },
-                            email: { type: "string", format: "email" },
-                            password: { type: "string" },
-                            rememberMe: { type: "boolean" },
-                        },
-                        required: ["username", "email", "password"],
-                    },
-                },
+  post: {
+    tags: ["auth"],
+    summary: "User login",
+    requestBody: {
+      required: true,
+      content: {
+        "application/json": {
+          schema: {
+            type: "object",
+            properties: {
+              username: { type: "string" },
+              email: { type: "string", format: "email" },
+              password: { type: "string" },
+              rememberMe: { type: "boolean" },
             },
+            required: ["username", "email", "password"],
+          },
         },
-        responses: {
-            200: {
-                description: "User logged in successfully",
-                content: {
-                    "application/json": {
-                        schema: {
-                            type: "object",
-                            properties: {
-                                msg: { type: "string" },
-                                token: { type: "string" },
-                            },
-                        },
-                    },
-                },
-                // headers: {
-                //   "Set-Cookie": {
-                //     description: "The refreshToken cookie",
-                //     schema: {
-                //       type: "string",
-                //     },
-                //   },
-                // },
-                // cookie: {
-                //   "refresh_token": {
-                //     description: "The refreshToken cookie",
-                //     schema: {
-                //       type: "string",
-                //     },
-                //   },
-                // },
-                // cookies: {
-                //   refresh_token: {
-                //     description: "The refreshToken cookie",
-                //     schema: {
-                //       type: "string",
-                //     },
-                //   },
-                // },
-            },
-            400: {
-                description: "Invalid credentials or unverified email",
-                content: {
-                    "application/json": {
-                        schema: {
-                            type: "object",
-                            properties: {
-                                msg: { type: "string" },
-                                message: { type: "string" },
-                            },
-                        },
-                    },
-                },
-            },
-        },
+      },
     },
+    responses: {
+      200: {
+        description: "User logged in successfully",
+        content: {
+          "application/json": {
+            schema: {
+              type: "object",
+              properties: {
+                msg: { type: "string" },
+                token: { type: "string" },
+              },
+            },
+          },
+        },
+        // headers: {
+        //   "Set-Cookie": {
+        //     description: "The refreshToken cookie",
+        //     schema: {
+        //       type: "string",
+        //     },
+        //   },
+        // },
+        // cookie: {
+        //   "refresh_token": {
+        //     description: "The refreshToken cookie",
+        //     schema: {
+        //       type: "string",
+        //     },
+        //   },
+        // },
+        // cookies: {
+        //   refresh_token: {
+        //     description: "The refreshToken cookie",
+        //     schema: {
+        //       type: "string",
+        //     },
+        //   },
+        // },
+      },
+      400: {
+        description: "Invalid credentials or unverified email",
+        content: {
+          "application/json": {
+            schema: {
+              type: "object",
+              properties: {
+                msg: { type: "string" },
+                message: { type: "string" },
+              },
+            },
+          },
+        },
+      },
+    },
+  },
 };
 
 paths["/api/v1/auth/token"] = {
-    post: {
-        tags: ["auth"],
-        summary: "Generate a new access token using a refresh token",
-        description:
-            "This endpoint generates a new access token by validating the provided refresh token.",
-        operationId: "generateNewAccessToken",
-        requestBody: {
-            description: "Refresh Token required to generate a new access token",
-            content: {
-                "application/json": {
-                    schema: {
-                        type: "object",
-                        properties: {
-                            refreshToken: {
-                                type: "string",
-                                description: "Valid refresh token from the user",
-                            },
-                        },
-                        required: ["refreshToken"],
-                    },
-                },
+  post: {
+    tags: ["auth"],
+    summary: "Generate a new access token using a refresh token",
+    description:
+      "This endpoint generates a new access token by validating the provided refresh token.",
+    operationId: "generateNewAccessToken",
+    requestBody: {
+      description: "Refresh Token required to generate a new access token",
+      content: {
+        "application/json": {
+          schema: {
+            type: "object",
+            properties: {
+              refreshToken: {
+                type: "string",
+                description: "Valid refresh token from the user",
+              },
             },
-            required: true,
+            required: ["refreshToken"],
+          },
         },
-        responses: {
-            "200": {
-                description: "Access token created successfully",
-                content: {
-                    "application/json": {
-                        schema: {
-                            type: "object",
-                            properties: {
-                                accessToken: {
-                                    type: "string",
-                                    description: "Newly created access token for the user",
-                                },
-                            },
-                        },
-                    },
-                },
-            },
-            "403": {
-                description: "Invalid refresh token",
-                content: {
-                    "application/json": {
-                        schema: {
-                            type: "object",
-                            properties: {
-                                message: {
-                                    type: "string",
-                                },
-                            },
-                        },
-                    },
-                },
-            },
-            "404": {
-                description: "User not found",
-                content: {
-                    "application/json": {
-                        schema: {
-                            type: "object",
-                            properties: {
-                                message: {
-                                    type: "string",
-                                },
-                            },
-                        },
-                    },
-                },
-            },
-        },
+      },
+      required: true,
     },
+    responses: {
+      "200": {
+        description: "Access token created successfully",
+        content: {
+          "application/json": {
+            schema: {
+              type: "object",
+              properties: {
+                accessToken: {
+                  type: "string",
+                  description: "Newly created access token for the user",
+                },
+              },
+            },
+          },
+        },
+      },
+      "403": {
+        description: "Invalid refresh token",
+        content: {
+          "application/json": {
+            schema: {
+              type: "object",
+              properties: {
+                message: {
+                  type: "string",
+                },
+              },
+            },
+          },
+        },
+      },
+      "404": {
+        description: "User not found",
+        content: {
+          "application/json": {
+            schema: {
+              type: "object",
+              properties: {
+                message: {
+                  type: "string",
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+  },
 };
 paths["/api/v1/auth/refresh_token"] = {
-    post: {
-        tags: ["auth"],
-        summary: "Generate a new refresh token",
-        description:
-            "This endpoint generates a new refresh token for authenticated users.",
-        operationId: "newRefreshToken",
-        requestBody: {
-            description: "Refresh Token required to generate a new refresh token",
-            content: {
-                "application/json": {
-                    schema: {
-                        type: "object",
-                        properties: {
-                            refreshToken: {
-                                type: "string",
-                                description: "Valid refresh token from the user",
-                            },
-                        },
-                        required: ["refreshToken"],
-                    },
-                },
+  post: {
+    tags: ["auth"],
+    summary: "Generate a new refresh token",
+    description:
+      "This endpoint generates a new refresh token for authenticated users.",
+    operationId: "newRefreshToken",
+    requestBody: {
+      description: "Refresh Token required to generate a new refresh token",
+      content: {
+        "application/json": {
+          schema: {
+            type: "object",
+            properties: {
+              refreshToken: {
+                type: "string",
+                description: "Valid refresh token from the user",
+              },
             },
-            required: true,
+            required: ["refreshToken"],
+          },
         },
-        responses: {
-            "200": {
-                description: "New refresh token created successfully",
-                content: {
-                    "application/json": {
-                        schema: {
-                            type: "object",
-                            properties: {
-                                refreshToken: {
-                                    type: "string",
-                                    description: "Newly created refresh token for the user",
-                                },
-                            },
-                        },
-                    },
-                },
-            },
-            "403": {
-                description: "Invalid refresh token",
-                content: {
-                    "application/json": {
-                        schema: {
-                            type: "object",
-                            properties: {
-                                message: {
-                                    type: "string",
-                                },
-                            },
-                        },
-                    },
-                },
-            },
-            "404": {
-                description: "User not found",
-                content: {
-                    "application/json": {
-                        schema: {
-                            type: "object",
-                            properties: {
-                                message: {
-                                    type: "string",
-                                },
-                            },
-                        },
-                    },
-                },
-            },
-        },
-        security: [
-            {
-                cookieAuth: [],
-            },
-        ],
+      },
+      required: true,
     },
+    responses: {
+      "200": {
+        description: "New refresh token created successfully",
+        content: {
+          "application/json": {
+            schema: {
+              type: "object",
+              properties: {
+                refreshToken: {
+                  type: "string",
+                  description: "Newly created refresh token for the user",
+                },
+              },
+            },
+          },
+        },
+      },
+      "403": {
+        description: "Invalid refresh token",
+        content: {
+          "application/json": {
+            schema: {
+              type: "object",
+              properties: {
+                message: {
+                  type: "string",
+                },
+              },
+            },
+          },
+        },
+      },
+      "404": {
+        description: "User not found",
+        content: {
+          "application/json": {
+            schema: {
+              type: "object",
+              properties: {
+                message: {
+                  type: "string",
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+    security: [
+      {
+        cookieAuth: [],
+      },
+    ],
+  },
 };
 
 paths["/api/v1/auth/verify/{emailVerificationToken}"] = {
-    get: {
-        tags: ["auth"],
-        summary: "Verify user's email",
-        description:
-            "This endpoint verifies a user's email using the email verification token.",
-        operationId: "verifyEmail",
-        parameters: [
-            {
-                name: "emailVerificationToken",
-                in: "path",
-                required: true,
-                schema: {
-                    type: "string",
-                },
-                description: "The email verification token provided to the user.",
-            },
-        ],
-        responses: {
-            "200": {
-                description: "Email verified successfully.",
-                content: {
-                    "application/json": {
-                        schema: {
-                            type: "object",
-                            properties: {
-                                message: {
-                                    type: "string",
-                                },
-                            },
-                        },
-                    },
-                },
-            },
-            "403": {
-                description: "Invalid or expired email verification token.",
-                content: {
-                    "application/json": {
-                        schema: {
-                            type: "object",
-                            properties: {
-                                message: {
-                                    type: "string",
-                                },
-                            },
-                        },
-                    },
-                },
-            },
-            "404": {
-                description: "User not found.",
-                content: {
-                    "application/json": {
-                        schema: {
-                            type: "object",
-                            properties: {
-                                message: {
-                                    type: "string",
-                                },
-                            },
-                        },
-                    },
-                },
-            },
+  get: {
+    tags: ["auth"],
+    summary: "Verify user's email",
+    description:
+      "This endpoint verifies a user's email using the email verification token.",
+    operationId: "verifyEmail",
+    parameters: [
+      {
+        name: "emailVerificationToken",
+        in: "path",
+        required: true,
+        schema: {
+          type: "string",
         },
+        description: "The email verification token provided to the user.",
+      },
+    ],
+    responses: {
+      "200": {
+        description: "Email verified successfully.",
+        content: {
+          "application/json": {
+            schema: {
+              type: "object",
+              properties: {
+                message: {
+                  type: "string",
+                },
+              },
+            },
+          },
+        },
+      },
+      "403": {
+        description: "Invalid or expired email verification token.",
+        content: {
+          "application/json": {
+            schema: {
+              type: "object",
+              properties: {
+                message: {
+                  type: "string",
+                },
+              },
+            },
+          },
+        },
+      },
+      "404": {
+        description: "User not found.",
+        content: {
+          "application/json": {
+            schema: {
+              type: "object",
+              properties: {
+                message: {
+                  type: "string",
+                },
+              },
+            },
+          },
+        },
+      },
     },
+  },
 };
 
 paths["/api/v1/users"] = {
-    get: {
-        tags: ["users"],
-        summary: "Get a user all users",
-        description: "This endpoint returns every user's data",
-        operationId: "getAllUser",
-        responses: {
-            "200": {
-                description: "User returned successfully",
-                content: {
-                    "application/json": {
-                        schema: {
-                            type: "object",
-                            properties: {
-                                user: { type: "object" },
-                            },
-                        },
-                    },
-                },
+  get: {
+    tags: ["users"],
+    summary: "Get a user all users",
+    description: "This endpoint returns every user's data",
+    operationId: "getAllUser",
+    responses: {
+      "200": {
+        description: "User returned successfully",
+        content: {
+          "application/json": {
+            schema: {
+              type: "object",
+              properties: {
+                user: { type: "object" },
+              },
             },
-            "500": {
-                description: "Internal server error",
-                content: {
-                    "application/json": {
-                        schema: {
-                            type: "object",
-                            properties: {
-                                error: { type: "string" },
-                            },
-                        },
-                    },
-                },
-            },
+          },
         },
+      },
+      "500": {
+        description: "Internal server error",
+        content: {
+          "application/json": {
+            schema: {
+              type: "object",
+              properties: {
+                error: { type: "string" },
+              },
+            },
+          },
+        },
+      },
     },
+  },
 };
 
 paths["/api/v1/users/{id}"] = {
-    get: {
-        tags: ["users"],
-        summary: "Get a user by ID",
-        description: "This endpoint returns a user by ID.",
-        operationId: "getUser",
-        parameters: [
-            {
-                name: "id",
-                in: "path",
-                description: "ID of user to return",
-                required: true,
-                schema: {
-                    type: "string",
-                },
-            },
-        ],
-        responses: {
-            "200": {
-                description: "User found successfully",
-                content: {
-                    "application/json": {
-                        schema: {
-                            type: "object",
-                            properties: {
-                                user: { type: "object" },
-                            },
-                        },
-                    },
-                },
-            },
-            "400": {
-                description: "Invalid user ID",
-                content: {
-                    "application/json": {
-                        schema: {
-                            type: "object",
-                            properties: {
-                                message: { type: "string" },
-                            },
-                        },
-                    },
-                },
-            },
-            "404": {
-                description: "User not found",
-                content: {
-                    "application/json": {
-                        schema: {
-                            type: "object",
-                            properties: {
-                                message: { type: "string" },
-                            },
-                        },
-                    },
-                },
-            },
-            "500": {
-                description: "Internal server error",
-                content: {
-                    "application/json": {
-                        schema: {
-                            type: "object",
-                            properties: {
-                                error: { type: "string" },
-                            },
-                        },
-                    },
-                },
-            },
+  get: {
+    tags: ["users"],
+    summary: "Get a user by ID",
+    description: "This endpoint returns a user by ID.",
+    operationId: "getUser",
+    parameters: [
+      {
+        name: "id",
+        in: "path",
+        description: "ID of user to return",
+        required: true,
+        schema: {
+          type: "string",
         },
+      },
+    ],
+    responses: {
+      "200": {
+        description: "User found successfully",
+        content: {
+          "application/json": {
+            schema: {
+              type: "object",
+              properties: {
+                user: { type: "object" },
+              },
+            },
+          },
+        },
+      },
+      "400": {
+        description: "Invalid user ID",
+        content: {
+          "application/json": {
+            schema: {
+              type: "object",
+              properties: {
+                message: { type: "string" },
+              },
+            },
+          },
+        },
+      },
+      "404": {
+        description: "User not found",
+        content: {
+          "application/json": {
+            schema: {
+              type: "object",
+              properties: {
+                message: { type: "string" },
+              },
+            },
+          },
+        },
+      },
+      "500": {
+        description: "Internal server error",
+        content: {
+          "application/json": {
+            schema: {
+              type: "object",
+              properties: {
+                error: { type: "string" },
+              },
+            },
+          },
+        },
+      },
     },
+  },
 };
 
 paths["/api/v1/users/dashboard"] = {
-    get: {
-        tags: ["users"],
-        summary: "Get user dashboard",
-        description: "This endpoint returns the user's dashboard.",
-        operationId: "getDashboard",
-        security: [
-            {
-                bearerAuth: [],
+  get: {
+    tags: ["users"],
+    summary: "Get user dashboard",
+    description: "This endpoint returns the user's dashboard.",
+    operationId: "getDashboard",
+    security: [
+      {
+        bearerAuth: [],
+      },
+    ],
+    responses: {
+      "200": {
+        description: "User dashboard retrieved successfully",
+        content: {
+          "application/json": {
+            schema: {
+              type: "object",
+              properties: {
+                user: { type: "object" },
+              },
             },
-        ],
-        responses: {
-            "200": {
-                description: "User dashboard retrieved successfully",
-                content: {
-                    "application/json": {
-                        schema: {
-                            type: "object",
-                            properties: {
-                                user: { type: "object" },
-                            },
-                        },
-                    },
-                },
-            },
-            "401": {
-                description: "Unauthorized",
-                content: {
-                    "application/json": {
-                        schema: {
-                            type: "object",
-                            properties: {
-                                msg: { type: "string" },
-                            },
-                        },
-                    },
-                },
-            },
-            "500": {
-                description: "Internal server error",
-                content: {
-                    "application/json": {
-                        schema: {
-                            type: "object",
-                            properties: {
-                                error: { type: "string" },
-                            },
-                        },
-                    },
-                },
-            },
+          },
         },
+      },
+      "401": {
+        description: "Unauthorized",
+        content: {
+          "application/json": {
+            schema: {
+              type: "object",
+              properties: {
+                msg: { type: "string" },
+              },
+            },
+          },
+        },
+      },
+      "500": {
+        description: "Internal server error",
+        content: {
+          "application/json": {
+            schema: {
+              type: "object",
+              properties: {
+                error: { type: "string" },
+              },
+            },
+          },
+        },
+      },
     },
+  },
 };
 
 paths["/api/v1/users/profile"] = {
-    put: {
-        tags: ["users"],
-        summary: "Edit user profile",
-        description: "This endpoint edits the user's profile.",
-        operationId: "editProfile",
-        security: [
-            {
-                bearerAuth: []
-            }
-        ],
-        requestBody: {
-            content: {
-                "application/json": {
-                    schema: {
-                        type: "object",
-                        properties: {
-                            old_password: { type: "string" },
-                            new_password: { type: "string" },
-                            confirm_password: { type: "string" },
-                            fullName: { type: "string" },
-                            phone: { type: "string", pattern: "^[0-9]{10,15}$" },
-                            age: { type: "integer" },
-                            gender: { type: "string" },
-                            height: { type: "number" },
-                            weight: { type: "number" },
-                            fitnessGoals: {
-                                type: "string",
-                                enum: [
-                                    "WEIGHT_LOSS",
-                                    "WEIGHT_GAIN",
-                                    "BODY_BUILDING",
-                                    "MUSCLE_GAIN",
-                                    "ENDURANCE_TRAINING",
-                                    "FLEXIBILITY_IMPROVEMENT",
-                                    "GENERAL_FITNESS",
-                                    "STRESS_RELIEF",
-                                ],
-                            },
-                            healthInformation: { type: "string" },
-                        },
-                    },
-                },
+  put: {
+    tags: ["users"],
+    summary: "Edit user profile",
+    description: "This endpoint edits the user's profile.",
+    operationId: "editProfile",
+    security: [
+      {
+        bearerAuth: [],
+      },
+    ],
+    requestBody: {
+      content: {
+        "application/json": {
+          schema: {
+            type: "object",
+            properties: {
+              old_password: { type: "string" },
+              new_password: { type: "string" },
+              confirm_password: { type: "string" },
+              fullName: { type: "string" },
+              phone: { type: "string", pattern: "^[0-9]{10,15}$" },
+              age: { type: "integer" },
+              gender: { type: "string" },
+              height: { type: "number" },
+              weight: { type: "number" },
+              fitnessGoals: {
+                type: "string",
+                enum: [
+                  "WEIGHT_LOSS",
+                  "WEIGHT_GAIN",
+                  "BODY_BUILDING",
+                  "MUSCLE_GAIN",
+                  "ENDURANCE_TRAINING",
+                  "FLEXIBILITY_IMPROVEMENT",
+                  "GENERAL_FITNESS",
+                  "STRESS_RELIEF",
+                ],
+              },
+              healthInformation: { type: "string" },
             },
+          },
         },
-        responses: {
-            "200": {
-                description: "User profile updated successfully",
-                content: {
-                    "application/json": {
-                        schema: {
-                            type: "object",
-                            properties: {
-                                user: { type: "object" },
-                            },
-                        },
-                    },
-                },
-            },
-            "400": {
-                description: "Bad request",
-                content: {
-                    "application/json": {
-                        schema: {
-                            type: "object",
-                            properties: {
-                                msg: { type: "string" },
-                            },
-                        },
-                    },
-                },
-            },
-            "404": {
-                description: "User not found",
-                content: {
-                    "application/json": {
-                        schema: {
-                            type: "object",
-                            properties: {
-                                message: { type: "string" },
-                            },
-                        },
-                    },
-                },
-            },
-            "500": {
-                description: "Internal server error",
-                content: {
-                    "application/json": {
-                        schema: {
-                            type: "object",
-                            properties: {
-                                error: { type: "string" },
-                            },
-                        },
-                    },
-                },
-            },
-        },
+      },
     },
+    responses: {
+      "200": {
+        description: "User profile updated successfully",
+        content: {
+          "application/json": {
+            schema: {
+              type: "object",
+              properties: {
+                user: { type: "object" },
+              },
+            },
+          },
+        },
+      },
+      "400": {
+        description: "Bad request",
+        content: {
+          "application/json": {
+            schema: {
+              type: "object",
+              properties: {
+                msg: { type: "string" },
+              },
+            },
+          },
+        },
+      },
+      "404": {
+        description: "User not found",
+        content: {
+          "application/json": {
+            schema: {
+              type: "object",
+              properties: {
+                message: { type: "string" },
+              },
+            },
+          },
+        },
+      },
+      "500": {
+        description: "Internal server error",
+        content: {
+          "application/json": {
+            schema: {
+              type: "object",
+              properties: {
+                error: { type: "string" },
+              },
+            },
+          },
+        },
+      },
+    },
+  },
 };
 
+paths["/api/v1/users/apikey"] = {
+  get: {
+    summary: "Get API key for a user",
+    description: "Retrieves the API key associated with a user.",
+    security: [
+      {
+        bearerAuth: [],
+      },
+    ],
+    tags: ["users"],
+    responses: {
+      "200": {
+        description: "Successful response with API key data",
+        content: {
+          "application/json": {
+            schema: {
+              type: "object",
+              properties: {
+                apiKey: {
+                  type: "string",
+                  description: "API key associated with the user",
+                },
+              },
+            },
+          },
+        },
+      },
+      "404": {
+        description: "Not Found",
+        content: {
+          "application/json": {
+            schema: {
+              $ref: "#/components/schemas/NotFoundResponse",
+            },
+          },
+        },
+      },
+      "401": {
+        description: "Unauthorized",
+        content: {
+          "application/json": {
+            schema: {
+              $ref: "#/components/schemas/UnauthorizedResponse",
+            },
+          },
+        },
+      },
+      "500": {
+        description: "Internal Server Error",
+        content: {
+          "application/json": {
+            schema: {
+              $ref: "#/components/schemas/ErrorResponse",
+            },
+          },
+        },
+      },
+    },
+  },
+};
+
+paths["/api/v1/users/apikey/reset"] = {
+  put: {
+    summary: "Reset API key for a user",
+    description: "Resets the API key associated with a user.",
+    security: [
+      {
+        bearerAuth: [],
+      },
+    ],
+    tags: ["users"],
+    responses: {
+      "200": {
+        description: "Successful response with new API key data",
+        content: {
+          "application/json": {
+            schema: {
+              type: "object",
+              properties: {
+                apiKey: {
+                  type: "string",
+                  description: "New API key associated with the user",
+                },
+              },
+            },
+          },
+        },
+      },
+      "404": {
+        description: "Not Found",
+        content: {
+          "application/json": {
+            schema: {
+              $ref: "#/components/schemas/NotFoundResponse",
+            },
+          },
+        },
+      },
+      "401": {
+        description: "Unauthorized",
+        content: {
+          "application/json": {
+            schema: {
+              $ref: "#/components/schemas/UnauthorizedResponse",
+            },
+          },
+        },
+      },
+      "500": {
+        description: "Internal Server Error",
+        content: {
+          "application/json": {
+            schema: {
+              $ref: "#/components/schemas/ErrorResponse",
+            },
+          },
+        },
+      },
+    },
+  },
+};
 
 const swaggerDocument = {
-    openapi: "3.0.0",
-    info: {
-        title: "Your API Title",
-        description: "",
-        version: "1.0.0",
+  openapi: "3.0.0",
+  info: {
+    title: "Your API Title",
+    description: "",
+    version: "1.0.0",
+  },
+  components: {
+    securitySchemes: {
+      bearerAuth: {
+        type: "http",
+        scheme: "bearer",
+        bearerFormat: "JWT",
+        in: "header",
+        name: "authorization",
+      },
+      cookieAuth: {
+        type: "apiKey",
+        in: "cookie",
+        name: "refreshToken", // Name of the cookie
+      },
     },
-    components: {
-        securitySchemes: {
-            bearerAuth: {
-                type: "http",
-                scheme: "bearer",
-                bearerFormat: "JWT",
-                in: "header",
-                name: "authorization",
-            },
-            cookieAuth: {
-                type: "apiKey",
-                in: "cookie",
-                name: "refreshToken", // Name of the cookie
-            },
-        },
-    },
-    security: {
-        bearerAuth: [],
-        cookieAuth: [],
-    },
-    paths: paths,
+  },
+  security: {
+    bearerAuth: [],
+    cookieAuth: [],
+  },
+  paths: paths,
 };
 export default swaggerDocument;
 
