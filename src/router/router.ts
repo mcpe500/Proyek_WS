@@ -24,6 +24,7 @@ import {
   registerSchemaJoi,
   validationTokenSchemaJoi,
 } from "../validators/User.validate";
+import { getAllPricingPackages } from "../controller/PricingController";
 
 const router = Router();
 
@@ -51,6 +52,9 @@ router.put(
   editProfile
 );
 router.get("/users/:id", getUser);
+
+// Pricing
+router.get("/pricing", getAllPricingPackages);
 
 // router.put("/users/:id", updateUser);
 // router.delete("/users/:id", deleteUser);

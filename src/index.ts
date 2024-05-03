@@ -25,7 +25,9 @@ app.use(express.urlencoded({ extended: true }));
 app.use(ROUTES.API_V1, router);
 
 app.get(ROUTES.ROOT, (req: Request, res: Response) => {
-  return res.status(RESPONSE_STATUS.SUCCESS).send("Hello World");
+  return res
+    .status(RESPONSE_STATUS.SUCCESS)
+    .send("This API Service is currently running");
 });
 
 export default app;
