@@ -24,6 +24,12 @@ import {
   registerSchemaJoi,
   validationTokenSchemaJoi,
 } from "../validators/User.validate";
+import {
+  getExercise,
+  getMuscle,
+  getDifficulty,
+  getType,
+} from "../controller/ExerciseController";
 
 const router = Router();
 
@@ -61,5 +67,10 @@ router.get("/users/:id", getUser);
 // router.get("/showBuiltInModules", showBuiltInModules);
 
 // router.use(validateAccessToken); // Use the middleware to validate the access token for all routes below
+
+router.get("/exercise/name", getExercise);
+router.get("/exercise/type", getType);
+router.get("/exercise/muscle", getMuscle);
+router.get("/exercise/difficulty", getDifficulty);
 
 export default router;
