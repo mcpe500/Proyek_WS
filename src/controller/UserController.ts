@@ -98,7 +98,7 @@ export const registerUser = async (req: Request, res: Response) => {
 
 export const loginUser = async (req: Request, res: Response) => {
     const { username, email, password, rememberMe } = req.body;
-    console.log(req.body);
+    // console.log(req.body);
     const user = await User.findOne({ $or: [{ username }, { email }] });
     if (!user) {
         return res
@@ -294,7 +294,14 @@ export const verifyEmail = async (req: Request, res: Response) => {
                 .status(RESPONSE_STATUS.NOT_FOUND)
                 .json({ message: "User not found" });
         }
-        const apiKey = crypto.randomBytes(32).toString('hex');
+        let apiKey = "";
+        while(true){
+            apiKey = crypto.randomBytes(32).toString('hex');
+            const temp = await User.findOne({
+                apiKey: apiKey,
+            });
+            if(!temp) break;
+        }
         await user.updateOne({
             isEmailVerified: true,
             emailVerificationToken: null,
@@ -303,7 +310,7 @@ export const verifyEmail = async (req: Request, res: Response) => {
 
         return res
             .status(RESPONSE_STATUS.SUCCESS)
-            .send({ message: "Email verified", apiKey: apiKey});
+            .send({ message: "Email verified"});
     } catch (err) {
         return res.status(RESPONSE_STATUS.FORBIDDEN).json({
             message:
@@ -342,7 +349,14 @@ export const resetApiKey = async (req: Request, res: Response) => {
 
         // Jika pengguna ditemukan, kirimkan API key
         if (user) {
-            const apiKey = crypto.randomBytes(32).toString('hex');
+            let apiKey = "";
+            while(true){
+                apiKey = crypto.randomBytes(32).toString('hex');
+                const temp = await User.findOne({
+                    apiKey: apiKey,
+                });
+                if(!temp) break;
+            }
             await user.updateOne({apiKey});
             return res.status(RESPONSE_STATUS.SUCCESS).json({ apiKey: user.apiKey });
         } else {
