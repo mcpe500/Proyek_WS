@@ -53,15 +53,15 @@ router.post(
 router.get("/auth/verify/:emailVerificationToken", verifyEmail);
 
 router.get("/users", getAllUser);
-router.get("/users/dashboard", validateAccessToken, getDashboard);
+router.get("/users/dashboard", [validateAccessToken], getDashboard);
 router.put(
   "/users/profile",
   [validateAccessToken, validateBody(editProfileSchemaJoi)],
   editProfile
 );
 
-router.get("/users/apikey", validateAccessToken, getApiKey);
-router.put("/users/apikey/reset", validateAccessToken, resetApiKey);
+router.get("/users/apikey", [validateAccessToken], getApiKey);
+router.put("/users/apikey/reset", [validateAccessToken], resetApiKey);
 
 router.get("/users/:id", getUser);
 

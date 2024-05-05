@@ -1,15 +1,16 @@
 import { NextFunction, Request, Response } from "express";
 import { verifyAccessToken } from "../utils/AuthUtils";
 import { RESPONSE_STATUS } from "../contracts/enum/ResponseRelated.enum";
+import { User } from "../models/dynamic/User.model";
 
 export const validateAccessToken = async (
   req: Request,
   res: Response,
   next: NextFunction
 ) => {
-  console.log(req.headers)
+  // console.log(req.headers)
   const token = req.headers.authorization;
-  console.log(token)
+  // console.log(token)
   if (!token) {
     return res.status(RESPONSE_STATUS.UNAUTHORIZED).send("Unauthorized");
   }
@@ -22,11 +23,22 @@ export const validateAccessToken = async (
     if (!decodedToken) {
       return res.status(RESPONSE_STATUS.UNAUTHORIZED).send("Unauthorized");
     }
-    req.body.username = decodedToken.username;
-    req.body.email = decodedToken.email;
-    
-    
-    next();
+    const { username, email } = decodedToken;
+    try {
+      const user: any = await User.findOne({ $or: [{ username }, { email }] });
+      if (user) {
+        req.body.user = user;
+        next();
+      } else {
+        return res
+          .status(RESPONSE_STATUS.NOT_FOUND)
+          .json({ msg: "User not found" });
+      }
+    } catch (error) {
+      return res
+        .status(RESPONSE_STATUS.INTERNAL_SERVER_ERROR)
+        .json({ msg: "Internal server error" });
+    }
   } catch (error) {
     return res.status(RESPONSE_STATUS.UNAUTHORIZED).send("Unauthorized");
   }
