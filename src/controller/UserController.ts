@@ -88,7 +88,7 @@ export const registerUser = async (req: Request, res: Response) => {
     };
     await sendVerificationEmail(email, emailToken, username);
     return res.status(RESPONSE_STATUS.CREATED).json({
-      msg: "Register Successful, please verify your email!",
+      msg: "Register Successful, please verify your email within 24 hours!",
       user: respone,
     });
   } catch (error) {
@@ -107,6 +107,13 @@ export const loginUser = async (req: Request, res: Response) => {
       .json({ msg: "Invalid credentials" });
   }
   if (!user.isEmailVerified) {
+    if (!verifyEmailVerificationToken(user.emailVerificationToken)) {
+        await User.deleteOne({ _id: user._id });
+    
+        return res
+         .status(RESPONSE_STATUS.BAD_REQUEST)
+         .send({ message: "Your email verification token has expired and as a result, your account has been deleted" });
+    }
     return res
       .status(RESPONSE_STATUS.BAD_REQUEST)
       .send({ message: "Please verify your email" });
