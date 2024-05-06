@@ -908,6 +908,189 @@ paths["/api/v1/users/apikey/reset"] = {
     },
   },
 };
+paths["/api/v1/exercise/name"] = {
+  get: {
+    summary: "Get exercise details by name",
+    description:
+      "Retrieves information about an exercise based on the provided name query parameter.",
+    parameters: [
+      {
+        name: "exercise",
+        in: "query",
+        description: "The name of the exercise to retrieve",
+        required: true,
+        type: "string",
+      },
+    ],
+    responses: {
+      "200": {
+        description: "Successful operation",
+        content: {
+          "application/json": {
+            schema: {
+              type: "object",
+              properties: {
+                exercise: {
+                  type: "object",
+                  description: "The retrieved exercise data",
+                },
+              },
+            },
+          },
+        },
+      },
+      "400": {
+        description: "Bad request (e.g., missing or invalid query parameter)",
+      },
+      "404": {
+        description: "Exercise not found",
+      },
+      "500": {
+        description: "Internal server error",
+      },
+    },
+  },
+};
+paths["/api/v1/exercise/type"] = {
+  get: {
+    summary: "Get exercise details by type",
+    description:
+      "Retrieves information about exercises based on the provided type query parameter.",
+    parameters: [
+      {
+        name: "type",
+        in: "query",
+        description:
+          "The type of exercise to retrieve (e.g., chest, back, legs)",
+        required: true,
+        type: "string",
+      },
+    ],
+    responses: {
+      "200": {
+        description: "Successful operation",
+        content: {
+          "application/json": {
+            schema: {
+              type: "object",
+              properties: {
+                exercise: {
+                  type: "array",
+                  description:
+                    "An array of exercise data matching the specified type",
+                },
+              },
+            },
+          },
+        },
+      },
+      "400": {
+        description: "Bad request (e.g., missing or invalid query parameter)",
+      },
+      "404": {
+        description: "No exercises found for the specified type",
+      },
+      "500": {
+        description: "Internal server error",
+      },
+    },
+  },
+};
+paths["/api/v1/exercise/muscle"] = {
+  get: {
+    summary: "Get exercise details by muscle",
+    description:
+      "Retrieves information about exercises that target the provided muscle query parameter.",
+    parameters: [
+      {
+        name: "muscle",
+        in: "query",
+        description:
+          "The targeted muscle group of the exercise (e.g., chest, back, biceps)",
+        required: true,
+        type: "string",
+      },
+    ],
+    responses: {
+      "200": {
+        description: "Successful operation",
+        content: {
+          "application/json": {
+            schema: {
+              type: "object",
+              properties: {
+                exercise: {
+                  type: "array",
+                  description:
+                    "An array of exercise data targeting the specified muscle",
+                },
+              },
+            },
+          },
+        },
+      },
+      "400": {
+        description: "Bad request (e.g., missing or invalid query parameter)",
+      },
+      "404": {
+        description: "No exercises found for the specified muscle",
+      },
+      "500": {
+        description: "Internal server error",
+      },
+    },
+  },
+};
+paths["/api/v1/exercise/difficulty"] = {
+  get: {
+    summary: "Get exercise details by difficulty",
+    description:
+      "Retrieves information about exercises with the provided difficulty query parameter.",
+    parameters: [
+      {
+        name: "difficulty",
+        in: "query",
+        description:
+          "The difficulty level of the exercise (e.g., beginner, intermediate, advanced)",
+        required: true,
+        type: "string",
+      },
+    ],
+    responses: {
+      "200": {
+        description: "Successful operation",
+        content: {
+          "application/json": {
+            schema: {
+              type: "object",
+              properties: {
+                exercise: {
+                  type: "array",
+                  description:
+                    "An array of exercise data matching the specified difficulty",
+                },
+              },
+            },
+          },
+        },
+      },
+      "400": {
+        description: "Bad request (e.g., missing or invalid query parameter)",
+      },
+      "404": {
+        description: "No exercises found for the specified difficulty",
+      },
+      "500": {
+        description: "Internal server error",
+      },
+    },
+  },
+};
+
+// router.get("/exercise/name", getExercise);
+// router.get("/exercise/type", getType);
+// router.get("/exercise/muscle", getMuscle);
+// router.get("/exercise/difficulty", getDifficulty);
 
 const swaggerDocument = {
   openapi: "3.0.0",
