@@ -1,59 +1,59 @@
-import axios, { Axios } from "axios";
+import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from "axios";
+import { ENV } from "../config/environment";
 
 class ApiService {
-  private axiosInstance: Axios;
-  constructor(baseURL: string) {
+  private axiosInstance: AxiosInstance;
+
+  constructor(baseURL: string, headers: AxiosRequestConfig["headers"] = {}) {
     this.axiosInstance = axios.create({
-      baseURL: baseURL,
-    });
-  }
-  async get<T>(url: string, headers = {}): Promise<T> {
-    const response = await this.axiosInstance.get<T>(url, { headers });
-    return response.data;
-  }
-
-  async fetch<T>(url: string, headers = {}): Promise<T> {
-    const response = await fetch(url, { headers });
-    return response.json();
-  }
-  async fetchImage<T>(url: string, headers = {}): Promise<T> {
-    const response = await fetch(url, { headers });
-    if (response.headers.get("Content-Type")?.startsWith("image")) {
-      return response.blob() as Promise<T>;
-    }
-    return response.json() as Promise<T>;
-  }
-
-  async query<T>(url: string, payload: any, headers = {}): Promise<T> {
-    const response = await this.axiosInstance.post<T>(url, payload, {
+      baseURL,
       headers,
     });
+  }
+
+  async get<T>(url: string, config: AxiosRequestConfig = {}): Promise<T> {
+    const response = await this.axiosInstance.get<T>(url, config);
     return response.data;
   }
 
-  async post<T>(url: string, data = {}, headers = {}): Promise<T> {
-    const response = await this.axiosInstance.post<T>(url, data, { headers });
+  async post<T>(
+    url: string,
+    data?: any,
+    config: AxiosRequestConfig = {}
+  ): Promise<T> {
+    const response = await this.axiosInstance.post<T>(url, data, config);
     return response.data;
   }
 
-  async put<T>(url: string, data: any, headers = {}): Promise<T> {
-    const response = await this.axiosInstance.put<T>(url, data, { headers });
+  async put<T>(
+    url: string,
+    data?: any,
+    config: AxiosRequestConfig = {}
+  ): Promise<T> {
+    const response = await this.axiosInstance.put<T>(url, data, config);
     return response.data;
   }
 
-  async patch<T>(url: string, data: any, headers = {}): Promise<T> {
-    const response = await this.axiosInstance.patch<T>(url, data, { headers });
+  async patch<T>(
+    url: string,
+    data?: any,
+    config: AxiosRequestConfig = {}
+  ): Promise<T> {
+    const response = await this.axiosInstance.patch<T>(url, data, config);
     return response.data;
   }
 
-  async delete<T>(url: string, headers = {}): Promise<T> {
-    const response = await this.axiosInstance.delete<T>(url, { headers });
+  async delete<T>(url: string, config: AxiosRequestConfig = {}): Promise<T> {
+    const response = await this.axiosInstance.delete<T>(url, config);
     return response.data;
   }
 }
 
 export const Apis = {
   API_NINJA_ApiService: new ApiService(
-    "https://api.api-ninjas.com/v1/exercises"
+    "https://api.api-ninjas.com/v1/exercises",
+    {
+      "X-Api-Key": ENV.API_NINJAS_API_KEY,
+    }
   ),
 };

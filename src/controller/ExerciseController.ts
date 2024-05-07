@@ -20,13 +20,11 @@ import { Apis } from "../services/ApiService";
 export const getExercise = async (req: Request, res: Response) => {
   try {
     const { exercise } = req.query;
-    const response = await Apis.API_NINJA_ApiService.query(
-      "",
-      {
-        name: exercise,
-      },
-      { "X-Api-Key": ENV.API_NINJAS_API_KEY }
-    );
+    console.log(req.query);
+    const response = await Apis.API_NINJA_ApiService.get("", {
+      params: { name: exercise },
+    });
+    console.log(response);
     // const response = await axios.get(
     //   "https://api.api-ninjas.com/v1/exercises?name=" + exercise,
     //   {
@@ -47,13 +45,11 @@ export const getExercise = async (req: Request, res: Response) => {
 export const getType = async (req: Request, res: Response) => {
   try {
     const { type } = req.query;
-    const response = await Apis.API_NINJA_ApiService.query(
-      "",
-      {
-        type: type,
-      },
-      { "X-Api-Key": ENV.API_NINJAS_API_KEY }
-    );
+    console.log(req.query);
+    const response = await Apis.API_NINJA_ApiService.get("", {
+      params: { type: type },
+    });
+    console.log(response);
     // const response = await axios.get(
     //   "https://api.api-ninjas.com/v1/exercises?type=" + type,
     //   {
@@ -74,13 +70,11 @@ export const getType = async (req: Request, res: Response) => {
 export const getMuscle = async (req: Request, res: Response) => {
   try {
     const { muscle } = req.query;
-    const response = await Apis.API_NINJA_ApiService.query(
-      "",
-      {
-        muscle: muscle,
-      },
-      { "X-Api-Key": ENV.API_NINJAS_API_KEY }
-    );
+    console.log(req.query);
+    const response = await Apis.API_NINJA_ApiService.get("", {
+      params: { muscle: muscle },
+    });
+    console.log(response);
     // const response = await axios.get(
     //   "https://api.api-ninjas.com/v1/exercises?muscle=" + muscle,
     //   {
@@ -101,13 +95,11 @@ export const getMuscle = async (req: Request, res: Response) => {
 export const getDifficulty = async (req: Request, res: Response) => {
   try {
     const { difficulty } = req.query;
-    const response = await Apis.API_NINJA_ApiService.query(
-      "",
-      {
-        difficulty: difficulty,
-      },
-      { "X-Api-Key": ENV.API_NINJAS_API_KEY }
-    );
+    console.log(req.query);
+    const response = await Apis.API_NINJA_ApiService.get("", {
+      params: { difficulty: difficulty },
+    });
+    console.log(response);
     // const response = await axios.get(
     //   "https://api.api-ninjas.com/v1/exercises?difficulty=" + difficulty,
     //   {

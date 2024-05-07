@@ -908,6 +908,7 @@ paths["/api/v1/users/apikey/reset"] = {
     },
   },
 };
+
 paths["/api/v1/exercise/name"] = {
   get: {
     summary: "Get exercise details by name",
@@ -918,7 +919,7 @@ paths["/api/v1/exercise/name"] = {
         name: "exercise",
         in: "query",
         description: "The name of the exercise to retrieve",
-        required: true,
+        required: false,
         type: "string",
       },
     ],
@@ -962,7 +963,7 @@ paths["/api/v1/exercise/type"] = {
         in: "query",
         description:
           "The type of exercise to retrieve (e.g., chest, back, legs)",
-        required: true,
+        required: false,
         type: "string",
       },
     ],
@@ -1007,7 +1008,7 @@ paths["/api/v1/exercise/muscle"] = {
         in: "query",
         description:
           "The targeted muscle group of the exercise (e.g., chest, back, biceps)",
-        required: true,
+        required: false,
         type: "string",
       },
     ],
@@ -1052,7 +1053,7 @@ paths["/api/v1/exercise/difficulty"] = {
         in: "query",
         description:
           "The difficulty level of the exercise (e.g., beginner, intermediate, advanced)",
-        required: true,
+        required: false,
         type: "string",
       },
     ],
