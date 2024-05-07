@@ -1087,11 +1087,6 @@ paths["/api/v1/exercise/difficulty"] = {
   },
 };
 
-// router.get("/exercise/name", getExercise);
-// router.get("/exercise/type", getType);
-// router.get("/exercise/muscle", getMuscle);
-// router.get("/exercise/difficulty", getDifficulty);
-
 const swaggerDocument = {
   openapi: "3.0.0",
   info: {

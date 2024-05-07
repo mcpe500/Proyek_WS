@@ -18,7 +18,7 @@ class ApiService {
   }
   async fetchImage<T>(url: string, headers = {}): Promise<T> {
     const response = await fetch(url, { headers });
-    if (response.headers.get('Content-Type')?.startsWith('image')) {
+    if (response.headers.get("Content-Type")?.startsWith("image")) {
       return response.blob() as Promise<T>;
     }
     return response.json() as Promise<T>;
@@ -52,4 +52,8 @@ class ApiService {
   }
 }
 
-export const Apis = {}
+export const Apis = {
+  API_NINJA_ApiService: new ApiService(
+    "https://api.api-ninjas.com/v1/exercises"
+  ),
+};

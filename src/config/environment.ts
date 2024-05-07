@@ -23,4 +23,5 @@ export const ENV: EnvironmentStructure = {
   DB_STATIC_USERNAME: process.env.DB_STATIC_USERNAME ?? "root",
   DB_STATIC_PASSWORD: process.env.DB_STATIC_PASSWORD ?? "",
   DB_STATIC_DATABASE: process.env.DB_STATIC_DATABASE ?? "db_name",
+  API_NINJAS_API_KEY: process.env.API_NINJAS_API_KEY ?? "",
 };

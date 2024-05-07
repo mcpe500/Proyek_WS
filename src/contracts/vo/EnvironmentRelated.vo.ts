@@ -17,4 +17,6 @@ export interface EnvironmentStructure {
   DB_STATIC_USERNAME: string;
   DB_STATIC_PASSWORD: string;
   DB_STATIC_DATABASE: string;
+
+  API_NINJAS_API_KEY: string;
 }
