@@ -12,9 +12,11 @@ import {
 } from "../utils/AuthUtils";
 import { RESPONSE_STATUS } from "../contracts/enum/ResponseRelated.enum";
 import { User } from "../models/dynamic/User.model";
+import Paket from "../models/static/Paket.model";
 import { JwtPayload } from "jsonwebtoken";
 import mongoose from "mongoose";
 import crypto from "crypto";
+import { Subscription } from "../models/dynamic/Subscription.model";
 
 // const UserSchema: Schema = new Schema({
 //   fullName: { type: String, required: true },
@@ -381,11 +383,40 @@ export const resetApiKey = async (req: Request, res: Response) => {
 };
 
 export const subscribePacket = async (req: Request, res: Response) => {
-  const { packetId, username, email } = req.body;
-  // check packet valid
+  const { paketId, user } = req.body;
+
+  const paket = await Paket.findOne({
+    where: {
+        Paket_id: paketId,
+    }
+  })
+
+  if (!paket) {
+    return res
+     .status(RESPONSE_STATUS.NOT_FOUND)
+     .json({ message: "Paket not found" });
+  }
+
   // check balance
   // update balancea
-  // insert subscription
+
+  let endDate = new Date(); 
+  endDate.setMonth(endDate.getMonth() + 1);
+  endDate.setDate(endDate.getDate() - 1);
+  endDate.setHours(23); 
+  endDate.setMinutes(59); 
+  endDate.setSeconds(59); 
+
+  //insert subscription
+  const subscription = new Subscription({
+    userId: user.id,
+    paketId,
+    endDate,
+  })
+  const newSubscription = await subscription.save();
+
+  return res.status(RESPONSE_STATUS.CREATED).json({ subscription: newSubscription });
+
 };
 
 // Mau 1. paket jadi …k per bulan unlimited tembak,

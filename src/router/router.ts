@@ -11,6 +11,7 @@ import {
   verifyEmail,
   getApiKey,
   resetApiKey,
+  subscribePacket,
 } from "../controller/UserController";
 import { validateAccessToken } from "../middleware/AuthMiddleware";
 import {
@@ -62,8 +63,9 @@ router.put(
 
 router.get("/users/apikey", [validateAccessToken], getApiKey);
 router.put("/users/apikey/reset", [validateAccessToken], resetApiKey);
-
+router.post("/users/subscribe", [validateAccessToken], subscribePacket); 
 router.get("/users/:id", getUser);
+
 
 // Pricing
 router.get("/pricing", getAllPricingPackages);
