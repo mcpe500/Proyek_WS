@@ -18,6 +18,7 @@ const UserSchema: Schema = new Schema({
     enum: Object.values(FITNESS_GOALS),
   },
   healthInformation: { type: String, required: false },
+  balance: { type: Number, default: 0 },
   refreshToken: { type: String, required: false },
   accessToken: { type: String, required: false },
   isEmailVerified: { type: Boolean, default: false },
