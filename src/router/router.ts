@@ -34,7 +34,7 @@ import {
   getDifficulty,
   getType,
 } from "../controller/ExerciseController";
-import { createPlan } from "../controller/UserPlansController";
+import { createPlan, editPlan, startPlan, completePlan, getPlan, exercisePlan, picturePlan, trackerPlan, deletePlan } from "../controller/UserPlansController";
 
 const router = Router();
 
@@ -85,5 +85,13 @@ router.get("/exercise/muscle", getMuscle);
 router.get("/exercise/difficulty", getDifficulty);
 
 router.post("/users/plan", validateAccessToken, createPlan);
+router.put("/users/plan/edit", validateAccessToken, editPlan);
+router.put("/users/plan/start", validateAccessToken, startPlan);
+router.put("/users/plan/complete", validateAccessToken, completePlan);
+router.get("/users/plan/:planId", validateAccessToken, getPlan);
+router.put("/users/plan/exercise/:exercisePlanId", validateAccessToken, exercisePlan);
+router.post("/users/plan/picture", validateAccessToken, picturePlan);
+router.get("/users/plan/tracker", validateAccessToken, trackerPlan);
+router.delete("/users/plan/:planId", validateAccessToken, deletePlan);
 
 export default router;
