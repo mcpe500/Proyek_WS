@@ -34,6 +34,7 @@ import {
   getDifficulty,
   getType,
 } from "../controller/ExerciseController";
+import { createExercisePlan } from "../controller/UserPlanController";
 
 const router = Router();
 
@@ -64,6 +65,7 @@ router.put(
 router.get("/users/apikey", [validateAccessToken], getApiKey);
 router.put("/users/apikey/reset", [validateAccessToken], resetApiKey);
 router.post("/users/subscribe", [validateAccessToken], subscribePacket); 
+router.post("/users/plan",[validateAccessToken], createExercisePlan);
 router.get("/users/:id", getUser);
 
 
