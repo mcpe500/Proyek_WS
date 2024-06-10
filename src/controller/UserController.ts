@@ -28,11 +28,6 @@ import { Subscription } from "../models/dynamic/Subscription.model";
 //   gender: { type: String, required: true },
 //   height: { type: Number, required: true },
 //   weight: { type: Number, required: true },
-//   fitnessGoals: {
-//     type: String,
-//     required: true,
-//     enum: Object.values(FITNESS_GOALS),
-//   },
 //   healthInformation: { type: String, required: true },
 //   refreshToken: { type: String },
 //   isEmailVerified: { type: Boolean, default: false },
@@ -50,7 +45,6 @@ export const registerUser = async (req: Request, res: Response) => {
     // gender,
     // height,
     // weight,
-    // fitnessGoals,
     // healthInformation,
   } = req.body;
 
@@ -75,7 +69,6 @@ export const registerUser = async (req: Request, res: Response) => {
       //   gender,
       //   height,
       //   weight,
-      //   fitnessGoals,
       //   healthInformation,
       isEmailVerified: false,
       emailVerificationToken: emailToken,
@@ -110,11 +103,12 @@ export const loginUser = async (req: Request, res: Response) => {
   }
   if (!user.isEmailVerified) {
     if (!verifyEmailVerificationToken(user.emailVerificationToken)) {
-        await User.deleteOne({ _id: user._id });
-    
-        return res
-         .status(RESPONSE_STATUS.BAD_REQUEST)
-         .send({ message: "Your email verification token has expired and as a result, your account has been deleted" });
+      await User.deleteOne({ _id: user._id });
+
+      return res.status(RESPONSE_STATUS.BAD_REQUEST).send({
+        message:
+          "Your email verification token has expired and as a result, your account has been deleted",
+      });
     }
     return res
       .status(RESPONSE_STATUS.BAD_REQUEST)
@@ -189,7 +183,6 @@ export const editProfile = async (req: Request, res: Response) => {
     gender,
     height,
     weight,
-    fitnessGoals,
     healthInformation,
     // username,
     // email,
@@ -234,7 +227,6 @@ export const editProfile = async (req: Request, res: Response) => {
   if (gender != "") user.gender = gender;
   if (height != "") user.height = height;
   if (weight != "") user.weight = weight;
-  if (fitnessGoals != "") user.fitnessGoals = fitnessGoals;
   if (healthInformation != "") user.healthInformation = healthInformation;
 
   // Save the updated user
@@ -387,36 +379,37 @@ export const subscribePacket = async (req: Request, res: Response) => {
 
   const paket = await Paket.findOne({
     where: {
-        Paket_id: paketId,
-    }
-  })
+      Paket_id: paketId,
+    },
+  });
 
   if (!paket) {
     return res
-     .status(RESPONSE_STATUS.NOT_FOUND)
-     .json({ message: "Paket not found" });
+      .status(RESPONSE_STATUS.NOT_FOUND)
+      .json({ message: "Paket not found" });
   }
 
   // check balance
   // update balancea
 
-  let endDate = new Date(); 
+  let endDate = new Date();
   endDate.setMonth(endDate.getMonth() + 1);
   endDate.setDate(endDate.getDate() - 1);
-  endDate.setHours(23); 
-  endDate.setMinutes(59); 
-  endDate.setSeconds(59); 
+  endDate.setHours(23);
+  endDate.setMinutes(59);
+  endDate.setSeconds(59);
 
   //insert subscription
   const subscription = new Subscription({
     userId: user.id,
     paketId,
     endDate,
-  })
+  });
   const newSubscription = await subscription.save();
 
-  return res.status(RESPONSE_STATUS.CREATED).json({ subscription: newSubscription });
-
+  return res
+    .status(RESPONSE_STATUS.CREATED)
+    .json({ subscription: newSubscription });
 };
 
 // Mau 1. paket jadi …k per bulan unlimited tembak,
