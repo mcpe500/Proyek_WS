@@ -16,12 +16,6 @@ import {
 } from "../controller/UserController";
 import { validateAccessToken } from "../middleware/AuthMiddleware";
 import {
-  accessRoutes,
-  addRoutes,
-  showBuiltInModules,
-} from "../controller/RoutesController";
-import { ROUTES } from "../contracts/enum/RoutesRelated.enum";
-import {
   validateBody,
   validateCookie,
   validateParams,
@@ -60,30 +54,16 @@ import { createUserPlanSchemaJoi } from "../validators/Plans.validate";
 
 const router = Router();
 
+// Authentication Routes
 router.post("/auth/register", validateBody(registerSchemaJoi), registerUser);
 router.post("/auth/login", validateBody(loginSchemaJoi), loginUser);
-
-router.post(
-  "/auth/token",
-  validateCookie(validationTokenSchemaJoi),
-  generateNewAccessToken
-);
-router.post(
-  "/auth/refresh_token",
-  validateCookie(validationTokenSchemaJoi),
-  newRefreshToken
-);
-
+router.post("/auth/token", validateCookie(validationTokenSchemaJoi), generateNewAccessToken);
+router.post("/auth/refresh_token", validateCookie(validationTokenSchemaJoi), newRefreshToken);
 router.get("/auth/verify/:emailVerificationToken", verifyEmail);
 
-router.get("/users", getAllUser);
+// User Routes
 router.get("/users/dashboard", [validateAccessToken], getDashboard);
-router.put(
-  "/users/profile",
-  [validateAccessToken, validateBody(editProfileSchemaJoi)],
-  editProfile
-);
-
+router.put("/users/profile", [validateAccessToken, validateBody(editProfileSchemaJoi)], editProfile);
 router.get("/users/apikey", [validateAccessToken], getApiKey);
 router.put("/users/apikey/reset", [validateAccessToken], resetApiKey);
 router.post("/users/subscribe", [validateAccessToken], subscribePacket); 
@@ -96,57 +76,34 @@ router.post(
   createExercisePlan
 );
 
+
+// Exercise Plan Routes IVAN [Blm Selesai]
+router.post("/users/plan", [validateAccessToken, validateBody(createUserPlanSchemaJoi)], createExercisePlan);
 router.put("/users/plan/edit/:id", [validateAccessToken], editExercisePlan);
 router.post("/users/plan/start/:id", [validateAccessToken], startExercisePlan);
+router.put("/users/plan/:id/workout/", [validateAccessToken], addWorkoutToExercisePlan); // TODO: Add description
+router.get("/users/plan/:id/workout/", [validateAccessToken], exercisePlanDetails); // TODO: Add description
+router.post("/users/plan/complete/:id", [validateAccessToken], completeExercisePlan);
 
-// TODO
-router.put(
-  "/users/plan/:id/workout/",
-  [validateAccessToken],
-  addWorkoutToExercisePlan
-);
-router.get(
-  "/users/plan/:id/workout/",
-  [validateAccessToken],
-  exercisePlanDetails
-);
-//
 
-router.post(
-  "/users/plan/complete/:id",
-  [validateAccessToken],
-  completeExercisePlan
-);
-
-router.get("/users/:id", getUser);
+//admin routes
+router.get("/users", getAllUser); // admin can use this
+router.get("/users/:id", getUser); // admin can use this
 
 // Pricing
 router.get("/pricing", getAllPricingPackages);
-// router.put("/users/:id", updateUser);
-// router.delete("/users/:id", deleteUser);
-
-// router.post(ROUTES.ADD_ROUTES, addRoutes);
-// router.post("/dynamic/:routes", accessRoutes)
-// router.get(ROUTES.DYNAMIC_ROUTES, accessRoutes);
-// router.get("/showBuiltInModules", showBuiltInModules);
-
-// router.use(validateAccessToken); // Use the middleware to validate the access token for all routes below
-
 router.get("/exercise/name", getExercise);
 router.get("/exercise/type", getType);
 router.get("/exercise/muscle", getMuscle);
 router.get("/exercise/difficulty", getDifficulty);
 
+// User Plan Routes HANSEN
 router.post("/users/plan", validateAccessToken, createPlan);
 router.put("/users/plan/edit", validateAccessToken, editPlan);
 router.put("/users/plan/start", validateAccessToken, startPlan);
 router.put("/users/plan/complete", validateAccessToken, completePlan);
 router.get("/users/plan/:planId", validateAccessToken, getPlan);
-router.put(
-  "/users/plan/exercise/:exercisePlanId",
-  validateAccessToken,
-  exercisePlan
-);
+router.put("/users/plan/exercise/:exercisePlanId", validateAccessToken, exercisePlan);
 router.post("/users/plan/picture", validateAccessToken, picturePlan);
 router.get("/users/plan/tracker", validateAccessToken, trackerPlan);
 router.delete("/users/plan/:planId", validateAccessToken, deletePlan);
