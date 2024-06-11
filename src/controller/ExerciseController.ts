@@ -16,6 +16,7 @@ import mongoose from "mongoose";
 import axios from "axios";
 import { ENV } from "../config/environment";
 import { Apis } from "../services/ApiService";
+import Joi from "joi";
 
 export const getExercise = async (req: Request, res: Response) => {
   try {
@@ -33,8 +34,12 @@ export const getExercise = async (req: Request, res: Response) => {
     //     },
     //   }
     // );
-
-    return res.status(RESPONSE_STATUS.SUCCESS).json({ exercise: response });
+    if ((response as any).length < 1) {
+      return res.status(RESPONSE_STATUS.NOT_FOUND).json({ error: `Exercise Not Found!` });
+    }
+    else{
+      return res.status(RESPONSE_STATUS.SUCCESS).json({ exercise: response });      
+    }
     //   .json({ exercise: response.data });
   } catch (error: any) {
     console.error("Request failed:", error);
@@ -43,7 +48,24 @@ export const getExercise = async (req: Request, res: Response) => {
 };
 
 export const getType = async (req: Request, res: Response) => {
+    const validTypes = [
+      "cardio",
+      "olympic_weightlifting",
+      "plyometrics",
+      "powerlifting",
+      "strength",
+      "stretching",
+      "strongman"
+  ];
+  const typeSchema = Joi.string()
+    .valid(...validTypes)
+    .insensitive();
   try {
+    const { error } = typeSchema.validate(req.query.type);
+    if (error) {
+      const errorMessage = `Type not valid. Valid types are: ${validTypes.join(', ')}`;
+      return res.status(RESPONSE_STATUS.BAD_REQUEST).json({ error: errorMessage });
+    }
     const { type } = req.query;
     console.log(req.query);
     const response = await Apis.API_NINJA_ApiService.get("", {
@@ -68,7 +90,33 @@ export const getType = async (req: Request, res: Response) => {
 };
 
 export const getMuscle = async (req: Request, res: Response) => {
+    const validMuscles = [
+      "abdominals",
+      "abductors",
+      "adductors",
+      "biceps",
+      "calves",
+      "chest",
+      "forearms",
+      "glutes",
+      "hamstrings",
+      "lats",
+      "lower_back",
+      "middle_back",
+      "neck",
+      "quadriceps",
+      "traps",
+      "triceps"
+  ];
+  const muscleSchema = Joi.string()
+    .valid(...validMuscles)
+    .insensitive();
   try {
+    const { error } = muscleSchema.validate(req.query.muscle);
+    if (error) {
+      const errorMessage = `Muscle not valid. Valid muscles are: ${validMuscles.join(', ')}`;
+      return res.status(RESPONSE_STATUS.BAD_REQUEST).json({ error: errorMessage });
+    }
     const { muscle } = req.query;
     console.log(req.query);
     const response = await Apis.API_NINJA_ApiService.get("", {
@@ -93,7 +141,21 @@ export const getMuscle = async (req: Request, res: Response) => {
 };
 
 export const getDifficulty = async (req: Request, res: Response) => {
+  const validDifficulty = [
+      "beginner",
+      "intermediate",
+      "expert"
+  ];
+  const difficultySchema = Joi.string()
+    .valid(...validDifficulty)
+    .insensitive();
   try {
+    const { error } = difficultySchema.validate(req.query.difficulty);
+    if (error) {
+      const errorMessage = `Difficulty not valid. Valid difficulty levels are: ${validDifficulty.join(', ')}`;
+      return res.status(RESPONSE_STATUS.BAD_REQUEST).json({ error: errorMessage });
+    }
+
     const { difficulty } = req.query;
     console.log(req.query);
     const response = await Apis.API_NINJA_ApiService.get("", {

@@ -20,7 +20,11 @@ import {
   showBuiltInModules,
 } from "../controller/RoutesController";
 import { ROUTES } from "../contracts/enum/RoutesRelated.enum";
-import { validateBody, validateCookie, validateParams } from "../middleware/ValidateMiddleware";
+import {
+  validateBody,
+  validateCookie,
+  validateParams,
+} from "../middleware/ValidateMiddleware";
 import {
   editProfileSchemaJoi,
   loginSchemaJoi,
@@ -41,6 +45,15 @@ import {
   exercisePlanDetails,
   addWorkoutToExercisePlan,
   startExercisePlan,
+  createPlan,
+  editPlan,
+  startPlan,
+  completePlan,
+  getPlan,
+  exercisePlan,
+  picturePlan,
+  trackerPlan,
+  deletePlan,
 } from "../controller/UserPlanController";
 import { createUserPlanSchemaJoi } from "../validators/Plans.validate";
 
@@ -84,8 +97,16 @@ router.put("/users/plan/edit/:id", [validateAccessToken], editExercisePlan);
 router.post("/users/plan/start/:id", [validateAccessToken], startExercisePlan);
 
 // TODO
-router.put("/users/plan/:id/workout/", [validateAccessToken], addWorkoutToExercisePlan);
-router.get("/users/plan/:id/workout/", [validateAccessToken], exercisePlanDetails);
+router.put(
+  "/users/plan/:id/workout/",
+  [validateAccessToken],
+  addWorkoutToExercisePlan
+);
+router.get(
+  "/users/plan/:id/workout/",
+  [validateAccessToken],
+  exercisePlanDetails
+);
 //
 
 router.post(
@@ -112,5 +133,19 @@ router.get("/exercise/name", getExercise);
 router.get("/exercise/type", getType);
 router.get("/exercise/muscle", getMuscle);
 router.get("/exercise/difficulty", getDifficulty);
+
+router.post("/users/plan", validateAccessToken, createPlan);
+router.put("/users/plan/edit", validateAccessToken, editPlan);
+router.put("/users/plan/start", validateAccessToken, startPlan);
+router.put("/users/plan/complete", validateAccessToken, completePlan);
+router.get("/users/plan/:planId", validateAccessToken, getPlan);
+router.put(
+  "/users/plan/exercise/:exercisePlanId",
+  validateAccessToken,
+  exercisePlan
+);
+router.post("/users/plan/picture", validateAccessToken, picturePlan);
+router.get("/users/plan/tracker", validateAccessToken, trackerPlan);
+router.delete("/users/plan/:planId", validateAccessToken, deletePlan);
 
 export default router;
