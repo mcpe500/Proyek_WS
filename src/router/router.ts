@@ -84,7 +84,7 @@ router.post("/users/plan/complete/:id", [validateAccessToken], completeExerciseP
 
 
 //admin routes
-router.get("/users", getAllUser); // admin can use this
+router.get("/users", getAllUser); // admin can use this, add filtering to filter using query
 router.get("/users/:id", getUser); // admin can use this
 
 // Pricing
