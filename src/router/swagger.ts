@@ -909,6 +909,101 @@ paths["/api/v1/users/apikey/reset"] = {
   },
 };
 
+paths["/api/v1/users/topup"] = {
+    put: {
+      tags: ["users"],
+      summary: "Top up user balance",
+      description: "This endpoint updates the user's balance by a specified amount.",
+      operationId: "topupUserBalance",
+      security: [
+        {
+          bearerAuth: [],
+        },
+      ],
+      requestBody: {
+        content: {
+          "application/json": {
+            schema: {
+              type: "object",
+              properties: {
+                amount: { type: "number" },
+              },
+              required: ["amount"],
+            },
+          },
+        },
+        required: true,
+      },
+      responses: {
+        "200": {
+          description: "Balance updated successfully",
+          content: {
+            "application/json": {
+              schema: {
+                type: "object",
+                properties: {
+                  message: { type: "string" },
+                },
+              },
+            },
+          },
+        },
+        "400": {
+          description: "Invalid amount",
+          content: {
+            "application/json": {
+              schema: {
+                type: "object",
+                properties: {
+                  message: { type: "string" },
+                },
+              },
+            },
+          },
+        },
+        "401": {
+          description: "Unauthorized",
+          content: {
+            "application/json": {
+              schema: {
+                type: "object",
+                properties: {
+                  message: { type: "string" },
+                },
+              },
+            },
+          },
+        },
+        "404": {
+          description: "User not found",
+          content: {
+            "application/json": {
+              schema: {
+                type: "object",
+                properties: {
+                  msg: { type: "string" },
+                },
+              },
+            },
+          },
+        },
+        "500": {
+          description: "Internal server error",
+          content: {
+            "application/json": {
+              schema: {
+                type: "object",
+                properties: {
+                  message: { type: "string" },
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+  };  
+
 paths["/api/v1/users/subscribe"] = {
     post: {
       tags: ["users"],

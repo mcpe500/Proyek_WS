@@ -12,6 +12,7 @@ const UserSchema: Schema = new Schema({
   height: { type: Number, required: false },
   weight: { type: Number, required: false },
   healthInformation: { type: String, required: false },
+  balance: { type: Number, default: 0 },
   refreshToken: { type: String, required: false },
   accessToken: { type: String, required: false },
   isEmailVerified: { type: Boolean, default: false },

@@ -374,6 +374,30 @@ export const resetApiKey = async (req: Request, res: Response) => {
   }
 };
 
+export const topup = async (req: Request, res: Response) => {
+    const { amount, user } = req.body;
+
+    if (amount <= 0) {
+        return res
+            .status(RESPONSE_STATUS.BAD_REQUEST)
+            .json({ message: "Invalid amount" });
+    }
+
+    try {
+        user.balance += amount;
+        const updatedUser = await user.save();
+
+        return res
+            .status(RESPONSE_STATUS.SUCCESS)
+            .json({ message: "Balance updated. Current balance: Rp" + user.balance });
+    } catch (error) {
+        return res
+            .status(RESPONSE_STATUS.INTERNAL_SERVER_ERROR)
+            .json({ message: "Internal server error" });
+    }
+
+}
+
 export const subscribePacket = async (req: Request, res: Response) => {
   const { paketId, user } = req.body;
 
@@ -390,7 +414,21 @@ export const subscribePacket = async (req: Request, res: Response) => {
   }
 
   // check balance
-  // update balancea
+  if (user.balance < paket.Paket_price) {
+    return res
+     .status(RESPONSE_STATUS.BAD_REQUEST)
+     .json({ message: "Not enough balance! Please topup first" });
+  }
+
+  // update balance
+  try {
+    user.balance -= paket.Paket_price;
+    await user.save();
+  } catch (error) {
+        return res
+            .status(RESPONSE_STATUS.INTERNAL_SERVER_ERROR)
+            .json({ message: "Internal server error" });
+  }
 
   let endDate = new Date();
   endDate.setMonth(endDate.getMonth() + 1);

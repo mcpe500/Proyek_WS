@@ -12,6 +12,7 @@ import {
   getApiKey,
   resetApiKey,
   subscribePacket,
+  topup,
 } from "../controller/UserController";
 import { validateAccessToken } from "../middleware/AuthMiddleware";
 import {
@@ -85,7 +86,9 @@ router.put(
 
 router.get("/users/apikey", [validateAccessToken], getApiKey);
 router.put("/users/apikey/reset", [validateAccessToken], resetApiKey);
-router.post("/users/subscribe", [validateAccessToken], subscribePacket);
+router.post("/users/subscribe", [validateAccessToken], subscribePacket); 
+router.put("/users/topup", [validateAccessToken], topup)
+router.get("/users/:id", getUser);
 
 router.post(
   "/users/plan",
