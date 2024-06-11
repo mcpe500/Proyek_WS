@@ -114,6 +114,12 @@ export const createUserPlanSchemaJoi = JoiExtended.object({
     "any.required": "Created by is a required field",
   }),
 });
+
+
+export const exercisePlanDetailsSchemaJoi = JoiExtended.object({
+})
+export const addWorkoutToExercisePlanSchemaJoi = JoiExtended.object({
+});
 // export const editUserPlanSchemaJoi = JoiExtended.object({
 //   name: JoiExtended.string().optional().messages({
 //     "string.base": "Name must be a string",

@@ -4,6 +4,8 @@ import { IPlans } from "../contracts/dto/PlansRelated.dto";
 import { Plans } from "../models/dynamic/Plans.model";
 import { PlansStatus } from "../contracts/enum/PlansRelated.enum";
 import { FITNESS_GOALS } from "../contracts/enum/FitnessRelated.enum";
+import { User } from "../models/dynamic/User.model";
+import { Exercise } from "../models/dynamic/Exercise.model";
 
 // Create Exercise Plan
 export const createExercisePlan = async (req: Request, res: Response) => {
@@ -100,6 +102,13 @@ export const startExercisePlan = async (req: Request, res: Response) => {
     if (!plan) {
       return res.status(404).json({ msg: "Plan not found" });
     }
+    // if there's an exercise
+    if (plan.exercises.length < 1) {
+      return res.status(404).json({ msg: "No exercise in the plan" });
+    }
+    if (plan.status == PlansStatus.STARTED) {
+      return res.status(404).json({ msg: "Plan already started" });
+    }
 
     plan.status = PlansStatus.STARTED;
 
@@ -137,8 +146,46 @@ export const completeExercisePlan = async (req: Request, res: Response) => {
   }
 };
 
-module.exports = {
-  createExercisePlan,
-  startExercisePlan,
-  completeExercisePlan,
+export const addWorkoutToExercisePlan = async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const { exerciseId } = req.body;
+  const user = req.body.user;
+
+  const plan = await Plans.findById(id);
+
+  if (!plan) {
+    return res.status(404).json({ msg: "Plan not found" });
+  }
+
+  const userFromPlan = await User.findById(plan.createdBy);
+
+  if (userFromPlan?._id != user._id) {
+    return res.status(404).json({ msg: "Not Your Plan" });
+  }
+
+  const exercise = await Exercise.findById(exerciseId);
+
+  if (!exercise) {
+    return res.status(404).json({ msg: "Exercise not found" });
+  }
+
+  plan.exercises.push(exercise);
+  await plan.save();
+
+  return res.status(200).json({ msg: "Exercise added to plan successfully" });
+};
+
+export const exercisePlanDetails = async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const user = req.body.user;
+  const plan = await Plans.findById(id);
+
+  if (!plan) {
+    return res.status(404).json({ msg: "Plan not found" });
+  }
+  const userFromPlan = await User.findById(plan.createdBy);
+  if (userFromPlan?._id != user._id) {
+    return res.status(404).json({ msg: "Not Your Plan" });
+  }
+  return res.status(200).json({ plan });
 };

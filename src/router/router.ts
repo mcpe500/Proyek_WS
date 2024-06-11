@@ -20,7 +20,7 @@ import {
   showBuiltInModules,
 } from "../controller/RoutesController";
 import { ROUTES } from "../contracts/enum/RoutesRelated.enum";
-import { validateBody, validateCookie } from "../middleware/ValidateMiddleware";
+import { validateBody, validateCookie, validateParams } from "../middleware/ValidateMiddleware";
 import {
   editProfileSchemaJoi,
   loginSchemaJoi,
@@ -38,6 +38,8 @@ import {
   completeExercisePlan,
   createExercisePlan,
   editExercisePlan,
+  exercisePlanDetails,
+  addWorkoutToExercisePlan,
   startExercisePlan,
 } from "../controller/UserPlanController";
 import { createUserPlanSchemaJoi } from "../validators/Plans.validate";
@@ -80,6 +82,12 @@ router.post(
 
 router.put("/users/plan/edit/:id", [validateAccessToken], editExercisePlan);
 router.post("/users/plan/start/:id", [validateAccessToken], startExercisePlan);
+
+// TODO
+router.put("/users/plan/:id/workout/", [validateAccessToken], addWorkoutToExercisePlan);
+router.get("/users/plan/:id/workout/", [validateAccessToken], exercisePlanDetails);
+//
+
 router.post(
   "/users/plan/complete/:id",
   [validateAccessToken],
