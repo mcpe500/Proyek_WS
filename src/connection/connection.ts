@@ -11,8 +11,4 @@ const connectMongoDB = async (): Promise<void> => {
   }
 };
 
-const connectStaticDB = async () => {
-  //create the connection for mysql here
-};
-
 export default connectMongoDB;

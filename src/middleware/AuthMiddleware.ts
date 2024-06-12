@@ -43,3 +43,11 @@ export const validateAccessToken = async (
     return res.status(RESPONSE_STATUS.UNAUTHORIZED).send("Unauthorized");
   }
 };
+
+export const validateAdmin = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  // TODO : Implement Checking if the user in req.body.user is an admin
+};
