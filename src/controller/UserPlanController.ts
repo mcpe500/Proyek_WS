@@ -215,29 +215,88 @@ export const exercisePlanDetails = async (req: Request, res: Response) => {
 };
 
 export const getAllExercisePlanByUser = async (req: Request, res: Response) => {
-  // TODO : Bikin Get ALL Exercise Plan By User
+  const { id } = req.params;
+  const user = req.body.user;
+  const plans = await Plans.find({
+    createdBy: user.username
+  }).select('name createdDate status');
+
+  try {
+    return res
+      .status(RESPONSE_STATUS.SUCCESS)
+      .json({ plans: plans });
+  } catch (error) {
+        return res
+            .status(RESPONSE_STATUS.INTERNAL_SERVER_ERROR)
+            .json({ message: "Internal server error" });
+  }
 };
-export const getExercisePlanDetailByUser = async (
-  req: Request,
-  res: Response
-) => {
-  // TODO : Bikin Get ALL Exercise Plan DETAIL By User
+
+export const getExercisePlanDetailByUser = async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const user = req.body.user;
+  const plan = await Plans.findById(id);
+
+  if (!plan) {
+    return res
+      .status(RESPONSE_STATUS.NOT_FOUND)
+      .json({ msg: "Plan not found" });
+  }
+
+  const userFromPlan = await User.findById(plan.createdBy);
+
+  if (userFromPlan?._id != user._id) {
+    return res.status(RESPONSE_STATUS.NOT_FOUND).json({ msg: "Not Your Plan" });
+  }
+
+  try {
+    return res
+      .status(RESPONSE_STATUS.SUCCESS)
+      .json({ plan_detail: plan });
+  } catch (error) {
+        return res
+            .status(RESPONSE_STATUS.INTERNAL_SERVER_ERROR)
+            .json({ message: "Internal server error" });
+  }
 };
 
-export const createPlan = async (req: Request, res: Response) => {};
+export const pictureExercisePlanByUser = async (req: Request, res: Response) => {};
 
-export const editPlan = async (req: Request, res: Response) => {};
+export const trackerExercisePlanByUser = async (req: Request, res: Response) => {};
 
-export const startPlan = async (req: Request, res: Response) => {};
+export const cancelExercisePlanByUser = async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const user = req.body.user;
+  const plan = await Plans.findById(id);
 
-export const completePlan = async (req: Request, res: Response) => {};
+  if (!plan) {
+    return res
+      .status(RESPONSE_STATUS.NOT_FOUND)
+      .json({ msg: "Plan not found" });
+  }
 
-export const getPlan = async (req: Request, res: Response) => {};
+  const userFromPlan = await User.findById(plan.createdBy);
 
-export const exercisePlan = async (req: Request, res: Response) => {};
+  if (userFromPlan?._id != user._id) {
+    return res.status(RESPONSE_STATUS.NOT_FOUND).json({ msg: "Not Your Plan" });
+  }
 
-export const picturePlan = async (req: Request, res: Response) => {};
+  if (plan.status !== "PENDING" && plan.status !== "STARTED") {
+    return res
+      .status(RESPONSE_STATUS.BAD_REQUEST)
+      .json({ msg: "Plan status is already completed or cancelled" });
+  }
 
-export const trackerPlan = async (req: Request, res: Response) => {};
-
-export const deletePlan = async (req: Request, res: Response) => {};
+  try {
+    plan.status = PlansStatus.CANCELLED;
+    await plan.save();
+    
+    return res
+      .status(RESPONSE_STATUS.SUCCESS)
+      .json({ message: "Plan has been cancelled" });
+  } catch (error) {
+        return res
+            .status(RESPONSE_STATUS.INTERNAL_SERVER_ERROR)
+            .json({ message: "Internal server error" });
+  }
+};
