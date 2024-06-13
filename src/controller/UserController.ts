@@ -564,3 +564,27 @@ export const addExercise = async (req: Request, res: Response) => {
         res.status(RESPONSE_STATUS.INTERNAL_SERVER_ERROR).json({ msg: 'Exercises added/updated failed.' });
       }
 };
+
+export const topupFromAdmin = async (req: Request, res: Response) => {
+    const { userID } = req.params;
+    const { saldo } = req.body;
+
+    if(userID){
+        const user = await User.findOne({ _id: userID });
+        if(!user)  return res.status(RESPONSE_STATUS.NOT_FOUND).json({ msg: 'User not found'});
+        user.balance += saldo;
+        await user.save();
+
+        return res.status(RESPONSE_STATUS.SUCCESS).json({ 
+            msg: 'Balance updated successfully', 
+            username: user.username, 
+            full_name: user.fullName, 
+            newBalance: user.balance 
+        });
+    }   
+    else{
+        const users = await User.updateMany({}, { $inc: { balance: saldo } });
+        return res.status(RESPONSE_STATUS.SUCCESS).json({ msg: 'Balance updated for all users successfully' });
+    }
+};
+

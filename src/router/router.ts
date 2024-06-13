@@ -19,7 +19,8 @@ import {
   getUserPacket,
   addUserPacket,
   deleteUserPacket,
-  addExercise
+  addExercise,
+  topupFromAdmin
 } from "../controller/UserController";
 import {
   validateAccessToken,
@@ -152,5 +153,6 @@ router.get("/admin/user/packet/:userID", [validateAccessToken, validateAdmin], g
 router.post("/admin/user/packet/:userID", [validateAccessToken, validateAdmin], addUserPacket);
 router.delete("/admin/user/packet/:userID", [validateAccessToken, validateAdmin], deleteUserPacket);
 router.get("/admin/exercise", [validateAccessToken, validateAdmin], addExercise);
+router.put("/admin/user/topup/:userID?", [validateAccessToken, validateAdmin], topupFromAdmin);
 
 export default router;
