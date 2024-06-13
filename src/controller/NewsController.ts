@@ -3,20 +3,29 @@ import puppeteer from "puppeteer";
 import { NewsSource } from "../config/NewsSources";
 import { extractArticles } from "../utils/NewsUtils";
 
+// Utility function to launch a new browser instance
+const launchBrowser = async () => {
+  return await puppeteer.launch();
+};
 
-
+// Get all news articles from the sources
 export const getAllNews = async (req: Request, res: Response) => {
   const sources = NewsSource;
-  const browser = await puppeteer.launch();
   const allArticles: any[] = [];
 
   try {
+    const browser = await launchBrowser();
+
     for (const source of sources) {
       if (source.name === "fitandwell") {
         try {
           const page = await browser.newPage();
-          await page.goto(source.url, { waitUntil: "networkidle2" });
-          await page.waitForSelector(".listing__link", { timeout: 10000 });
+          console.log(`Extracting articles from ${source.url}`);
+          await page.goto(source.url, {
+            waitUntil: "networkidle2",
+            timeout: 300000,
+          });
+          await page.waitForSelector(".listing__link", { timeout: 300000 });
           const articles = await extractArticles(page);
           allArticles.push(...articles);
           await page.close();
@@ -28,44 +37,57 @@ export const getAllNews = async (req: Request, res: Response) => {
         }
       }
     }
+
+    await browser.close();
   } catch (error) {
     console.error("An error occurred while extracting news:", error);
-    res.status(500).send("An error occurred while extracting news.");
-    return;
-  } finally {
-    await browser.close();
+    return res.status(500).send("An error occurred while extracting news.");
   }
 
   return res.json(allArticles);
 };
 
+// Get specific news article by title
 export const getSpecificNews = async (req: Request, res: Response) => {
   const { title } = req.params;
+  let articleUrl = "";
 
-  const browser = await puppeteer.launch();
-  const page = await browser.newPage();
-  //   try {
-  //     const page = await browser.newPage();
-  //     await page.goto(source.url, { waitUntil: "networkidle2" });
-  //     await page.waitForSelector(".listing__link", { timeout: 10000 });
-  //     const articles = await extractArticles(page);
-  //     allArticles.push(...articles);
-  //     await page.close();
-  //   } catch (error) {
-  //     console.error(`Failed to extract articles from ${source.url}:`, error);
-  //   }
   try {
-    // const page = await browser.newPage();
-    // await page.goto(NewsSource[0].url, { waitUntil: "networkidle2" });
-    // await page.waitForSelector(".listing__link", { timeout: 10000 });
-    // const articles = await extractArticles(page);
+    const browser = await launchBrowser();
+    const page = await browser.newPage();
 
-    // await page.close();
+    for (const source of NewsSource) {
+      if (source.name === "fitandwell") {
+        try {
+          console.log(`Extracting articles from ${source.url}`);
+          await page.goto(source.url, {
+            waitUntil: "networkidle2",
+            timeout: 300000,
+          });
+          await page.waitForSelector(".listing__link", { timeout: 300000 });
+          const articles = await extractArticles(page);
 
-    const url =
-      "https://www.fitandwell.com/news/these-exercises-are-an-absolute-game-changer-a-trainer-shares-her-10-minute-pilates-routine-for-strengthening-deep-core-muscles";
-    await page.goto(url, { waitUntil: "networkidle2" });
-    await page.waitForSelector("title", { timeout: 10000 });
+          const article = articles.find((a) => a.title?.includes(title));
+          if (article && article.url) {
+            articleUrl = article.url;
+            break;
+          }
+        } catch (error) {
+          console.error(
+            `Failed to extract articles from ${source.url}:`,
+            error
+          );
+        }
+      }
+    }
+
+    if (!articleUrl) {
+      await browser.close();
+      return res.status(404).send("Article not found.");
+    }
+
+    await page.goto(articleUrl, { waitUntil: "networkidle2", timeout: 300000 });
+    await page.waitForSelector("title", { timeout: 300000 });
 
     const data = await page.evaluate(() => {
       const getTextContent = (selector: string) => {
@@ -76,33 +98,20 @@ export const getSpecificNews = async (req: Request, res: Response) => {
       const getContent = () => {
         const element = document.querySelector("#article-body");
         const text = element?.textContent?.trim() || "";
-        const contentArray = text.split(".").map((t) => t.replaceAll("\n", ""));
+        // const contentArray = text.split(".").map((t) => t.replace(/\n/g, ""));
+        function removeHtmlCssJs(str: string) {
+          // Remove HTML tags
+          str = str.replace(/<[^>]*>/g, "");
 
-        const filterAndFormatContent = (content: string[]) => {
-          const filteredContent = content.filter(
-            (line) =>
-              !line.includes("Sponsored Links") &&
-              !line.includes("Promoted Links") &&
-              !line.includes("window") &&
-              !line.includes("catch(err => console") &&
-              !line.includes("error")
-          );
+          // Remove CSS styles
+          str = str.replace(/<style[^>]*>.*<\/style>/gm, "");
 
-          let formattedContent = "";
-          filteredContent.forEach((line, index) => {
-            if (index === 0) {
-              formattedContent += `# ${line}\n\n`;
-            } else if (line.startsWith(" ")) {
-              formattedContent += `## ${line.trim()}\n\n`;
-            } else {
-              formattedContent += `${line}\n\n`;
-            }
-          });
+          // Remove JavaScript
+          str = str.replace(/<script[^>]*>.*<\/script>/gm, "");
 
-          return formattedContent;
-        };
-
-        return filterAndFormatContent(contentArray);
+          return str;
+        }
+        return removeHtmlCssJs(text);
       };
 
       const getAttributeContent = (selector: string, attribute: string) => {
@@ -110,26 +119,12 @@ export const getSpecificNews = async (req: Request, res: Response) => {
         return element ? element.getAttribute(attribute) : null;
       };
 
-      const getNextRecommendation = () => {
-        const nextElement = document.querySelector(
-          '[aria-label="Next article"]'
-        );
-        return nextElement ? (nextElement as HTMLAnchorElement).href : null;
-      };
-
-      const getPreviousRecommendation = () => {
-        const prevElement = document.querySelector(
-          '[aria-label="Previous article"]'
-        );
-        return prevElement ? (prevElement as HTMLAnchorElement).href : null;
-      };
-
       const getAuthor = () => {
-        const authorElement = document.querySelector(
+        const scriptElement = document.querySelector(
           'script[type="application/ld+json"]'
         );
-        if (authorElement) {
-          const json = JSON.parse(authorElement.textContent || "{}");
+        if (scriptElement) {
+          const json = JSON.parse(scriptElement.textContent || "{}");
           return json.author ? json.author.name : null;
         }
         return null;
@@ -139,23 +134,24 @@ export const getSpecificNews = async (req: Request, res: Response) => {
         title: getTextContent("title"),
         description: getTextContent(".header__strapline"),
         content: getContent(),
-        nextRecommendation: getNextRecommendation(),
-        previousRecommendation: getPreviousRecommendation(),
         writer: getAuthor(),
         publishedDate: getAttributeContent('meta[name="pub_date"]', "content"),
+        nextRecommendation: getTextContent('[aria-label="Next article"]'),
+        previousRecommendation: getTextContent(
+          '[aria-label="Previous article"]'
+        ),
       };
     });
 
+    await browser.close();
     res.json(data);
   } catch (error) {
     console.error(
       "An error occurred while extracting the specific news:",
       error
     );
-    res
+    return res
       .status(500)
       .send("An error occurred while extracting the specific news.");
-  } finally {
-    await browser.close();
   }
 };

@@ -1,31 +1,31 @@
 import { Page } from "puppeteer";
 
+// Utility function to extract articles from the page
 export const extractArticles = async (page: Page) => {
   return await page.evaluate(() => {
-    const articleElements = Array.from(
-      document.querySelectorAll(".listing__link")
-    );
-    return articleElements.map((articleElement) => {
-      const url = articleElement.getAttribute("href") || null;
-      const title =
-        articleElement.querySelector(".listing__title")?.textContent?.trim() ||
-        null;
-      const detail =
-        articleElement
+    const articles = Array.from(document.querySelectorAll(".listing__link"));
+    return articles.map((article) => ({
+      url: article.getAttribute("href") || null,
+      title:
+        article.querySelector(".listing__title")?.textContent?.trim() || null,
+      detail:
+        article
           .querySelector(".listing__text--strapline")
-          ?.textContent?.trim() || null;
-      const type =
-        articleElement.querySelector(".listing__label")?.textContent?.trim() ||
-        null;
-      const writer =
-        articleElement
+          ?.textContent?.trim() || null,
+      type:
+        article.querySelector(".listing__label")?.textContent?.trim() || null,
+      writer:
+        article
           .querySelector(".listing__text--byline")
-          ?.textContent?.trim() || null;
-      const publishedDate =
-        articleElement
-          .querySelector(".date.byline__time")
-          ?.getAttribute("datetime") || null;
-      return { url, title, detail, type, writer, publishedDate };
-    });
+          ?.textContent?.trim()
+          .split("\n") || null,
+      publishedDate:
+        new Date(
+          article
+            .querySelector(".date.byline__time")
+            ?.getAttribute("datetime")
+            ?.toString() ?? ""
+        ).toUTCString() || null,
+    }));
   });
 };
