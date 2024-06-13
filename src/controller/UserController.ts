@@ -325,6 +325,13 @@ export const verifyEmail = async (req: Request, res: Response) => {
       apiKey,
     });
 
+    const subscription = new Subscription({
+      userId: user._id,
+      paketId: "PAK001",
+      endDate: new Date('9999-12-31T23:59:59.999Z'),
+    });
+    await subscription.save();
+
     return res
       .status(RESPONSE_STATUS.SUCCESS)
       .send({ message: "Email verified" });

@@ -62,6 +62,7 @@ import {
   getExercisePlanDetailByUser,
 } from "../controller/UserPlanController";
 import { createUserPlanSchemaJoi } from "../validators/Plans.validate";
+import { checkAndIncreaseAPIHit } from "../middleware/BusinessMiddleware";
 
 const router = Router();
 
@@ -89,36 +90,36 @@ router.put(
   editProfile
 ); // finished
 router.get("/users/apikey", [validateAccessToken], getApiKey); // finished
-router.put("/users/apikey/reset", [validateAccessToken], resetApiKey); // finished
+router.put("/users/apikey/reset", [validateAccessToken, checkAndIncreaseAPIHit], resetApiKey); // finished
 router.post("/users/subscribe", [validateAccessToken], subscribePacket); // finished
 router.post(
   "/users/plan",
-  [validateAccessToken, validateBody(createUserPlanSchemaJoi)],
+  [validateAccessToken, validateBody(createUserPlanSchemaJoi), checkAndIncreaseAPIHit],
   createExercisePlan
 ); // finished
 router.get("/users/plan", [validateAccessToken], getAllExercisePlanByUser); // NOT FINISHED
 router.get(
   "/users/plan/:id",
-  [validateAccessToken],
+  [validateAccessToken, checkAndIncreaseAPIHit],
   getExercisePlanDetailByUser
 ); // NOT FINISHED
 
 // Exercise Plan Routes
-router.put("/users/plan/edit/:id", [validateAccessToken], editExercisePlan); // finished
-router.post("/users/plan/start/:id", [validateAccessToken], startExercisePlan); // finished
+router.put("/users/plan/edit/:id", [validateAccessToken, checkAndIncreaseAPIHit], editExercisePlan); // finished
+router.post("/users/plan/start/:id", [validateAccessToken, checkAndIncreaseAPIHit], startExercisePlan); // finished
 router.put(
   "/users/plan/:id/workout/",
-  [validateAccessToken],
+  [validateAccessToken, checkAndIncreaseAPIHit],
   addWorkoutToExercisePlan
 ); // not yet done; TODO : Add Description
 router.get(
   "/users/plan/:id/workout/",
-  [validateAccessToken],
+  [validateAccessToken, checkAndIncreaseAPIHit],
   exercisePlanDetails
 ); // not yet done; TODO : Add Description
 router.post(
   "/users/plan/complete/:id",
-  [validateAccessToken],
+  [validateAccessToken, checkAndIncreaseAPIHit],
   completeExercisePlan
 ); // finished
 
