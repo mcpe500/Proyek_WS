@@ -13,6 +13,13 @@ import {
   resetApiKey,
   subscribePacket,
   topup,
+  adminDashboard,
+  getUserProfile,
+  updateUserProfile,
+  deleteUserProfile,
+  getUserPacket,
+  addUserPacket,
+  deleteUserPacket
 } from "../controller/UserController";
 import {
   validateAccessToken,
@@ -136,5 +143,14 @@ router.get("/exercise/difficulty", getDifficulty);
 // router.post("/users/plan/picture", validateAccessToken, picturePlan); // not yet done
 // router.get("/users/plan/tracker", validateAccessToken, trackerPlan); // not yet done
 // router.delete("/users/plan/:planId", validateAccessToken, deletePlan); // not yet done
+
+//route untuk admin
+router.get("/admin/dashboard", [validateAccessToken, validateAdmin], adminDashboard);
+router.get("/admin/user/profile/:userID", [validateAccessToken, validateAdmin], getUserProfile);
+router.put("/admin/user/profile/:userID", [validateAccessToken, validateAdmin], updateUserProfile);
+router.delete("/admin/user/profile/:userID", [validateAccessToken, validateAdmin], deleteUserProfile);
+router.get("/admin/user/packet/:userID", [validateAccessToken, validateAdmin], getUserPacket);
+router.post("/admin/user/packet/:userID", [validateAccessToken, validateAdmin], addUserPacket);
+router.delete("/admin/user/packet/:userID", [validateAccessToken, validateAdmin], deleteUserPacket);
 
 export default router;
