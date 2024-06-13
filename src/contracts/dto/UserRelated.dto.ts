@@ -18,4 +18,5 @@ export interface IUser extends Document {
   accessToken: string;
   isEmailVerified: boolean;
   emailVerificationToken: string;
+  role: string;
 }
