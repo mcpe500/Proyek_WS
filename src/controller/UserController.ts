@@ -17,6 +17,9 @@ import { JwtPayload } from "jsonwebtoken";
 import mongoose from "mongoose";
 import crypto from "crypto";
 import { Subscription } from "../models/dynamic/Subscription.model";
+import { Exercise } from "../models/dynamic/Exercise.model";
+import { Apis } from "../services/ApiService";
+import { IExercise } from "../contracts/dto/PlansRelated.dto";
 
 // const UserSchema: Schema = new Schema({
 //   fullName: { type: String, required: true },
@@ -535,5 +538,29 @@ export const deleteUserPacket = async (req: Request, res: Response) => {
 };
 
 export const addExercise = async (req: Request, res: Response) => {
+    try {
+        // Fetch data from external API
+        const exercises: any[] = await Apis.API_NINJA_ApiService.get<any[]>('');
     
+        for (const exercise of exercises) {
+          // Check if the exercise already exists in the database
+          const existingExercise = await Exercise.findOne({ name: exercise.name });
+    
+          // If the exercise does not exist, insert it into the database
+          if (!existingExercise) {
+            const newExercise = new Exercise({
+                name: exercise.name,
+                type: exercise.type,
+                targeted_muscle: exercise.muscle,
+                equipmentRequired: exercise.equipment ? exercise.equipment : "-",
+                description: exercise.instructions}
+            );
+            await newExercise.save();
+          }
+        }
+    
+        res.status(RESPONSE_STATUS.SUCCESS).json({ msg: 'Exercises have been added/updated successfully.' });
+      } catch (error) {
+        res.status(RESPONSE_STATUS.INTERNAL_SERVER_ERROR).json({ msg: 'Exercises added/updated failed.' });
+      }
 };

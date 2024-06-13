@@ -2,12 +2,11 @@ import { Document } from "mongoose";
 import { PlansStatus } from "../enum/PlansRelated.enum";
 
 export interface IExercise extends Document {
-  name: string;
-  description: string;
-  sets: number;
-  repetitions: number;
-  restBetweenSetsInSeconds: number;
-  equipmentRequired?: IEquipment[];
+  name: String,
+    type: String,
+    targeted_muscle: String,
+    equipmentRequired: String,
+    description: String
 }
 
 export interface IEquipment extends Document {
