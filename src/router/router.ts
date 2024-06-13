@@ -39,6 +39,8 @@ import {
 import { getAllPricingPackages } from "../controller/PricingController";
 import {
   getExercise,
+  getAllGoals,
+  getGoalById,
 } from "../controller/ExerciseController";
 import {
   completeExercisePlan,
@@ -146,5 +148,9 @@ router.delete("/admin/user/profile/:userID", [validateAccessToken, validateAdmin
 router.get("/admin/user/packet/:userID", [validateAccessToken, validateAdmin], getUserPacket);
 router.post("/admin/user/packet/:userID", [validateAccessToken, validateAdmin], addUserPacket);
 router.delete("/admin/user/packet/:userID", [validateAccessToken, validateAdmin], deleteUserPacket);
+
+// Exercise Goals
+router.get("/exercise/goals", [validateAccessToken], getAllGoals);
+router.get("/exercise/goals/:id", [validateAccessToken], getGoalById);
 
 export default router;

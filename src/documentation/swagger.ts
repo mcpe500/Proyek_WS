@@ -24,6 +24,9 @@ import editUserPlanById from "./paths/editUserPlanById";
 import startUserPlanById from "./paths/startUserPlanById";
 import completeUserPlanById from "./paths/completeUserPlanById";
 import addWorkoutToExercisePlan from "./paths/addWorkoutToExercisePlan";
+import getAllGoals from "./paths/getAllGoals";
+import getGoalById from "./paths/getGoalById";
+import cancelPlanByUser from "./paths/cancelPlanByUser";
 
 const paths: any = {};
 paths["/"] = root;
@@ -51,6 +54,9 @@ paths["/api/v1/users/plan/start/{id}"] = startUserPlanById;
 paths["/api/v1/users/plan/complete/{id}"] = completeUserPlanById;
 
 paths["/api/v1/users/plan/{id}/workout/"] = addWorkoutToExercisePlan;
+paths["/api/v1/exercise/goals"] = getAllGoals;
+paths["/api/v1/exercise/goals/{id}"] = getGoalById;
+paths["/api/v1/users/plan/cancel/{id}"] = cancelPlanByUser;
 
 const swaggerDocument = {
   openapi: "3.0.0",

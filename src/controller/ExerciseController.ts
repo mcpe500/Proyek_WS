@@ -17,6 +17,7 @@ import axios from "axios";
 import { ENV } from "../config/environment";
 import { Apis } from "../services/ApiService";
 import Joi from "joi";
+import { FITNESS_GOALS } from "../contracts/enum/FitnessRelated.enum";
 
 export const getExercise = async (req: Request, res: Response) => {
   try {
@@ -118,5 +119,43 @@ export const getExercise = async (req: Request, res: Response) => {
   } catch (error: any) {
     console.error("Request failed:", error);
     return res.status(RESPONSE_STATUS.NOT_FOUND).json({ error: error.message });
+  }
+};
+
+export const getAllGoals = async (req: Request, res: Response) => {
+  try {
+    const goalsBrief = Object.values(FITNESS_GOALS).map(goal => ({
+      title: goal.title,
+      description: goal.description
+    }));
+    
+    return res
+      .status(RESPONSE_STATUS.SUCCESS)
+      .json({ Goal_list: goalsBrief });
+  } catch (error) {
+    return res
+        .status(RESPONSE_STATUS.INTERNAL_SERVER_ERROR)
+        .json({ message: "Internal server error" });
+  }
+};
+
+export const getGoalById = async (req: Request, res: Response) => {
+  try {
+    const goalTitle = req.params.id.toLowerCase();
+    const goal = Object.values(FITNESS_GOALS).find(goal =>
+      goal.title.toLowerCase() === goalTitle
+    );
+
+  if (goal) {
+    return res
+      .status(RESPONSE_STATUS.SUCCESS)
+      .json({ Goal: goal });
+  } else {
+    res.status(RESPONSE_STATUS.NOT_FOUND).json({ message: 'Goal not found' });
+  }
+  } catch (error) {
+    return res
+        .status(RESPONSE_STATUS.INTERNAL_SERVER_ERROR)
+        .json({ message: "Internal server error" });
   }
 };
