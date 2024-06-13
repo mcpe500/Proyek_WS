@@ -1,6 +1,5 @@
 import mongoose, { Schema } from "mongoose";
 import { IUser } from "../../contracts/dto/UserRelated.dto";
-import { FITNESS_GOALS } from "../../contracts/enum/FitnessRelated.enum";
 
 const UserSchema: Schema = new Schema({
   username: { type: String, required: true, unique: true },
@@ -12,12 +11,8 @@ const UserSchema: Schema = new Schema({
   gender: { type: String, required: false },
   height: { type: Number, required: false },
   weight: { type: Number, required: false },
-  fitnessGoals: {
-    type: String,
-    required: false,
-    enum: Object.values(FITNESS_GOALS),
-  },
   healthInformation: { type: String, required: false },
+  balance: { type: Number, default: 0 },
   refreshToken: { type: String, required: false },
   accessToken: { type: String, required: false },
   isEmailVerified: { type: Boolean, default: false },

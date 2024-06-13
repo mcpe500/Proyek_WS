@@ -2,7 +2,7 @@ import { Document } from "mongoose";
 
 export interface ISubscription extends Document {
     userId: String,
-    packetId: String,
+    paketId: String,
     apiHit: Number,
     startDate: Date,
     endDate: Date,

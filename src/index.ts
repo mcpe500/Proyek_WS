@@ -5,7 +5,7 @@ import cookieParser from "cookie-parser";
 import swaggerUi from "swagger-ui-express";
 import { ROUTES } from "./contracts/enum/RoutesRelated.enum";
 import cors from "cors";
-import swaggerDocument from "./router/swagger";
+import swaggerDocument from "./documentation/swagger";
 import { RESPONSE_STATUS } from "./contracts/enum/ResponseRelated.enum";
 import connectMongoDB from "./connection/connection";
 import sequelize from "./connection/connectionStatic";
@@ -25,7 +25,9 @@ app.use(express.urlencoded({ extended: true }));
 app.use(ROUTES.API_V1, router);
 
 app.get(ROUTES.ROOT, (req: Request, res: Response) => {
-  return res.status(RESPONSE_STATUS.SUCCESS).send("Hello World");
+  return res
+    .status(RESPONSE_STATUS.SUCCESS)
+    .send("This API Service is currently running");
 });
 
 export default app;

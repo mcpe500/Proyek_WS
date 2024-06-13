@@ -764,6 +764,29 @@ paths["/api/v1/users/profile"] = {
   },
 };
 
+paths["/api/v1/pricing"] = {
+  get: {
+    tags: ["pricing"],
+    summary: "Get all pricing packages",
+    description: "Retrieves all pricing packages available.",
+    responses: {
+      "200": {
+        description: "Successful response with pricing packages data",
+        content: {
+          "application/json": {
+            schema: {
+              type: "array",
+              items: {
+                $ref: "#/components/schemas/PricingPackage",
+              },
+            },
+          },
+        },
+      },
+    },
+  },
+};
+
 paths["/api/v1/users/apikey"] = {
   get: {
     summary: "Get API key for a user",
@@ -881,6 +904,354 @@ paths["/api/v1/users/apikey/reset"] = {
             },
           },
         },
+      },
+    },
+  },
+};
+
+paths["/api/v1/users/topup"] = {
+    put: {
+      tags: ["users"],
+      summary: "Top up user balance",
+      description: "This endpoint updates the user's balance by a specified amount.",
+      operationId: "topupUserBalance",
+      security: [
+        {
+          bearerAuth: [],
+        },
+      ],
+      requestBody: {
+        content: {
+          "application/json": {
+            schema: {
+              type: "object",
+              properties: {
+                amount: { type: "number" },
+              },
+              required: ["amount"],
+            },
+          },
+        },
+        required: true,
+      },
+      responses: {
+        "200": {
+          description: "Balance updated successfully",
+          content: {
+            "application/json": {
+              schema: {
+                type: "object",
+                properties: {
+                  message: { type: "string" },
+                },
+              },
+            },
+          },
+        },
+        "400": {
+          description: "Invalid amount",
+          content: {
+            "application/json": {
+              schema: {
+                type: "object",
+                properties: {
+                  message: { type: "string" },
+                },
+              },
+            },
+          },
+        },
+        "401": {
+          description: "Unauthorized",
+          content: {
+            "application/json": {
+              schema: {
+                type: "object",
+                properties: {
+                  message: { type: "string" },
+                },
+              },
+            },
+          },
+        },
+        "404": {
+          description: "User not found",
+          content: {
+            "application/json": {
+              schema: {
+                type: "object",
+                properties: {
+                  msg: { type: "string" },
+                },
+              },
+            },
+          },
+        },
+        "500": {
+          description: "Internal server error",
+          content: {
+            "application/json": {
+              schema: {
+                type: "object",
+                properties: {
+                  message: { type: "string" },
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+  };  
+
+paths["/api/v1/users/subscribe"] = {
+    post: {
+      tags: ["users"],
+      summary: "Subscribe a user to a packet",
+      description: "This endpoint subscribes a user to a packet.",
+      operationId: "subscribePacket",
+      security: [
+        {
+          bearerAuth: [],
+        },
+      ],
+      requestBody: {
+        content: {
+          "application/json": {
+            schema: {
+              type: "object",
+              properties: {
+                paketId: { type: "string" },
+              },
+              required: ["paketId"]
+            }
+          }
+        },
+        required: true
+      },
+      responses: {
+        "201": {
+          description: "Subscription created successfully",
+          content: {
+            "application/json": {
+              schema: {
+                type: "object",
+                properties: {
+                  subscription: { type: "object" }
+                }
+              }
+            }
+          }
+        },
+        "404": {
+          description: "Packet not found",
+          content: {
+            "application/json": {
+              schema: {
+                type: "object",
+                properties: {
+                  message: { type: "string" }
+                }
+              }
+            }
+          }
+        },
+        "500": {
+          description: "Internal server error",
+          content: {
+            "application/json": {
+              schema: {
+                type: "object",
+                properties: {
+                  msg: { type: "string" }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  };
+  
+
+paths["/api/v1/exercise/name"] = {
+  get: {
+    tags: ["exercise"],
+    summary: "Get exercise details by name",
+    description:
+      "Retrieves information about an exercise based on the provided name query parameter.",
+    parameters: [
+      {
+        name: "exercise",
+        in: "query",
+        description: "The name of the exercise to retrieve",
+        required: false,
+        type: "string",
+      },
+    ],
+    responses: {
+      "200": {
+        description: "Successful operation",
+        content: {
+          "application/json": {
+            schema: {
+              type: "object",
+              properties: {
+                exercise: {
+                  type: "object",
+                  description: "The retrieved exercise data",
+                },
+              },
+            },
+          },
+        },
+      },
+      "400": {
+        description: "Bad request (e.g., missing or invalid query parameter)",
+      },
+      "404": {
+        description: "Exercise not found",
+      },
+      "500": {
+        description: "Internal server error",
+      },
+    },
+  },
+};
+paths["/api/v1/exercise/type"] = {
+  get: {
+    tags: ["exercise"],
+    summary: "Get exercise details by type",
+    description:
+      "Retrieves information about exercises based on the provided type query parameter.",
+    parameters: [
+      {
+        name: "type",
+        in: "query",
+        description:
+          "The type of exercise to retrieve (e.g., chest, back, legs)",
+        required: false,
+        type: "string",
+      },
+    ],
+    responses: {
+      "200": {
+        description: "Successful operation",
+        content: {
+          "application/json": {
+            schema: {
+              type: "object",
+              properties: {
+                exercise: {
+                  type: "array",
+                  description:
+                    "An array of exercise data matching the specified type",
+                },
+              },
+            },
+          },
+        },
+      },
+      "400": {
+        description: "Bad request (e.g., missing or invalid query parameter)",
+      },
+      "404": {
+        description: "No exercises found for the specified type",
+      },
+      "500": {
+        description: "Internal server error",
+      },
+    },
+  },
+};
+paths["/api/v1/exercise/muscle"] = {
+  get: {
+    tags: ["exercise"],
+    summary: "Get exercise details by muscle",
+    description:
+      "Retrieves information about exercises that target the provided muscle query parameter.",
+    parameters: [
+      {
+        name: "muscle",
+        in: "query",
+        description:
+          "The targeted muscle group of the exercise (e.g., chest, back, biceps)",
+        required: false,
+        type: "string",
+      },
+    ],
+    responses: {
+      "200": {
+        description: "Successful operation",
+        content: {
+          "application/json": {
+            schema: {
+              type: "object",
+              properties: {
+                exercise: {
+                  type: "array",
+                  description:
+                    "An array of exercise data targeting the specified muscle",
+                },
+              },
+            },
+          },
+        },
+      },
+      "400": {
+        description: "Bad request (e.g., missing or invalid query parameter)",
+      },
+      "404": {
+        description: "No exercises found for the specified muscle",
+      },
+      "500": {
+        description: "Internal server error",
+      },
+    },
+  },
+};
+paths["/api/v1/exercise/difficulty"] = {
+  get: {
+    tags: ["exercise"],
+    summary: "Get exercise details by difficulty",
+    description:
+      "Retrieves information about exercises with the provided difficulty query parameter.",
+    parameters: [
+      {
+        name: "difficulty",
+        in: "query",
+        description:
+          "The difficulty level of the exercise (e.g., beginner, intermediate, advanced)",
+        required: false,
+        type: "string",
+      },
+    ],
+    responses: {
+      "200": {
+        description: "Successful operation",
+        content: {
+          "application/json": {
+            schema: {
+              type: "object",
+              properties: {
+                exercise: {
+                  type: "array",
+                  description:
+                    "An array of exercise data matching the specified difficulty",
+                },
+              },
+            },
+          },
+        },
+      },
+      "400": {
+        description: "Bad request (e.g., missing or invalid query parameter)",
+      },
+      "404": {
+        description: "No exercises found for the specified difficulty",
+      },
+      "500": {
+        description: "Internal server error",
       },
     },
   },

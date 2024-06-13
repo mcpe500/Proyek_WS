@@ -8,9 +8,15 @@
     "build": "tsc",
     "deploy": "node ./output/run.js",
     "dev": "nodemon ./src/run.ts",
-    "migrate": "ts-node ./database/migrate.ts",
+    "migrate:development": "npx sequelize-cli db:migrate --env development",
+    "seed:development": "npx sequelize-cli db:seed:all --env development",
+    "rollback:development": "npx sequelize-cli db:migrate:undo:all --env development",
+    "seed:undo:development": "npx sequelize-cli db:seed:undo:all --env development",
+    
+    "migrate:production": "npx sequelize-cli db:migrate --env production",
     "seed:production": "npx sequelize-cli db:seed:all --env production",
-    "rollback:production": "npx sequelize-cli db:seed:undo:all --env production",
+    "rollback:production": "npx sequelize-cli db:migrate:undo:all --env production",
+    "seed:undo:production": "npx sequelize-cli db:seed:undo:all --env production",
     "test": "jest --detectOpenHandles"
   },
   "keywords": [],

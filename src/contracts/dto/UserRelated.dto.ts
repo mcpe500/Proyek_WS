@@ -13,6 +13,7 @@ export interface IUser extends Document {
   weight: number;
   fitnessGoals: typeof FITNESS_GOALS;
   healthInformation: string;
+  balance: number;
   refreshToken: string;
   accessToken: string;
   isEmailVerified: boolean;

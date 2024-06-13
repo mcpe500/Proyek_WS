@@ -15,6 +15,19 @@ export const validateBody = (schema: Schema) => {
   };
 };
 
+export const validateParams = (schema: Schema) => {
+  return async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      await schema.validateAsync(req.params);
+      next();
+    } catch (err: any) {
+      res
+        .status(RESPONSE_STATUS.BAD_REQUEST)
+        .send({ error: err.details[0].message });
+    }
+  };
+};
+
 export const validateCookie = (schema: Schema) => {
   return async (req: Request, res: Response, next: NextFunction) => {
     try {
