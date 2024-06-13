@@ -7,7 +7,7 @@
     "start": "ts-node ./src/run.ts",
     "build": "tsc",
     "deploy": "node ./output/run.js",
-    "dev": "nodemon ./src/run.ts",
+    "dev": "nodemon ./src/run.ts --config nodemon.json",
     "migrate:development": "npx sequelize-cli db:migrate --env development",
     "seed:development": "npx sequelize-cli db:seed:all --env development",
     "rollback:development": "npx sequelize-cli db:migrate:undo:all --env development",

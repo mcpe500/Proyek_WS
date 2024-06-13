@@ -1,0 +1,4 @@
+{
+  "verbose": true,
+  "ignore": ["./src/documentation/swagger_log"]
+}
