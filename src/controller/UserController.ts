@@ -479,11 +479,19 @@ export const deleteUserProfile = async (req: Request, res: Response) => {
 };
 
 export const getUserPacket = async (req: Request, res: Response) => {
-    const { packetId, username, email } = req.body;
-    // check packet valid
-    // check balance
-    // update balancea
-    // insert subscription
+    const { userID } = req.params;
+    const user = await User.findOne({ username: userID });
+    if(!user)  return res.status(RESPONSE_STATUS.NOT_FOUND).json({ msg: 'User not found'});
+    const subscription = await Subscription.findOne({ username: userID });
+    if(!subscription) return res.status(RESPONSE_STATUS.NOT_FOUND).json({ msg: "User tidak memiliki subscription" });
+    const packet = await Paket.findOne({ where: {Paket_id: subscription.paketId} });
+    return res.status(RESPONSE_STATUS.SUCCESS).json({ 
+        username: user.username,
+        nama: user.fullName,
+        subscription_start: subscription.startDate,
+        subscription_end: subscription.endDate,
+        packet:packet
+    });
 };
 
 export const addUserPacket = async (req: Request, res: Response) => {
@@ -495,9 +503,11 @@ export const addUserPacket = async (req: Request, res: Response) => {
 };
 
 export const deleteUserPacket = async (req: Request, res: Response) => {
-    const { packetId, username, email } = req.body;
-    // check packet valid
-    // check balance
-    // update balancea
-    // insert subscription
+    const { userID } = req.params;
+    const user = await User.findOne({ username: userID });
+    if(!user)  return res.status(RESPONSE_STATUS.NOT_FOUND).json({ msg: 'User not found'});
+    const subscription = await Subscription.findOne({ username: userID });
+    if(!subscription) return res.status(RESPONSE_STATUS.NOT_FOUND).json({ msg: "User tidak memiliki subscription" });
+    await subscription.updateOne({ isActive: false });
+    return res.status(RESPONSE_STATUS.SUCCESS).json({ msg: "Subscription deleted successfully" });
 };
