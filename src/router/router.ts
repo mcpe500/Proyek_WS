@@ -12,7 +12,7 @@ import {
   getApiKey,
   resetApiKey,
   subscribePacket,
-  topup,,
+  topup,
   adminDashboard,
   getUserProfile,
   updateUserProfile,
@@ -145,12 +145,12 @@ router.get("/exercise/difficulty", getDifficulty);
 // router.delete("/users/plan/:planId", validateAccessToken, deletePlan); // not yet done
 
 //route untuk admin
-router.get("/admin/dashboard", validateAccessToken, adminDashboard);
-router.get("/admin/user/profile/:userID", validateAccessToken, getUserProfile);
-router.put("/admin/user/profile/:userID", validateAccessToken, updateUserProfile);
-router.delete("/admin/user/profile/:userID", validateAccessToken, deleteUserProfile);
-router.get("/admin/user/packet/:userID", validateAccessToken, getUserPacket);
-router.post("/admin/user/packet/:userID", validateAccessToken, addUserPacket);
-router.delete("/admin/user/packet/:userID", validateAccessToken, deleteUserPacket);
+router.get("/admin/dashboard", [validateAccessToken, validateAdmin], adminDashboard);
+router.get("/admin/user/profile/:userID", [validateAccessToken, validateAdmin], getUserProfile);
+router.put("/admin/user/profile/:userID", [validateAccessToken, validateAdmin], updateUserProfile);
+router.delete("/admin/user/profile/:userID", [validateAccessToken, validateAdmin], deleteUserProfile);
+router.get("/admin/user/packet/:userID", [validateAccessToken, validateAdmin], getUserPacket);
+router.post("/admin/user/packet/:userID", [validateAccessToken, validateAdmin], addUserPacket);
+router.delete("/admin/user/packet/:userID", [validateAccessToken, validateAdmin], deleteUserPacket);
 
 export default router;

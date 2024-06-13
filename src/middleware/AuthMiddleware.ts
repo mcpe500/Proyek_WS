@@ -49,5 +49,7 @@ export const validateAdmin = async (
   res: Response,
   next: NextFunction
 ) => {
-  // TODO : Implement Checking if the user in req.body.user is an admin
+  const { user } = req.body;
+  if(user && user.role != "ADMIN") return res.status(RESPONSE_STATUS.UNAUTHORIZED).json({ msg: 'User is not admin'});
+  next();
 };
