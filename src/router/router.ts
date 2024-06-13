@@ -15,11 +15,11 @@ import {
   topup,
   adminDashboard,
   getUserProfile,
-  updateUserProfile,
   deleteUserProfile,
   getUserPacket,
   addUserPacket,
-  deleteUserPacket
+  deleteUserPacket,
+  addExercise
 } from "../controller/UserController";
 import {
   validateAccessToken,
@@ -147,10 +147,10 @@ router.get("/exercise/difficulty", getDifficulty);
 //route untuk admin
 router.get("/admin/dashboard", [validateAccessToken, validateAdmin], adminDashboard);
 router.get("/admin/user/profile/:userID", [validateAccessToken, validateAdmin], getUserProfile);
-router.put("/admin/user/profile/:userID", [validateAccessToken, validateAdmin], updateUserProfile);
 router.delete("/admin/user/profile/:userID", [validateAccessToken, validateAdmin], deleteUserProfile);
 router.get("/admin/user/packet/:userID", [validateAccessToken, validateAdmin], getUserPacket);
 router.post("/admin/user/packet/:userID", [validateAccessToken, validateAdmin], addUserPacket);
 router.delete("/admin/user/packet/:userID", [validateAccessToken, validateAdmin], deleteUserPacket);
+router.get("/admin/exercise", [validateAccessToken, validateAdmin], addExercise);
 
 export default router;
