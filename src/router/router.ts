@@ -15,7 +15,6 @@ import {
   topup,
   adminDashboard,
   getUserProfile,
-  updateUserProfile,
   deleteUserProfile,
   getUserPacket,
   addUserPacket,
@@ -147,7 +146,6 @@ router.get("/exercise/difficulty", getDifficulty);
 //route untuk admin
 router.get("/admin/dashboard", [validateAccessToken, validateAdmin], adminDashboard);
 router.get("/admin/user/profile/:userID", [validateAccessToken, validateAdmin], getUserProfile);
-router.put("/admin/user/profile/:userID", [validateAccessToken, validateAdmin], updateUserProfile);
 router.delete("/admin/user/profile/:userID", [validateAccessToken, validateAdmin], deleteUserProfile);
 router.get("/admin/user/packet/:userID", [validateAccessToken, validateAdmin], getUserPacket);
 router.post("/admin/user/packet/:userID", [validateAccessToken, validateAdmin], addUserPacket);

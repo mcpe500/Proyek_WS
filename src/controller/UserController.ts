@@ -413,6 +413,19 @@ export const subscribePacket = async (req: Request, res: Response) => {
       .json({ message: "Paket not found" });
   }
 
+  // check active subscription
+  const activeSubscription = await Subscription.findOne({
+    userId: user._id,
+    isActive: true,
+    endDate: { $gt: new Date() } // Check if endDate is in the future
+  });
+
+  if (activeSubscription) {
+    await activeSubscription.updateOne({
+      isActive: false
+    })
+  }
+
   // check balance
   if (user.balance < paket.Paket_price) {
     return res
@@ -439,7 +452,7 @@ export const subscribePacket = async (req: Request, res: Response) => {
 
   //insert subscription
   const subscription = new Subscription({
-    userId: user.id,
+    userId: user._id,
     paketId,
     endDate,
   });

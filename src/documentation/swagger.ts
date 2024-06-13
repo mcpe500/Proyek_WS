@@ -81,25 +81,25 @@ const swaggerDocument = {
   },
   paths: paths,
 };
-console.log(swaggerDocument);
-const directoryExists = (dirPath: string) => {
-  try {
-    return fs.statSync(dirPath).isDirectory();
-  } catch (err) {
-    return false;
-  }
-};
-const logDir = path.join(__dirname, "swagger_log");
-if (!directoryExists(logDir)) {
-  fs.mkdirSync(logDir);
-}
-const swaggerJSON = JSON.stringify(swaggerDocument, null, 2);
-const logFilePath = path.join(logDir, "swagger.json");
-try {
-  fs.writeFileSync(logFilePath, swaggerJSON);
-} catch (error) {
-  console.error("Error writing file:", error);
-}
+// console.log(swaggerDocument);
+// const directoryExists = (dirPath: string) => {
+//   try {
+//     return fs.statSync(dirPath).isDirectory();
+//   } catch (err) {
+//     return false;
+//   }
+// };
+// const logDir = path.join(__dirname, "swagger_log");
+// if (!directoryExists(logDir)) {
+//   fs.mkdirSync(logDir);
+// }
+// const swaggerJSON = JSON.stringify(swaggerDocument, null, 2);
+// const logFilePath = path.join(logDir, "swagger.json");
+// try {
+//   fs.writeFileSync(logFilePath, swaggerJSON);
+// } catch (error) {
+//   console.error("Error writing file:", error);
+// }
 
 export default swaggerDocument;
 //   components:
