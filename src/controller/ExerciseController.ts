@@ -26,14 +26,6 @@ export const getExercise = async (req: Request, res: Response) => {
       params: { name: exercise },
     });
     console.log(response);
-    // const response = await axios.get(
-    //   "https://api.api-ninjas.com/v1/exercises?name=" + exercise,
-    //   {
-    //     headers: {
-    //       "X-Api-Key": ENV.API_NINJAS_API_KEY,
-    //     },
-    //   }
-    // );
     if ((response as any).length < 1) {
       return res.status(RESPONSE_STATUS.NOT_FOUND).json({ error: `Exercise Not Found!` });
     }

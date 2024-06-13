@@ -15,11 +15,10 @@ import {
   topup,
   adminDashboard,
   getUserProfile,
-  updateUserProfile,
   deleteUserProfile,
   getUserPacket,
   addUserPacket,
-  deleteUserPacket
+  deleteUserPacket,
 } from "../controller/UserController";
 import {
   validateAccessToken,
@@ -63,6 +62,7 @@ import {
   getExercisePlanDetailByUser,
 } from "../controller/UserPlanController";
 import { createUserPlanSchemaJoi } from "../validators/Plans.validate";
+import { getAllNews, getSpecificNews } from "../controller/NewsController";
 
 const router = Router();
 
@@ -82,7 +82,7 @@ router.post(
 router.get("/auth/verify/:emailVerificationToken", verifyEmail); // finished
 
 // User Routes
-router.put("/users/topup", [validateAccessToken], topup)
+router.put("/users/topup", [validateAccessToken], topup);
 router.get("/users/dashboard", [validateAccessToken], getDashboard); // finished
 router.put(
   "/users/profile",
@@ -145,12 +145,39 @@ router.get("/exercise/difficulty", getDifficulty);
 // router.delete("/users/plan/:planId", validateAccessToken, deletePlan); // not yet done
 
 //route untuk admin
-router.get("/admin/dashboard", [validateAccessToken, validateAdmin], adminDashboard);
-router.get("/admin/user/profile/:userID", [validateAccessToken, validateAdmin], getUserProfile);
-router.put("/admin/user/profile/:userID", [validateAccessToken, validateAdmin], updateUserProfile);
-router.delete("/admin/user/profile/:userID", [validateAccessToken, validateAdmin], deleteUserProfile);
-router.get("/admin/user/packet/:userID", [validateAccessToken, validateAdmin], getUserPacket);
-router.post("/admin/user/packet/:userID", [validateAccessToken, validateAdmin], addUserPacket);
-router.delete("/admin/user/packet/:userID", [validateAccessToken, validateAdmin], deleteUserPacket);
+router.get(
+  "/admin/dashboard",
+  [validateAccessToken, validateAdmin],
+  adminDashboard
+);
+router.get(
+  "/admin/user/profile/:userID",
+  [validateAccessToken, validateAdmin],
+  getUserProfile
+);
+router.delete(
+  "/admin/user/profile/:userID",
+  [validateAccessToken, validateAdmin],
+  deleteUserProfile
+);
+router.get(
+  "/admin/user/packet/:userID",
+  [validateAccessToken, validateAdmin],
+  getUserPacket
+);
+router.post(
+  "/admin/user/packet/:userID",
+  [validateAccessToken, validateAdmin],
+  addUserPacket
+);
+router.delete(
+  "/admin/user/packet/:userID",
+  [validateAccessToken, validateAdmin],
+  deleteUserPacket
+);
+
+// NEWS
+router.get("/news", getAllNews);
+router.get("/news/:title", getSpecificNews);
 
 export default router;

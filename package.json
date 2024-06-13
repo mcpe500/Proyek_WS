@@ -12,7 +12,6 @@
     "seed:development": "npx sequelize-cli db:seed:all --env development",
     "rollback:development": "npx sequelize-cli db:migrate:undo:all --env development",
     "seed:undo:development": "npx sequelize-cli db:seed:undo:all --env development",
-    
     "migrate:production": "npx sequelize-cli db:migrate --env production",
     "seed:production": "npx sequelize-cli db:seed:all --env production",
     "rollback:production": "npx sequelize-cli db:migrate:undo:all --env production",
@@ -60,6 +59,7 @@
     "multer": "^1.4.5-lts.1",
     "mysql2": "^3.9.7",
     "nodemailer": "^6.9.13",
+    "puppeteer": "^22.11.0",
     "sequelize": "^6.37.3",
     "swagger-jsdoc": "^6.2.8",
     "swagger-ui-express": "^5.0.0"
