@@ -22,7 +22,8 @@ const UserSchema: Schema = new Schema({
   accessToken: { type: String, required: false },
   isEmailVerified: { type: Boolean, default: false },
   emailVerificationToken: { type: String },
-  apiKey: {type: String}
+  apiKey: {type: String},
+  role: {type: String}
 });
 
 export const User = mongoose.model<IUser>("User", UserSchema);

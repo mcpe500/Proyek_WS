@@ -383,3 +383,64 @@ export const subscribePacket = async (req: Request, res: Response) => {
 // [Paket 2] rate limit 50 per 10 detik 100k?
 // [Paket 3] rate limit 150 per 10 detik 250k?
 // [Enterprise] rate limit 1000 per detik 2000k?
+
+//admin
+export const adminDashboard = async (req: Request, res: Response) => {
+    const { username, email } = req.body;
+    const admin = await User.findOne({ username: username });
+    if(admin && admin.role != "ADMIN") return res.status(RESPONSE_STATUS.UNAUTHORIZED).json({ msg: 'User is not admin'})
+    return res.status(RESPONSE_STATUS.SUCCESS).json({ data: admin })
+};
+
+export const getUserProfile = async (req: Request, res: Response) => {
+    const { username, email } = req.body;
+    const { userID } = req.params;
+    const admin = await User.findOne({ username: username });
+    if(admin && admin.role != "ADMIN") return res.status(RESPONSE_STATUS.UNAUTHORIZED).json({ msg: 'User is not admin'})
+    const user = await User.findOne({ username: userID });
+    if(!user)  return res.status(RESPONSE_STATUS.NOT_FOUND).json({ msg: 'User not found'})
+    return res.status(RESPONSE_STATUS.SUCCESS).json({ data: user })
+};
+
+export const updateUserProfile = async (req: Request, res: Response) => {
+    const { packetId, username, email } = req.body;
+    // check packet valid
+    // check balance
+    // update balancea
+    // insert subscription
+};
+
+export const deleteUserProfile = async (req: Request, res: Response) => {
+    const { username, email } = req.body;
+    const { userID } = req.params;
+    const admin = await User.findOne({ username: username });
+    if(admin && admin.role != "ADMIN") return res.status(RESPONSE_STATUS.UNAUTHORIZED).json({ msg: 'User is not admin'})
+    const user = await User.findOne({ username: userID });
+    if(!user)  return res.status(RESPONSE_STATUS.NOT_FOUND).json({ msg: 'User not found'})
+    await User.deleteOne({username: user.username});
+    return res.status(RESPONSE_STATUS.SUCCESS).json({ msg: "User deleted successfully" })
+};
+
+export const getUserPacket = async (req: Request, res: Response) => {
+    const { packetId, username, email } = req.body;
+    // check packet valid
+    // check balance
+    // update balancea
+    // insert subscription
+};
+
+export const addUserPacket = async (req: Request, res: Response) => {
+    const { packetId, username, email } = req.body;
+    // check packet valid
+    // check balance
+    // update balancea
+    // insert subscription
+};
+
+export const deleteUserPacket = async (req: Request, res: Response) => {
+    const { packetId, username, email } = req.body;
+    // check packet valid
+    // check balance
+    // update balancea
+    // insert subscription
+};

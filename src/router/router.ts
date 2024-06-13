@@ -10,7 +10,14 @@ import {
   registerUser,
   verifyEmail,
   getApiKey,
-  resetApiKey
+  resetApiKey,
+  adminDashboard,
+  getUserProfile,
+  updateUserProfile,
+  deleteUserProfile,
+  getUserPacket,
+  addUserPacket,
+  deleteUserPacket
 } from "../controller/UserController";
 import { validateAccessToken } from "../middleware/AuthMiddleware";
 import {
@@ -69,5 +76,14 @@ router.get("/users/:id", getUser);
 // router.get("/showBuiltInModules", showBuiltInModules);
 
 // router.use(validateAccessToken); // Use the middleware to validate the access token for all routes below
+
+//route untuk admin
+router.get("/admin/dashboard", validateAccessToken, adminDashboard);
+router.get("/admin/user/profile/:userID", validateAccessToken, getUserProfile);
+router.put("/admin/user/profile/:userID", validateAccessToken, updateUserProfile);
+router.delete("/admin/user/profile/:userID", validateAccessToken, deleteUserProfile);
+router.get("/admin/user/packet/:userID", validateAccessToken, getUserPacket);
+router.post("/admin/user/packet/:userID", validateAccessToken, addUserPacket);
+router.delete("/admin/user/packet/:userID", validateAccessToken, deleteUserPacket);
 
 export default router;
