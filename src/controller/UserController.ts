@@ -35,18 +35,7 @@ import { Subscription } from "../models/dynamic/Subscription.model";
 // });
 
 export const registerUser = async (req: Request, res: Response) => {
-  const {
-    username,
-    email,
-    password,
-    fullName,
-    phone,
-    // age,
-    // gender,
-    // height,
-    // weight,
-    // healthInformation,
-  } = req.body;
+  const { username, email, password, fullName, phone } = req.body;
 
   try {
     const existingUser = await User.findOne({ $or: [{ username }, { email }] }); //
@@ -65,11 +54,6 @@ export const registerUser = async (req: Request, res: Response) => {
       password: hashedPassword,
       fullName,
       phone,
-      //   age,
-      //   gender,
-      //   height,
-      //   weight,
-      //   healthInformation,
       isEmailVerified: false,
       emailVerificationToken: emailToken,
     });
@@ -328,7 +312,7 @@ export const verifyEmail = async (req: Request, res: Response) => {
     const subscription = new Subscription({
       userId: user._id,
       paketId: "PAK001",
-      endDate: new Date('9999-12-31T23:59:59.999Z'),
+      endDate: new Date("9999-12-31T23:59:59.999Z"),
     });
     await subscription.save();
 
@@ -382,28 +366,27 @@ export const resetApiKey = async (req: Request, res: Response) => {
 };
 
 export const topup = async (req: Request, res: Response) => {
-    const { amount, user } = req.body;
+  const { amount, user } = req.body;
 
-    if (amount <= 0) {
-        return res
-            .status(RESPONSE_STATUS.BAD_REQUEST)
-            .json({ message: "Invalid amount" });
-    }
+  if (amount <= 0) {
+    return res
+      .status(RESPONSE_STATUS.BAD_REQUEST)
+      .json({ message: "Invalid amount" });
+  }
 
-    try {
-        user.balance += amount;
-        const updatedUser = await user.save();
+  try {
+    user.balance += amount;
+    const updatedUser = await user.save();
 
-        return res
-            .status(RESPONSE_STATUS.SUCCESS)
-            .json({ message: "Balance updated. Current balance: Rp" + user.balance });
-    } catch (error) {
-        return res
-            .status(RESPONSE_STATUS.INTERNAL_SERVER_ERROR)
-            .json({ message: "Internal server error" });
-    }
-
-}
+    return res
+      .status(RESPONSE_STATUS.SUCCESS)
+      .json({ message: "Balance updated. Current balance: Rp" + user.balance });
+  } catch (error) {
+    return res
+      .status(RESPONSE_STATUS.INTERNAL_SERVER_ERROR)
+      .json({ message: "Internal server error" });
+  }
+};
 
 export const subscribePacket = async (req: Request, res: Response) => {
   const { paketId, user } = req.body;
@@ -424,20 +407,20 @@ export const subscribePacket = async (req: Request, res: Response) => {
   const activeSubscription = await Subscription.findOne({
     userId: user._id,
     isActive: true,
-    endDate: { $gt: new Date() } // Check if endDate is in the future
+    endDate: { $gt: new Date() }, // Check if endDate is in the future
   });
 
   if (activeSubscription) {
     await activeSubscription.updateOne({
-      isActive: false
-    })
+      isActive: false,
+    });
   }
 
   // check balance
   if (user.balance < paket.Paket_price) {
     return res
-     .status(RESPONSE_STATUS.BAD_REQUEST)
-     .json({ message: "Not enough balance! Please topup first" });
+      .status(RESPONSE_STATUS.BAD_REQUEST)
+      .json({ message: "Not enough balance! Please topup first" });
   }
 
   // update balance
@@ -445,9 +428,9 @@ export const subscribePacket = async (req: Request, res: Response) => {
     user.balance -= paket.Paket_price;
     await user.save();
   } catch (error) {
-        return res
-            .status(RESPONSE_STATUS.INTERNAL_SERVER_ERROR)
-            .json({ message: "Internal server error" });
+    return res
+      .status(RESPONSE_STATUS.INTERNAL_SERVER_ERROR)
+      .json({ message: "Internal server error" });
   }
 
   let endDate = new Date();
@@ -479,51 +462,53 @@ export const subscribePacket = async (req: Request, res: Response) => {
 
 //admin
 export const adminDashboard = async (req: Request, res: Response) => {
-    const { user } = req.body;
-    return res.status(RESPONSE_STATUS.SUCCESS).json({ data: user })
+  const { user } = req.body;
+  return res.status(RESPONSE_STATUS.SUCCESS).json({ data: user });
 };
 
 export const getUserProfile = async (req: Request, res: Response) => {
-    const { userID } = req.params;
-    const user = await User.findOne({ username: userID });
-    if(!user)  return res.status(RESPONSE_STATUS.NOT_FOUND).json({ msg: 'User not found'})
-    return res.status(RESPONSE_STATUS.SUCCESS).json({ data: user })
-};
-
-export const updateUserProfile = async (req: Request, res: Response) => {
   const { userID } = req.params;
-  // what is this
+  const user = await User.findOne({ username: userID });
+  if (!user)
+    return res
+      .status(RESPONSE_STATUS.NOT_FOUND)
+      .json({ msg: "User not found" });
+  return res.status(RESPONSE_STATUS.SUCCESS).json({ data: user });
 };
-
 
 export const deleteUserProfile = async (req: Request, res: Response) => {
-    const { userID } = req.params;
-    const user = await User.findOne({ username: userID });
-    if(!user)  return res.status(RESPONSE_STATUS.NOT_FOUND).json({ msg: 'User not found'})
-    await User.deleteOne({username: user.username});
-    return res.status(RESPONSE_STATUS.SUCCESS).json({ msg: "User deleted successfully" })
+  const { userID } = req.params;
+  const user = await User.findOne({ username: userID });
+  if (!user)
+    return res
+      .status(RESPONSE_STATUS.NOT_FOUND)
+      .json({ msg: "User not found" });
+  await User.deleteOne({ username: user.username });
+  return res
+    .status(RESPONSE_STATUS.SUCCESS)
+    .json({ msg: "User deleted successfully" });
 };
 
 export const getUserPacket = async (req: Request, res: Response) => {
-    const { packetId, username, email } = req.body;
-    // check packet valid
-    // check balance
-    // update balancea
-    // insert subscription
+  const { packetId, username, email } = req.body;
+  // check packet valid
+  // check balance
+  // update balancea
+  // insert subscription
 };
 
 export const addUserPacket = async (req: Request, res: Response) => {
-    const { packetId, username, email } = req.body;
-    // check packet valid
-    // check balance
-    // update balancea
-    // insert subscription
+  const { packetId, username, email } = req.body;
+  // check packet valid
+  // check balance
+  // update balancea
+  // insert subscription
 };
 
 export const deleteUserPacket = async (req: Request, res: Response) => {
-    const { packetId, username, email } = req.body;
-    // check packet valid
-    // check balance
-    // update balancea
-    // insert subscription
+  const { packetId, username, email } = req.body;
+  // check packet valid
+  // check balance
+  // update balancea
+  // insert subscription
 };

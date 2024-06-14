@@ -50,6 +50,9 @@ export const validateAdmin = async (
   next: NextFunction
 ) => {
   const { user } = req.body;
-  if(user && user.role != "ADMIN") return res.status(RESPONSE_STATUS.UNAUTHORIZED).json({ msg: 'User is not admin'});
+  if (user && user.role != "ADMIN")
+    return res
+      .status(RESPONSE_STATUS.UNAUTHORIZED)
+      .json({ msg: "User is not admin" });
   next();
 };

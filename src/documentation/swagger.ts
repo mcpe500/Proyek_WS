@@ -29,6 +29,8 @@ import getAllGoals from "./paths/getAllGoals";
 import getGoalById from "./paths/getGoalById";
 import getAllNews from "./paths/getAllNews";
 import cancelPlanByUser from "./paths/cancelPlanByUser";
+import adminDashboard from "./paths/admin/adminDashboard";
+import getAndDeleteUserProfile from "./paths/admin/getAndDeleteUserProfile";
 const paths: any = {};
 paths["/"] = root;
 paths["/api/v1/auth/register"] = register;
@@ -60,6 +62,13 @@ paths["/api/v1/news/{title}"] = getNewsByTitle;
 paths["/api/v1/exercise/goals"] = getAllGoals;
 paths["/api/v1/exercise/goals/{id}"] = getGoalById;
 paths["/api/v1/users/plan/cancel/{id}"] = cancelPlanByUser;
+
+paths["/api/v1/admin/dashboard"] = adminDashboard; // GET
+paths["/api/v1/admin/user/profile/{userID}"] = getAndDeleteUserProfile; // GET and DELETE
+paths["/api/v1/admin/user/packet/{userID}"] = {}; // GET and POST and DELETE
+// paths["/api/v1/admin/dashboard"] = {}
+// paths["/api/v1/admin/dashboard"] = {}
+// paths["/api/v1/admin/dashboard"] = {}
 
 const swaggerDocument = {
   openapi: "3.0.0",
