@@ -58,7 +58,7 @@ export const checkAndIncreaseAPIHit = async (
     }
 
     // If resetAt is less than current time, reset API Hit
-    if (activeSubscription.resetAt < new Date()) {
+    if (!activeSubscription.resetAt || activeSubscription.resetAt < new Date()) {
       await activeSubscription.updateOne({ apiHit: 0, resetAt: new Date(new Date().getTime() + 60 * 1000) });
     }
 
