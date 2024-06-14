@@ -19,6 +19,8 @@ import {
   getUserPacket,
   addUserPacket,
   deleteUserPacket,
+  addExercise,
+  topupFromAdmin,
 } from "../controller/UserController";
 import {
   validateAccessToken,
@@ -188,6 +190,16 @@ router.delete(
   [validateAccessToken, validateAdmin],
   deleteUserPacket
 );
+router.get(
+  "/admin/exercise",
+  [validateAccessToken, validateAdmin],
+  addExercise
+);
+router.put(
+  "/admin/user/topup/:userID?",
+  [validateAccessToken, validateAdmin],
+  topupFromAdmin
+);
 
 // NEWS
 router.get("/news", getAllNews);
@@ -195,5 +207,4 @@ router.get("/news/:title", getSpecificNews);
 // Exercise Goals
 router.get("/exercise/goals", [validateAccessToken], getAllGoals);
 router.get("/exercise/goals/:id", [validateAccessToken], getGoalById);
-
 export default router;

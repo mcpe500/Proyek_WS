@@ -3,7 +3,7 @@ export default {
     tags: ["news"],
     summary: "Get specific news article",
     description:
-      "This endpoint retrieves a specific news article based on the title parameter.",
+      "This endpoint retrieves a specific news article based on the title parameter and returns it as a PDF.",
     operationId: "getSpecificNews",
     parameters: [
       {
@@ -18,20 +18,12 @@ export default {
     ],
     responses: {
       "200": {
-        description: "Details of the specific news article.",
+        description: "PDF of the specific news article.",
         content: {
-          "application/json": {
+          "application/pdf": {
             schema: {
-              type: "object",
-              properties: {
-                title: { type: "string" },
-                description: { type: "string" },
-                content: { type: "string" },
-                nextRecommendation: { type: "string" },
-                previousRecommendation: { type: "string" },
-                writer: { type: "string" },
-                publishedDate: { type: "string" },
-              },
+              type: "string",
+              format: "binary",
             },
           },
         },
