@@ -208,7 +208,8 @@ export const getSpecificNews = async (req: Request, res: Response) => {
     console.log("Full page");
 
     // Generate PDF from the page content
-    const pdf = await page.pdf({ format: "A4" });
+    // make the pdf to load the full page
+    const pdf = await page.pdf({ format: "A4", timeout: 300000 });
 
     await browser.close();
 
