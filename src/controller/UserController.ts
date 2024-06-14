@@ -329,6 +329,7 @@ export const verifyEmail = async (req: Request, res: Response) => {
       userId: user._id,
       paketId: "PAK001",
       endDate: new Date('9999-12-31T23:59:59.999Z'),
+      resetAt: new Date(new Date().getTime() + 60 * 1000)
     });
     await subscription.save();
 
