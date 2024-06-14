@@ -38,9 +38,8 @@ import {
 import { getAllPricingPackages } from "../controller/PricingController";
 import {
   getExercise,
-  getMuscle,
-  getDifficulty,
-  getType,
+  getAllGoals,
+  getGoalById,
 } from "../controller/ExerciseController";
 import {
   completeExercisePlan,
@@ -49,17 +48,11 @@ import {
   exercisePlanDetails,
   addWorkoutToExercisePlan,
   startExercisePlan,
-  createPlan,
-  editPlan,
-  startPlan,
-  completePlan,
-  getPlan,
-  exercisePlan,
-  picturePlan,
-  trackerPlan,
-  deletePlan,
+  pictureExercisePlanByUser,
+  trackerExercisePlanByUser,
   getAllExercisePlanByUser,
   getExercisePlanDetailByUser,
+  cancelExercisePlanByUser,
 } from "../controller/UserPlanController";
 import { createUserPlanSchemaJoi } from "../validators/Plans.validate";
 import { checkAndIncreaseAPIHit } from "../middleware/BusinessMiddleware";
@@ -106,12 +99,12 @@ router.post(
   ],
   createExercisePlan
 ); // finished
-router.get("/users/plan", [validateAccessToken], getAllExercisePlanByUser); // NOT FINISHED
+router.get("/users/plan", [validateAccessToken], getAllExercisePlanByUser); // waiting for review
 router.get(
   "/users/plan/:id",
   [validateAccessToken, checkAndIncreaseAPIHit],
   getExercisePlanDetailByUser
-); // NOT FINISHED
+); // waiting for review
 
 // Exercise Plan Routes
 router.put(
@@ -140,16 +133,19 @@ router.post(
   completeExercisePlan
 ); // finished
 
+router.put(
+  "/users/plan/cancel/:id",
+  [validateAccessToken],
+  cancelExercisePlanByUser
+); // finished
+
 // Admin Routes
 router.get("/users", [validateAccessToken, validateAdmin], getAllUser); // finished // admin can use this, add filtering to filter using query
 router.get("/users/:id", [validateAccessToken, validateAdmin], getUser); // finished // admin can use this
 
 // Pricing
 router.get("/pricing", getAllPricingPackages);
-router.get("/exercise/name", getExercise);
-router.get("/exercise/type", getType);
-router.get("/exercise/muscle", getMuscle);
-router.get("/exercise/difficulty", getDifficulty);
+router.get("/exercise", [validateAccessToken], getExercise);
 
 // User Plan Routes
 // router.put("/users/plan/edit", validateAccessToken, editPlan); // finished
@@ -226,5 +222,9 @@ router.delete(
   [validateAccessToken, validateAdmin],
   deleteUserPacket
 );
+
+// Exercise Goals
+router.get("/exercise/goals", [validateAccessToken], getAllGoals);
+router.get("/exercise/goals/:id", [validateAccessToken], getGoalById);
 
 export default router;

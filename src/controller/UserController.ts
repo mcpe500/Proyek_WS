@@ -490,6 +490,12 @@ export const getUserProfile = async (req: Request, res: Response) => {
     return res.status(RESPONSE_STATUS.SUCCESS).json({ data: user })
 };
 
+export const updateUserProfile = async (req: Request, res: Response) => {
+  const { userID } = req.params;
+  // what is this
+};
+
+
 export const deleteUserProfile = async (req: Request, res: Response) => {
     const { userID } = req.params;
     const user = await User.findOne({ username: userID });

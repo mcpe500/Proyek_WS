@@ -1810,6 +1810,32 @@
                       },
                       "url": {
                         "type": "string"
+    "/api/v1/exercise/goals": {
+      "get": {
+        "tags": ["goals"],
+        "summary": "Get all fitness goals",
+        "description": "This endpoint retrieves a list of all fitness goals.",
+        "operationId": "getAllGoals",
+        "responses": {
+          "200": {
+            "description": "A list of fitness goals.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "Goal_list": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "title": {
+                            "type": "string"
+                          },
+                          "description": {
+                            "type": "string"
+                          }
+                        }
                       }
                     }
                   }
@@ -1818,7 +1844,7 @@
             }
           },
           "500": {
-            "description": "An error occurred while extracting news.",
+            "description": "Internal server error.",
             "content": {
               "application/json": {
                 "schema": {
@@ -1835,53 +1861,41 @@
         }
       }
     },
-    "/api/v1/news/{title}": {
+    "/api/v1/exercise/goals/{id}": {
       "get": {
-        "tags": [
-          "news"
-        ],
-        "summary": "Get specific news article",
-        "description": "This endpoint retrieves a specific news article based on the title parameter.",
-        "operationId": "getSpecificNews",
+        "tags": ["goals"],
+        "summary": "Get fitness goal by ID",
+        "description": "This endpoint retrieves a specific fitness goal by its ID.",
+        "operationId": "getGoalById",
         "parameters": [
           {
-            "name": "title",
+            "name": "id",
             "in": "path",
             "required": true,
             "schema": {
               "type": "string"
             },
-            "description": "The title of the news article to retrieve."
+            "description": "The ID of the fitness goal."
           }
         ],
         "responses": {
           "200": {
-            "description": "Details of the specific news article.",
+            "description": "The requested fitness goal.",
             "content": {
               "application/json": {
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "title": {
-                      "type": "string"
-                    },
-                    "description": {
-                      "type": "string"
-                    },
-                    "content": {
-                      "type": "string"
-                    },
-                    "nextRecommendation": {
-                      "type": "string"
-                    },
-                    "previousRecommendation": {
-                      "type": "string"
-                    },
-                    "writer": {
-                      "type": "string"
-                    },
-                    "publishedDate": {
-                      "type": "string"
+                    "Goal": {
+                      "type": "object",
+                      "properties": {
+                        "title": {
+                          "type": "string"
+                        },
+                        "description": {
+                          "type": "string"
+                        }
+                      }
                     }
                   }
                 }
@@ -1889,7 +1903,7 @@
             }
           },
           "404": {
-            "description": "Article not found.",
+            "description": "Goal not found.",
             "content": {
               "application/json": {
                 "schema": {
@@ -1904,7 +1918,110 @@
             }
           },
           "500": {
-            "description": "An error occurred while extracting the specific news.",
+            "description": "Internal server error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/users/plan/cancel/{id}": {
+      "put": {
+        "tags": ["plans"],
+        "summary": "Cancel an exercise plan by user",
+        "description": "This endpoint allows a user to cancel their exercise plan.",
+        "operationId": "cancelExercisePlanByUser",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The ID of the exercise plan to be cancelled."
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "user": {
+                    "type": "object",
+                    "properties": {
+                      "_id": {
+                        "type": "string"
+                      }
+                    },
+                    "required": ["_id"]
+                  }
+                },
+                "required": ["user"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Plan has been cancelled successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Plan status is already completed or cancelled.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "msg": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Plan not found or not the user's plan.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "msg": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error.",
             "content": {
               "application/json": {
                 "schema": {
