@@ -325,6 +325,13 @@ export const verifyEmail = async (req: Request, res: Response) => {
       apiKey,
     });
 
+    const subscription = new Subscription({
+      userId: user._id,
+      paketId: "PAK001",
+      endDate: new Date('9999-12-31T23:59:59.999Z'),
+    });
+    await subscription.save();
+
     return res
       .status(RESPONSE_STATUS.SUCCESS)
       .send({ message: "Email verified" });
@@ -413,6 +420,19 @@ export const subscribePacket = async (req: Request, res: Response) => {
       .json({ message: "Paket not found" });
   }
 
+  // check active subscription
+  const activeSubscription = await Subscription.findOne({
+    userId: user._id,
+    isActive: true,
+    endDate: { $gt: new Date() } // Check if endDate is in the future
+  });
+
+  if (activeSubscription) {
+    await activeSubscription.updateOne({
+      isActive: false
+    })
+  }
+
   // check balance
   if (user.balance < paket.Paket_price) {
     return res
@@ -439,7 +459,7 @@ export const subscribePacket = async (req: Request, res: Response) => {
 
   //insert subscription
   const subscription = new Subscription({
-    userId: user.id,
+    userId: user._id,
     paketId,
     endDate,
   });
