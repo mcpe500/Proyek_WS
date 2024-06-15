@@ -8,9 +8,9 @@ export const validateAccessToken = async (
   res: Response,
   next: NextFunction
 ) => {
-  // console.log(req.headers)
+  //   console.log(req.headers)
   const token = req.headers.authorization;
-  // console.log(token)
+  console.log(token);
   if (!token) {
     return res.status(RESPONSE_STATUS.UNAUTHORIZED).send("Unauthorized");
   }
@@ -28,6 +28,8 @@ export const validateAccessToken = async (
       const user = await User.findOne({ $or: [{ username }, { email }] });
       if (user) {
         req.body.user = user;
+        // console.log(decodedToken);
+
         next();
       } else {
         return res
@@ -49,5 +51,10 @@ export const validateAdmin = async (
   res: Response,
   next: NextFunction
 ) => {
-  // TODO : Implement Checking if the user in req.body.user is an admin
+  const { user } = req.body;
+  if (user && user.role != "ADMIN")
+    return res
+      .status(RESPONSE_STATUS.UNAUTHORIZED)
+      .json({ msg: "User is not admin" });
+  next();
 };

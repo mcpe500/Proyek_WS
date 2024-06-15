@@ -1,10 +1,11 @@
-import { Document } from "mongoose";
+import { Document, Types } from "mongoose";
 
 export interface ISubscription extends Document {
-    userId: String,
-    paketId: String,
-    apiHit: Number,
+    userId: Types.ObjectId,
+    paketId: string,
+    apiHit: number,
     startDate: Date,
     endDate: Date,
-    isActive: Boolean,
+    isActive: boolean,
+    resetAt: Date,
 }

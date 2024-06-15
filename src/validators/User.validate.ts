@@ -23,34 +23,6 @@ export const registerSchemaJoi: Schema = JoiExtended.object({
       "any.required": "Phone number is required",
       "string.pattern.base": "Phone number must be between 10 and 15 digits",
     }),
-  //   age: JoiExtended.number().integer().required().messages({
-  //     "any.required": "Age is required",
-  //     "number.base": "Age must be a number",
-  //     "number.integer": "Age must be an integer",
-  //   }),
-  //   gender: JoiExtended.string().required().messages({
-  //     "any.required": "Gender is required",
-  //   }),
-  //   height: JoiExtended.number().required().messages({
-  //     "any.required": "Height is required",
-  //     "number.base": "Height must be a number",
-  //   }),
-  //   weight: JoiExtended.number().required().messages({
-  //     "any.required": "Weight is required",
-  //     "number.base": "Weight must be a number",
-  //   }),
-  //   fitnessGoals: JoiExtended.string()
-  //     .valid(...Object.values(FITNESS_GOALS))
-  //     .required()
-  //     .messages({
-  //       "any.required": "Fitness goals are required",
-  //       "any.only": `Fitness goals must be one of ${Object.values(
-  //         FITNESS_GOALS
-  //       )}`,
-  //     }),
-  //   healthInformation: JoiExtended.string().required().messages({
-  //     "any.required": "Health information is required",
-  //   }),
 });
 
 export const editProfileSchemaJoi = JoiExtended.object({
@@ -92,18 +64,22 @@ export const editProfileSchemaJoi = JoiExtended.object({
 }).unknown();
 
 export const loginSchemaJoi = JoiExtended.object({
-  username: JoiExtended.string().required().messages({
-    "any.required": "Username is a required field",
+  username: JoiExtended.string().empty("").messages({
+    "string.empty": "Username must not be empty",
   }),
-  email: JoiExtended.string().email().required().messages({
-    "any.required": "Email is a required field",
+  email: JoiExtended.string().email().empty("").messages({
     "string.email": "Please enter a valid email address",
   }),
   password: JoiExtended.string().required().messages({
     "any.required": "Password is a required field",
   }),
   rememberMe: JoiExtended.boolean().optional(),
-});
+})
+  .xor("username", "email")
+  .messages({
+    "object.missing": "Username or email is required for login",
+  });
+
 export const validationTokenSchemaJoi = JoiExtended.object({
   refreshToken: JoiExtended.string().required().messages({
     "string.base": "**refreshToken** must be a string",

@@ -1,6 +1,6 @@
 export default {
   get: {
-    tags: ["users"],
+    tags: ["admin"],
     summary: "Get a user by ID",
     description: "This endpoint returns a user by ID.",
     operationId: "getUser",

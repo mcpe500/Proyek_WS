@@ -1,15 +1,32 @@
 export default {
   get: {
-    summary: "Root endpoint",
-    description: "Returns a Hello World message",
+    tags: ["root"],
+    summary: "Check API Service status",
+    description: "This endpoint checks if the API Service is running.",
+    operationId: "checkStatus",
     responses: {
       "200": {
-        description: "Successful operation",
+        description: "API Service is running",
         content: {
-          "text/plain": {
+          "application/json": {
             schema: {
-              type: "string",
-              example: "Hello World",
+              type: "object",
+              properties: {
+                message: { type: "string" },
+              },
+            },
+          },
+        },
+      },
+      "500": {
+        description: "Internal server error",
+        content: {
+          "application/json": {
+            schema: {
+              type: "object",
+              properties: {
+                msg: { type: "string" },
+              },
             },
           },
         },

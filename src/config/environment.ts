@@ -25,3 +25,4 @@ export const ENV: EnvironmentStructure = {
   DB_STATIC_DATABASE: process.env.DB_STATIC_DATABASE ?? "db_name",
   API_NINJAS_API_KEY: process.env.API_NINJAS_API_KEY ?? "",
 };
+

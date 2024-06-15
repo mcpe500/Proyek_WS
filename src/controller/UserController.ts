@@ -17,6 +17,9 @@ import { JwtPayload } from "jsonwebtoken";
 import mongoose from "mongoose";
 import crypto from "crypto";
 import { Subscription } from "../models/dynamic/Subscription.model";
+import { Exercise } from "../models/dynamic/Exercise.model";
+import { Apis } from "../services/ApiService";
+import { IExercise } from "../contracts/dto/PlansRelated.dto";
 
 // const UserSchema: Schema = new Schema({
 //   fullName: { type: String, required: true },
@@ -35,18 +38,7 @@ import { Subscription } from "../models/dynamic/Subscription.model";
 // });
 
 export const registerUser = async (req: Request, res: Response) => {
-  const {
-    username,
-    email,
-    password,
-    fullName,
-    phone,
-    // age,
-    // gender,
-    // height,
-    // weight,
-    // healthInformation,
-  } = req.body;
+  const { username, email, password, fullName, phone } = req.body;
 
   try {
     const existingUser = await User.findOne({ $or: [{ username }, { email }] }); //
@@ -65,11 +57,6 @@ export const registerUser = async (req: Request, res: Response) => {
       password: hashedPassword,
       fullName,
       phone,
-      //   age,
-      //   gender,
-      //   height,
-      //   weight,
-      //   healthInformation,
       isEmailVerified: false,
       emailVerificationToken: emailToken,
     });
@@ -160,6 +147,8 @@ export const getUser = async (req: Request, res: Response) => {
 };
 
 export const getAllUser = async (req: Request, res: Response) => {
+  console.log("getAllUser");  
+  
   const user = await User.find();
 
   return res.status(RESPONSE_STATUS.SUCCESS).json({ user: user });
@@ -324,6 +313,14 @@ export const verifyEmail = async (req: Request, res: Response) => {
       emailVerificationToken: null,
       apiKey,
     });
+    
+    const subscription = new Subscription({
+        userId: user._id,
+        paketId: "PAK001",
+        endDate: new Date('9999-12-31T23:59:59.999Z'),
+        resetAt: new Date(new Date().getTime() + 60 * 1000)
+    });
+    await subscription.save();
 
     return res
       .status(RESPONSE_STATUS.SUCCESS)
@@ -375,28 +372,27 @@ export const resetApiKey = async (req: Request, res: Response) => {
 };
 
 export const topup = async (req: Request, res: Response) => {
-    const { amount, user } = req.body;
+  const { amount, user } = req.body;
 
-    if (amount <= 0) {
-        return res
-            .status(RESPONSE_STATUS.BAD_REQUEST)
-            .json({ message: "Invalid amount" });
-    }
+  if (amount <= 0) {
+    return res
+      .status(RESPONSE_STATUS.BAD_REQUEST)
+      .json({ message: "Invalid amount" });
+  }
 
-    try {
-        user.balance += amount;
-        const updatedUser = await user.save();
+  try {
+    user.balance += amount;
+    const updatedUser = await user.save();
 
-        return res
-            .status(RESPONSE_STATUS.SUCCESS)
-            .json({ message: "Balance updated. Current balance: Rp" + user.balance });
-    } catch (error) {
-        return res
-            .status(RESPONSE_STATUS.INTERNAL_SERVER_ERROR)
-            .json({ message: "Internal server error" });
-    }
-
-}
+    return res
+      .status(RESPONSE_STATUS.SUCCESS)
+      .json({ message: "Balance updated. Current balance: Rp" + user.balance });
+  } catch (error) {
+    return res
+      .status(RESPONSE_STATUS.INTERNAL_SERVER_ERROR)
+      .json({ message: "Internal server error" });
+  }
+};
 
 export const subscribePacket = async (req: Request, res: Response) => {
   const { paketId, user } = req.body;
@@ -413,11 +409,24 @@ export const subscribePacket = async (req: Request, res: Response) => {
       .json({ message: "Paket not found" });
   }
 
+  // check active subscription
+  const activeSubscription = await Subscription.findOne({
+    userId: user._id,
+    isActive: true,
+    endDate: { $gt: new Date() }, // Check if endDate is in the future
+  });
+
+  if (activeSubscription) {
+    await activeSubscription.updateOne({
+      isActive: false,
+    });
+  }
+
   // check balance
   if (user.balance < paket.Paket_price) {
     return res
-     .status(RESPONSE_STATUS.BAD_REQUEST)
-     .json({ message: "Not enough balance! Please topup first" });
+      .status(RESPONSE_STATUS.BAD_REQUEST)
+      .json({ message: "Not enough balance! Please topup first" });
   }
 
   // update balance
@@ -425,9 +434,9 @@ export const subscribePacket = async (req: Request, res: Response) => {
     user.balance -= paket.Paket_price;
     await user.save();
   } catch (error) {
-        return res
-            .status(RESPONSE_STATUS.INTERNAL_SERVER_ERROR)
-            .json({ message: "Internal server error" });
+    return res
+      .status(RESPONSE_STATUS.INTERNAL_SERVER_ERROR)
+      .json({ message: "Internal server error" });
   }
 
   let endDate = new Date();
@@ -439,7 +448,7 @@ export const subscribePacket = async (req: Request, res: Response) => {
 
   //insert subscription
   const subscription = new Subscription({
-    userId: user.id,
+    userId: user._id,
     paketId,
     endDate,
   });
@@ -456,3 +465,132 @@ export const subscribePacket = async (req: Request, res: Response) => {
 // [Paket 2] rate limit 50 per 10 detik 100k?
 // [Paket 3] rate limit 150 per 10 detik 250k?
 // [Enterprise] rate limit 1000 per detik 2000k?
+
+//admin
+export const adminDashboard = async (req: Request, res: Response) => {
+  const { user } = req.body;
+  return res.status(RESPONSE_STATUS.SUCCESS).json({ data: user });
+};
+
+export const getUserProfile = async (req: Request, res: Response) => {
+    const { userID } = req.params;
+    const user = await User.findOne({ _id: userID });
+    if(!user)  return res.status(RESPONSE_STATUS.NOT_FOUND).json({ msg: 'User not found'})
+    return res.status(RESPONSE_STATUS.SUCCESS).json({ data: user })
+};
+
+export const deleteUserProfile = async (req: Request, res: Response) => {
+    const { userID } = req.params;
+    const user = await User.findOne({ _id: userID });
+    if(!user)  return res.status(RESPONSE_STATUS.NOT_FOUND).json({ msg: 'User not found'})
+    const subscription = await Subscription.findOne({ _id: userID, isActive: true });
+    if(subscription) await subscription.updateOne({ isActive: false });
+    await User.deleteOne({_id: user._id});
+    return res.status(RESPONSE_STATUS.SUCCESS).json({ msg: "User deleted successfully" })
+};
+
+export const getUserPacket = async (req: Request, res: Response) => {
+    const { userID } = req.params;
+    const user = await User.findOne({ _id: userID });
+    if(!user) return res.status(RESPONSE_STATUS.NOT_FOUND).json({ msg: 'User not found'});
+    const subscription = await Subscription.findOne({ _id: userID, isActive: true });
+    if(!subscription) return res.status(RESPONSE_STATUS.NOT_FOUND).json({ msg: "User doesn't have any subscription" });
+    const packet = await Paket.findOne({ where: {Paket_id: subscription.paketId} });
+    if(!packet) return res.status(RESPONSE_STATUS.NOT_FOUND).json({ msg: 'Packet not found'});
+    return res.status(RESPONSE_STATUS.SUCCESS).json({ 
+        username: user.username,
+        nama: user.fullName,
+        subscription_start: subscription.startDate,
+        subscription_end: subscription.endDate,
+        packet:packet
+    });
+};
+
+export const addUserPacket = async (req: Request, res: Response) => {
+    const { userID } = req.params;
+    const { paket_id } = req.body;
+    const user = await User.findOne({ _id: userID });
+    if(!user)  return res.status(RESPONSE_STATUS.NOT_FOUND).json({ msg: 'User not found'});
+    const subscription = await Subscription.findOne({ _id: userID, isActive: true });
+    if(subscription) await subscription.updateOne({ isActive: false });
+    let endDate = new Date();
+    endDate.setMonth(endDate.getMonth() + 1);
+    endDate.setDate(endDate.getDate() - 1);
+    endDate.setHours(23);
+    endDate.setMinutes(59);
+    endDate.setSeconds(59);
+    const packet = await Paket.findOne({ where: {Paket_id: paket_id } });
+    if(!packet) return res.status(RESPONSE_STATUS.NOT_FOUND).json({ msg: 'Packet not found'});
+    const subs = new Subscription({
+        userId: user._id,
+        paketId: packet.Paket_id,
+        endDate,
+      });
+      const newSubscription = await subs.save();
+    
+      return res
+        .status(RESPONSE_STATUS.CREATED)
+        .json({ subscription: newSubscription });
+};
+
+export const deleteUserPacket = async (req: Request, res: Response) => {
+    const { userID } = req.params;
+    const user = await User.findOne({ _id: userID });
+    if(!user)  return res.status(RESPONSE_STATUS.NOT_FOUND).json({ msg: 'User not found'});
+    const subscription = await Subscription.findOne({ _id: userID, isActive: true });
+    if(!subscription) return res.status(RESPONSE_STATUS.NOT_FOUND).json({ msg: "User doesn't have any subscription" });
+    await subscription.updateOne({ isActive: false });
+    return res.status(RESPONSE_STATUS.SUCCESS).json({ msg: "Subscription deleted successfully" });
+};
+
+export const addExercise = async (req: Request, res: Response) => {
+    try {
+        // Fetch data from external API
+        const exercises: any[] = await Apis.API_NINJA_ApiService.get<any[]>('');
+    
+        for (const exercise of exercises) {
+          // Check if the exercise already exists in the database
+          const existingExercise = await Exercise.findOne({ name: exercise.name });
+    
+          // If the exercise does not exist, insert it into the database
+          if (!existingExercise) {
+            const newExercise = new Exercise({
+                name: exercise.name,
+                type: exercise.type,
+                targeted_muscle: exercise.muscle,
+                equipmentRequired: exercise.equipment ? exercise.equipment : "-",
+                description: exercise.instructions}
+            );
+            await newExercise.save();
+          }
+        }
+    
+        res.status(RESPONSE_STATUS.SUCCESS).json({ msg: 'Exercises have been added/updated successfully.' });
+      } catch (error) {
+        res.status(RESPONSE_STATUS.INTERNAL_SERVER_ERROR).json({ msg: 'Exercises added/updated failed.' });
+      }
+};
+
+export const topupFromAdmin = async (req: Request, res: Response) => {
+    const { userID } = req.params;
+    const { saldo } = req.body;
+
+    if(userID){
+        const user = await User.findOne({ _id: userID });
+        if(!user)  return res.status(RESPONSE_STATUS.NOT_FOUND).json({ msg: 'User not found'});
+        user.balance += saldo;
+        await user.save();
+
+        return res.status(RESPONSE_STATUS.SUCCESS).json({ 
+            msg: 'Balance updated successfully', 
+            username: user.username, 
+            full_name: user.fullName, 
+            newBalance: user.balance 
+        });
+    }   
+    else{
+        const users = await User.updateMany({}, { $inc: { balance: saldo } });
+        return res.status(RESPONSE_STATUS.SUCCESS).json({ msg: 'Balance updated for all users successfully' });
+    }
+};
+
