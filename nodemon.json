@@ -1,4 +1,4 @@
 {
   "verbose": true,
-  "ignore": ["./src/documentation/swagger_log"]
+  "ignore": ["./src/documentation/swagger_log","./articles/"]
 }

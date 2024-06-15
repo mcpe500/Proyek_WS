@@ -14,9 +14,6 @@ import getAllPricing from "./paths/public/getAllPricing";
 import getUserAPIKey from "./paths/user/getUserAPIKey";
 import resetUserAPIKey from "./paths/user/resetUserAPIKey";
 import subscribeToUserPacket from "./paths/user/subscribeToUserPacket";
-import getExerciseDetailByType from "./paths/user/plan/exercise/getExerciseDetailByType";
-import getExerciseDetailByMuscle from "./paths/user/plan/exercise/getExerciseDetailByMuscle";
-import getExerciseDetailByDifficulty from "./paths/user/plan/exercise/getExerciseDetailByDifficulty";
 import userPlanHandlers from "./paths/user/plan/userPlanHandlers";
 import userPlanByIDHandlers from "./paths/user/plan/userPlanByIDHandlers";
 import editUserPlanById from "./paths/user/plan/editUserPlanById";
@@ -31,7 +28,7 @@ import cancelPlanByUser from "./paths/user/plan/cancelPlanByUser";
 import adminDashboard from "./paths/admin/adminDashboard";
 import getAndDeleteUserProfile from "./paths/admin/getAndDeleteUserProfile";
 import getAndPostAndDeletePacket from "./paths/admin/getAndPostAndDeletePacket";
-import getExerciseDetailsByName from "./paths/user/plan/exercise/getExerciseDetailsByName";
+import getExerciseByQuery from "./paths/user/plan/exercise/getExerciseByQuery";
 const paths: any = {};
 paths["/"] = root;
 paths["/api/v1/auth/register"] = register;
@@ -45,10 +42,7 @@ paths["/api/v1/pricing"] = getAllPricing;
 paths["/api/v1/users/apikey"] = getUserAPIKey;
 paths["/api/v1/users/apikey/reset"] = resetUserAPIKey;
 paths["/api/v1/users/subscribe"] = subscribeToUserPacket;
-paths["/api/v1/exercise/name"] = getExerciseDetailsByName;
-paths["/api/v1/exercise/type"] = getExerciseDetailByType;
-paths["/api/v1/exercise/muscle"] = getExerciseDetailByMuscle;
-paths["/api/v1/exercise/difficulty"] = getExerciseDetailByDifficulty;
+paths["/api/v1/exercise"] = getExerciseByQuery;
 paths["/api/v1/users/plan"] = userPlanHandlers;
 paths["/api/v1/users/plan/{id}"] = userPlanByIDHandlers;
 paths["/api/v1/users/plan/edit/{id}"] = editUserPlanById;
@@ -90,7 +84,7 @@ const swaggerDocument = {
       cookieAuth: {
         type: "apiKey",
         in: "cookie",
-        name: "refreshToken", // Name of the cookie
+        name: "refresh_token", // Name of the cookie
       },
     },
   },
