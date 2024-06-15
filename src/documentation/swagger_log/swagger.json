@@ -1810,6 +1810,16 @@
                       },
                       "url": {
                         "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/exercise/goals": {
       "get": {
         "tags": ["goals"],
