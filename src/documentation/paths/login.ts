@@ -1,9 +1,10 @@
 export default {
   post: {
     tags: ["auth"],
-    summary: "User login",
+    summary: "Login a user",
+    description: "This endpoint logs in a user.",
+    operationId: "loginUser",
     requestBody: {
-      required: true,
       content: {
         "application/json": {
           schema: {
@@ -18,10 +19,11 @@ export default {
           },
         },
       },
+      required: true,
     },
     responses: {
-      200: {
-        description: "User logged in successfully",
+      "200": {
+        description: "Logged in successfully",
         content: {
           "application/json": {
             schema: {
@@ -33,40 +35,28 @@ export default {
             },
           },
         },
-        // headers: {
-        //   "Set-Cookie": {
-        //     description: "The refreshToken cookie",
-        //     schema: {
-        //       type: "string",
-        //     },
-        //   },
-        // },
-        // cookie: {
-        //   "refresh_token": {
-        //     description: "The refreshToken cookie",
-        //     schema: {
-        //       type: "string",
-        //     },
-        //   },
-        // },
-        // cookies: {
-        //   refresh_token: {
-        //     description: "The refreshToken cookie",
-        //     schema: {
-        //       type: "string",
-        //     },
-        //   },
-        // },
       },
-      400: {
-        description: "Invalid credentials or unverified email",
+      "400": {
+        description: "Bad Request",
         content: {
           "application/json": {
             schema: {
               type: "object",
               properties: {
                 msg: { type: "string" },
-                message: { type: "string" },
+              },
+            },
+          },
+        },
+      },
+      "500": {
+        description: "Internal server error",
+        content: {
+          "application/json": {
+            schema: {
+              type: "object",
+              properties: {
+                msg: { type: "string" },
               },
             },
           },

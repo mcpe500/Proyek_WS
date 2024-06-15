@@ -19,6 +19,8 @@ import {
   getUserPacket,
   addUserPacket,
   deleteUserPacket,
+  addExercise,
+  topupFromAdmin,
 } from "../controller/UserController";
 import {
   validateAccessToken,
@@ -188,43 +190,21 @@ router.delete(
   [validateAccessToken, validateAdmin],
   deleteUserPacket
 );
+router.get(
+  "/admin/exercise",
+  [validateAccessToken, validateAdmin],
+  addExercise
+);
+router.put(
+  "/admin/user/topup/:userID?",
+  [validateAccessToken, validateAdmin],
+  topupFromAdmin
+);
 
 // NEWS
 router.get("/news", getAllNews);
 router.get("/news/:title", getSpecificNews);
-router.get(
-  "/admin/dashboard",
-  [validateAccessToken, validateAdmin],
-  adminDashboard
-);
-router.get(
-  "/admin/user/profile/:userID",
-  [validateAccessToken, validateAdmin],
-  getUserProfile
-);
-router.delete(
-  "/admin/user/profile/:userID",
-  [validateAccessToken, validateAdmin],
-  deleteUserProfile
-);
-router.get(
-  "/admin/user/packet/:userID",
-  [validateAccessToken, validateAdmin],
-  getUserPacket
-);
-router.post(
-  "/admin/user/packet/:userID",
-  [validateAccessToken, validateAdmin],
-  addUserPacket
-);
-router.delete(
-  "/admin/user/packet/:userID",
-  [validateAccessToken, validateAdmin],
-  deleteUserPacket
-);
-
 // Exercise Goals
 router.get("/exercise/goals", [validateAccessToken], getAllGoals);
 router.get("/exercise/goals/:id", [validateAccessToken], getGoalById);
-
 export default router;

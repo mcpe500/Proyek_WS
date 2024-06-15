@@ -15,10 +15,8 @@ export const extractArticles = async (page: Page) => {
       type:
         article.querySelector(".listing__label")?.textContent?.trim() || null,
       writer:
-        article
-          .querySelector(".listing__text--byline")
-          ?.textContent?.trim()
-          .split("\n") || null,
+        article.querySelector(".listing__text--byline")?.textContent?.trim() ||
+        null,
       publishedDate:
         new Date(
           article

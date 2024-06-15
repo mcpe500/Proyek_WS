@@ -24,11 +24,14 @@ import editUserPlanById from "./paths/editUserPlanById";
 import startUserPlanById from "./paths/startUserPlanById";
 import completeUserPlanById from "./paths/completeUserPlanById";
 import addWorkoutToExercisePlan from "./paths/addWorkoutToExercisePlan";
-import getNewsByTitle from "./paths/getNewsByTitle";
+import getNewsByTitle from "./paths/news/getNewsByTitle";
 import getAllGoals from "./paths/getAllGoals";
 import getGoalById from "./paths/getGoalById";
-import getAllNews from "./paths/getAllNews";
+import getAllNews from "./paths/news/getAllNews";
 import cancelPlanByUser from "./paths/cancelPlanByUser";
+import adminDashboard from "./paths/admin/adminDashboard";
+import getAndDeleteUserProfile from "./paths/admin/getAndDeleteUserProfile";
+import getAndPostAndDeletePacket from "./paths/admin/getAndPostAndDeletePacket";
 const paths: any = {};
 paths["/"] = root;
 paths["/api/v1/auth/register"] = register;
@@ -60,6 +63,13 @@ paths["/api/v1/news/{title}"] = getNewsByTitle;
 paths["/api/v1/exercise/goals"] = getAllGoals;
 paths["/api/v1/exercise/goals/{id}"] = getGoalById;
 paths["/api/v1/users/plan/cancel/{id}"] = cancelPlanByUser;
+
+paths["/api/v1/admin/dashboard"] = adminDashboard; // GET
+paths["/api/v1/admin/user/profile/{userID}"] = getAndDeleteUserProfile; // GET and DELETE
+paths["/api/v1/admin/user/packet/{userID}"] = getAndPostAndDeletePacket; // GET and POST and DELETE
+// paths["/api/v1/admin/dashboard"] = {}
+// paths["/api/v1/admin/dashboard"] = {}
+// paths["/api/v1/admin/dashboard"] = {}
 
 const swaggerDocument = {
   openapi: "3.0.0",
