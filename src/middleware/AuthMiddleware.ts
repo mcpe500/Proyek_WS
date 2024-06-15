@@ -8,14 +8,10 @@ export const validateAccessToken = async (
   res: Response,
   next: NextFunction
 ) => {
-    console.log("asdasdadadsad");
-    
-  console.log(req.headers)
+//   console.log(req.headers)
   const token = req.headers.authorization;
-  console.log(token)
+//   console.log(token)
   if (!token) {
-    console.log("aaa");
-    
     return res.status(RESPONSE_STATUS.UNAUTHORIZED).send("Unauthorized");
   }
   const [prefix, accessToken] = token.split(" ");
@@ -32,7 +28,7 @@ export const validateAccessToken = async (
       const user = await User.findOne({ $or: [{ username }, { email }] });
       if (user) {
         req.body.user = user;
-        console.log(decodedToken);
+        // console.log(decodedToken);
         
         next();
       } else {
