@@ -78,8 +78,8 @@ router.post(
 router.get("/auth/verify/:emailVerificationToken", verifyEmail); // finished
 
 // Admin Routes
-router.get("/users", [validateAccessToken, validateAdmin], getAllUser); // finished // admin can use this, add filtering to filter using query
-router.get("/users/:id", [validateAccessToken, validateAdmin], getUser); // finished // admin can use this
+router.get("/admin/users", [validateAccessToken, validateAdmin], getAllUser); // finished // admin can use this, add filtering to filter using query
+router.get("/admin/users/:id", [validateAccessToken, validateAdmin], getUser); // finished // admin can use this
 
 // User Routes
 router.put("/users/topup", [validateAccessToken], topup);
