@@ -39,8 +39,6 @@ paths["/api/v1/auth/login"] = login;
 paths["/api/v1/auth/token"] = newAccessTokenFromRefreshToken;
 paths["/api/v1/auth/refresh_token"] = newRefreshToken;
 paths["/api/v1/auth/verify/{emailVerificationToken}"] = verifyEmail;
-paths["/api/v1/admin/users"] = getAllUser;
-paths["/api/v1/admin/users/{id}"] = getUserById;
 paths["/api/v1/users/dashboard"] = userDashboard;
 paths["/api/v1/users/profile"] = editUserProfile;
 paths["/api/v1/pricing"] = getAllPricing;
@@ -64,6 +62,8 @@ paths["/api/v1/exercise/goals"] = getAllGoals;
 paths["/api/v1/exercise/goals/{id}"] = getGoalById;
 paths["/api/v1/users/plan/cancel/{id}"] = cancelPlanByUser;
 
+paths["/api/v1/admin/users"] = getAllUser;
+paths["/api/v1/admin/users/{id}"] = getUserById;
 paths["/api/v1/admin/dashboard"] = adminDashboard; // GET
 paths["/api/v1/admin/user/profile/{userID}"] = getAndDeleteUserProfile; // GET and DELETE
 paths["/api/v1/admin/user/packet/{userID}"] = getAndPostAndDeletePacket; // GET and POST and DELETE
