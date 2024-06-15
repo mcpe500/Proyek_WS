@@ -147,6 +147,8 @@ export const getUser = async (req: Request, res: Response) => {
 };
 
 export const getAllUser = async (req: Request, res: Response) => {
+  console.log("getAllUser");  
+  
   const user = await User.find();
 
   return res.status(RESPONSE_STATUS.SUCCESS).json({ user: user });

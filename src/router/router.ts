@@ -77,6 +77,10 @@ router.post(
 ); // finished
 router.get("/auth/verify/:emailVerificationToken", verifyEmail); // finished
 
+// Admin Routes
+router.get("/users", [validateAccessToken, validateAdmin], getAllUser); // finished // admin can use this, add filtering to filter using query
+router.get("/users/:id", [validateAccessToken, validateAdmin], getUser); // finished // admin can use this
+
 // User Routes
 router.put("/users/topup", [validateAccessToken], topup);
 router.get("/users/dashboard", [validateAccessToken], getDashboard); // finished
@@ -141,16 +145,12 @@ router.put(
   cancelExercisePlanByUser
 ); // finished
 
-// Admin Routes
-router.get("/users", [validateAccessToken, validateAdmin], getAllUser); // finished // admin can use this, add filtering to filter using query
-router.get("/users/:id", [validateAccessToken, validateAdmin], getUser); // finished // admin can use this
-
 // Pricing
 router.get("/pricing", getAllPricingPackages);
 router.get("/exercise", [validateAccessToken], getExercise);
 
 // User Plan Routes
-// router.put("/users/plan/edit", validateAccessToken, editPlan); // finished
+// router.put("/users/plan/edit", validateAccessToken, editPlan); // finished 
 // router.put("/users/plan/start", validateAccessToken, startPlan); // finished
 // router.put("/users/plan/complete", validateAccessToken, completePlan); // finished
 // router.get("/users/plan/:planId", validateAccessToken, getPlan); // finished
