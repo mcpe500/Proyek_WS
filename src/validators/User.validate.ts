@@ -64,18 +64,22 @@ export const editProfileSchemaJoi = JoiExtended.object({
 }).unknown();
 
 export const loginSchemaJoi = JoiExtended.object({
-  username: JoiExtended.string().required().messages({
-    "any.required": "Username is a required field",
+  username: JoiExtended.string().empty("").messages({
+    "string.empty": "Username must not be empty",
   }),
-  email: JoiExtended.string().email().required().messages({
-    "any.required": "Email is a required field",
+  email: JoiExtended.string().email().empty("").messages({
     "string.email": "Please enter a valid email address",
   }),
   password: JoiExtended.string().required().messages({
     "any.required": "Password is a required field",
   }),
   rememberMe: JoiExtended.boolean().optional(),
-});
+})
+  .xor("username", "email")
+  .messages({
+    "object.missing": "Username or email is required for login",
+  });
+
 export const validationTokenSchemaJoi = JoiExtended.object({
   refreshToken: JoiExtended.string().required().messages({
     "string.base": "**refreshToken** must be a string",

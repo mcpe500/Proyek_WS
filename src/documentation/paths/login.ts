@@ -15,11 +15,10 @@ export default {
               password: { type: "string" },
               rememberMe: { type: "boolean" },
             },
-            required: ["username", "email", "password"],
+            required: ["password"],
           },
         },
       },
-      required: true,
     },
     responses: {
       "200": {
