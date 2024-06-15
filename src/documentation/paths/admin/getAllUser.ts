@@ -1,7 +1,7 @@
 export default {
   get: {
-    tags: ["users"],
-    summary: "Get a user all users",
+    tags: ["admin"],
+    summary: "Allow admin to get a user all users",
     description: "This endpoint returns every user's data",
     operationId: "getAllUser",
     responses: {
