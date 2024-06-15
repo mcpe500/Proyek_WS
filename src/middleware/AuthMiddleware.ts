@@ -8,10 +8,14 @@ export const validateAccessToken = async (
   res: Response,
   next: NextFunction
 ) => {
-  // console.log(req.headers)
+    console.log("asdasdadadsad");
+    
+  console.log(req.headers)
   const token = req.headers.authorization;
-  // console.log(token)
+  console.log(token)
   if (!token) {
+    console.log("aaa");
+    
     return res.status(RESPONSE_STATUS.UNAUTHORIZED).send("Unauthorized");
   }
   const [prefix, accessToken] = token.split(" ");
@@ -28,6 +32,8 @@ export const validateAccessToken = async (
       const user = await User.findOne({ $or: [{ username }, { email }] });
       if (user) {
         req.body.user = user;
+        console.log(decodedToken);
+        
         next();
       } else {
         return res
@@ -50,6 +56,12 @@ export const validateAdmin = async (
   next: NextFunction
 ) => {
   const { user } = req.body;
-  if(user && user.role != "ADMIN") return res.status(RESPONSE_STATUS.UNAUTHORIZED).json({ msg: 'User is not admin'});
+  console.log("a");
+  if(user && user.role != "ADMIN") {
+    console.log("b");
+    
+    return res.status(RESPONSE_STATUS.UNAUTHORIZED).json({ msg: 'User is not admin'});
+  }
+  
   next();
 };
