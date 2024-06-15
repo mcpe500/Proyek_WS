@@ -6,6 +6,7 @@ import { PlansStatus } from "../contracts/enum/PlansRelated.enum";
 import { FITNESS_GOALS } from "../contracts/enum/FitnessRelated.enum";
 import { User } from "../models/dynamic/User.model";
 import { Exercise } from "../models/dynamic/Exercise.model";
+import mongoose from "mongoose";
 
 // Create Exercise Plan
 export const createExercisePlan = async (req: Request, res: Response) => {
@@ -200,7 +201,7 @@ export const addWorkoutToExercisePlan = async (req: Request, res: Response) => {
 export const exercisePlanDetails = async (req: Request, res: Response) => {
   const { id } = req.params;
   const user = req.body.user;
-  const plan = await Plans.findById(id);
+  const plan = await Plans.findById(id)
 
   if (!plan) {
     return res
@@ -219,7 +220,7 @@ export const getAllExercisePlanByUser = async (req: Request, res: Response) => {
   const user = req.body.user;
   const plans = await Plans.find({
     createdBy: user.username
-  }).select('name createdDate status');
+  }).select('_id, name createdDate status');
 
   try {
     return res
@@ -235,6 +236,11 @@ export const getAllExercisePlanByUser = async (req: Request, res: Response) => {
 export const getExercisePlanDetailByUser = async (req: Request, res: Response) => {
   const { id } = req.params;
   const user = req.body.user;
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    return res
+      .status(RESPONSE_STATUS.BAD_REQUEST)
+      .json({ message: "Invalid ID" });
+  }
   const plan = await Plans.findById(id);
 
   if (!plan) {
@@ -267,6 +273,11 @@ export const trackerExercisePlanByUser = async (req: Request, res: Response) => 
 export const cancelExercisePlanByUser = async (req: Request, res: Response) => {
   const { id } = req.params;
   const user = req.body.user;
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    return res
+      .status(RESPONSE_STATUS.BAD_REQUEST)
+      .json({ message: "Invalid ID" });
+  }
   const plan = await Plans.findById(id);
 
   if (!plan) {
