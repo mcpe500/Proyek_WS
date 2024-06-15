@@ -10,11 +10,12 @@ export default {
           schema: {
             type: "object",
             properties: {
-              username: { type: "string" },
-              email: { type: "string", format: "email" },
+              username: { type: "string", default: "string" },
+              email: { type: "string", format: "email", default: "" },
               password: { type: "string" },
               rememberMe: { type: "boolean" },
             },
+            anyOf: [{ required: ["username"] }, { required: ["email"] }],
             required: ["password"],
           },
         },
