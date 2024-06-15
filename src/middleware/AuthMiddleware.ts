@@ -9,7 +9,7 @@ export const validateAccessToken = async (
   next: NextFunction
 ) => {
   const token = req.headers.authorization;
-  console.log(token);
+  // console.log(token);
   if (!token) {
     return res.status(RESPONSE_STATUS.UNAUTHORIZED).send("Unauthorized");
   }
@@ -51,6 +51,8 @@ export const validateAdmin = async (
   next: NextFunction
 ) => {
   const { user } = req.body;
+  // console.log(user);
+  
   if (user && user.role != "ADMIN")
     return res
       .status(RESPONSE_STATUS.UNAUTHORIZED)

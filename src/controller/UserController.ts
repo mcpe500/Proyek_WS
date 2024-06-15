@@ -253,7 +253,7 @@ export const generateNewAccessToken = async (req: Request, res: Response) => {
 
   try {
     const decoded = verifyRefreshToken(refreshToken);
-    console.log("decoded : ", decoded);
+    // console.log("decoded : ", decoded);
     const user = await User.findOne({
       $or: [{ username: decoded.username }, { email: decoded.email }],
     });
