@@ -207,18 +207,19 @@ export const getSpecificNews = async (req: Request, res: Response) => {
     await page.emulateMediaType("screen");
     console.log("Full page");
 
-    // Generate PDF from the page content
-    // make the pdf to load the full page
-    const pdf = await page.pdf({ format: "A4", timeout: 300000 });
+    // Wait for the page to fully render
+    // await page.waitForTimeout(5000); // Adjust the timeout as needed
+
+    // Get the HTML content of the page
+    const htmlContent = await page.content();
 
     await browser.close();
 
     // Set the response headers
-    res.setHeader("Content-Type", "application/pdf");
-    res.setHeader("Content-Disposition", "attachment; filename=article.pdf");
+    res.setHeader("Content-Type", "text/html");
 
-    // Send the PDF file
-    res.send(pdf);
+    // Send the HTML content
+    res.send(htmlContent);
   } catch (error) {
     console.error(
       "An error occurred while extracting the specific news:",
