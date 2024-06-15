@@ -4,3 +4,4 @@
 .package-lock.json
 /src/documentation/swagger_log
 /ooutput/documentation/swagger_log
+/articles

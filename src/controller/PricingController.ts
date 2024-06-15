@@ -4,7 +4,11 @@ import { RESPONSE_STATUS } from "../contracts/enum/ResponseRelated.enum";
 
 export const getAllPricingPackages = async (req: Request, res: Response) => {
   try {
+    console.log("MASUK");
+
     const pakets = await Paket.findAll();
+    console.log(pakets);
+
     return res.status(RESPONSE_STATUS.SUCCESS).json(pakets);
   } catch (error) {
     console.error("Error retrieving pricing packages:", error);

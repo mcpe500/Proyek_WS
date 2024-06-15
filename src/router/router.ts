@@ -25,6 +25,7 @@ import {
 import {
   validateAccessToken,
   validateAdmin,
+  validateNotSignIn,
 } from "../middleware/AuthMiddleware";
 import {
   validateBody,
@@ -63,7 +64,12 @@ import { getAllNews, getSpecificNews } from "../controller/NewsController";
 const router = Router();
 
 // Authentication Routes
-router.post("/auth/register", validateBody(registerSchemaJoi), registerUser); // finished
+router.post(
+  "/auth/register",
+  validateBody(registerSchemaJoi),
+  validateNotSignIn,
+  registerUser
+); // finished
 router.post("/auth/login", validateBody(loginSchemaJoi), loginUser); // finished
 router.post(
   "/auth/token",
@@ -150,7 +156,7 @@ router.get("/pricing", getAllPricingPackages);
 router.get("/exercise", [validateAccessToken], getExercise);
 
 // User Plan Routes
-// router.put("/users/plan/edit", validateAccessToken, editPlan); // finished 
+// router.put("/users/plan/edit", validateAccessToken, editPlan); // finished
 // router.put("/users/plan/start", validateAccessToken, startPlan); // finished
 // router.put("/users/plan/complete", validateAccessToken, completePlan); // finished
 // router.get("/users/plan/:planId", validateAccessToken, getPlan); // finished

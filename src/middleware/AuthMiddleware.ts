@@ -8,7 +8,6 @@ export const validateAccessToken = async (
   res: Response,
   next: NextFunction
 ) => {
-  //   console.log(req.headers)
   const token = req.headers.authorization;
   console.log(token);
   if (!token) {
@@ -56,5 +55,17 @@ export const validateAdmin = async (
     return res
       .status(RESPONSE_STATUS.UNAUTHORIZED)
       .json({ msg: "User is not admin" });
+  next();
+};
+
+export const validateNotSignIn = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  const token = req.headers.authorization;
+  if (token) {
+    return res.status(RESPONSE_STATUS.UNAUTHORIZED).send("Unauthorized");
+  }
   next();
 };

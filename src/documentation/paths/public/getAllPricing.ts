@@ -11,7 +11,33 @@ export default {
             schema: {
               type: "array",
               items: {
-                $ref: "#/components/schemas/PricingPackage",
+                type: "object",
+                properties: {
+                  Paket_id: {
+                    type: "string",
+                    example: "PAK001",
+                  },
+                  Paket_name: {
+                    type: "string",
+                    example: "Starter",
+                  },
+                  Paket_description: {
+                    type: "string",
+                    example: "Free package with limited rate",
+                  },
+                  Paket_Limit: {
+                    type: "integer",
+                    example: 15,
+                  },
+                  Paket_price: {
+                    type: "integer",
+                    example: 0,
+                  },
+                  Paket_price_currency: {
+                    type: "string",
+                    example: "IDR",
+                  },
+                },
               },
             },
           },
