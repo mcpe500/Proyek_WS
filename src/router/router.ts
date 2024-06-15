@@ -40,11 +40,8 @@ import {
 import { getAllPricingPackages } from "../controller/PricingController";
 import {
   getExercise,
-<<<<<<< HEAD
-=======
   getAllGoals,
   getGoalById,
->>>>>>> e74d214c757db32887d00c1a1771b67b309a5c3c
 } from "../controller/ExerciseController";
 import {
   completeExercisePlan,
@@ -81,8 +78,8 @@ router.post(
 router.get("/auth/verify/:emailVerificationToken", verifyEmail); // finished
 
 // Admin Routes
-router.get("/users", [validateAccessToken, validateAdmin], getAllUser); // finished // admin can use this, add filtering to filter using query
-router.get("/users/:id", [validateAccessToken, validateAdmin], getUser); // finished // admin can use this
+router.get("/admin/users", [validateAccessToken, validateAdmin], getAllUser); // finished // admin can use this, add filtering to filter using query
+router.get("/admin/users/:id", [validateAccessToken, validateAdmin], getUser); // finished // admin can use this
 
 // User Routes
 router.put("/users/topup", [validateAccessToken], topup);
@@ -147,13 +144,6 @@ router.put(
   [validateAccessToken],
   cancelExercisePlanByUser
 ); // finished
-<<<<<<< HEAD
-
-// Admin Routes
-router.get("/users", [validateAccessToken, validateAdmin], getAllUser); // finished // admin can use this, add filtering to filter using query
-router.get("/users/:id", [validateAccessToken, validateAdmin], getUser); // finished // admin can use this
-=======
->>>>>>> e74d214c757db32887d00c1a1771b67b309a5c3c
 
 // Pricing
 router.get("/pricing", getAllPricingPackages);
