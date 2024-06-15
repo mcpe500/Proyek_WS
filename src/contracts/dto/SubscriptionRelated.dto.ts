@@ -7,4 +7,5 @@ export interface ISubscription extends Document {
     startDate: Date,
     endDate: Date,
     isActive: boolean,
+    resetAt: Date,
 }
