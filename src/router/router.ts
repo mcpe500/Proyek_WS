@@ -31,6 +31,7 @@ import {
   validateBody,
   validateCookie,
   validateParams,
+  validateQuery,
 } from "../middleware/ValidateMiddleware";
 import {
   editProfileSchemaJoi,
@@ -60,6 +61,8 @@ import {
 import { createUserPlanSchemaJoi } from "../validators/Plans.validate";
 import { checkAndIncreaseAPIHit } from "../middleware/BusinessMiddleware";
 import { getFilteredNews, getSpecificNews } from "../controller/NewsController";
+import { getNearestGyms } from "../controller/GymsController";
+import { getGymsSchema } from "../validators/Maps.validate";
 
 const router = Router();
 
@@ -207,5 +210,13 @@ router.get("/exercise/goals/:title", [validateAccessToken], getGoalByTitle);
 // router.get("/news", getAllNews);
 router.get("/news", getFilteredNews);
 router.get("/news/:title", getSpecificNews);
+
+// Maps Routes
+router.get(
+  "/gyms/nearest",
+  validateAccessToken,
+  validateQuery(getGymsSchema),
+  getNearestGyms
+);
 
 export default router;

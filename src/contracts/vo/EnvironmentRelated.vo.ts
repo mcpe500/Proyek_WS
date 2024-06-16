@@ -1,5 +1,6 @@
 export interface EnvironmentStructure {
   PORT: number;
+  BACKEND_API_URL: string;
   SECRET_KEY: string;
   REFRESH_TOKEN_SECRET: string;
   ACCESS_TOKEN_SECRET: string;
@@ -19,4 +20,5 @@ export interface EnvironmentStructure {
   DB_STATIC_DATABASE: string;
 
   API_NINJAS_API_KEY: string;
+  API_GOOGLE_PLACES_API_KEY: string;
 }

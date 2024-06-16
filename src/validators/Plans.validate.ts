@@ -111,11 +111,8 @@ export const createUserPlanSchemaJoi = JoiExtended.object({
   }),
 });
 
-
-export const exercisePlanDetailsSchemaJoi = JoiExtended.object({
-})
-export const addWorkoutToExercisePlanSchemaJoi = JoiExtended.object({
-});
+export const exercisePlanDetailsSchemaJoi = JoiExtended.object({});
+export const addWorkoutToExercisePlanSchemaJoi = JoiExtended.object({});
 // export const editUserPlanSchemaJoi = JoiExtended.object({
 //   name: JoiExtended.string().optional().messages({
 //     "string.base": "Name must be a string",

@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Fitness Location Tracker</title>
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+    />
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=Montserrat:wght@700&family=Open+Sans:wght@400;700&display=swap");
+
+      body {
+        font-family: "Open Sans", sans-serif;
+        background: linear-gradient(-45deg, #56ab2f, #a8e063);
+        background-size: cover;
+        min-height: 100vh;
+        
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin: 0;
+        padding: 20px;
+      }
+
+      .container {
+        max-width: 700px;
+        background-color: rgba(255, 255, 255, 0.9);
+        padding: 40px;
+        border-radius: 10px;
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        text-align: center;
+      }
+
+      h1,
+      h2 {
+        font-family: "Montserrat", sans-serif;
+        color: #333;
+        margin-bottom: 30px;
+      }
+
+      .btn-location {
+        background-color: #88b04b; /* Olive Green */
+        border: none;
+        color: white;
+        padding: 12px 24px;
+        font-size: 1.2rem;
+        font-weight: bold;
+        border-radius: 25px; /* Rounded corners */
+        box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2); /* Subtle shadow */
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+      }
+
+      .btn-location:hover {
+        background-color: #4a9c28; /* Darker Olive Green on hover */
+      }
+
+      .location-display,
+      .gyms-display {
+        margin-top: 20px;
+        font-size: 1.2rem;
+        text-align: left;
+      }
+
+      input[type="text"] {
+        width: calc(100% - 20px);
+        padding: 10px;
+        margin: 10px 0;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        font-size: 1rem;
+        outline: none;
+      }
+
+      input[type="text"]:focus {
+        border-color: #88b04b; /* Olive Green */
+      }
+
+      .gym-card {
+        background-color: #f9f9f9;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        padding: 15px;
+        margin-bottom: 10px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      }
+
+      .gym-card h3 {
+        margin-top: 0;
+        font-size: 1.2rem;
+        color: #333;
+      }
+
+      .gym-card p {
+        margin: 5px 0;
+        color: #666;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Fitness Location Tracker</h1>
+      <button class="btn btn-location" onclick="getLocation()">
+        Locate Me
+      </button>
+      <div id="location-display" class="location-display mt-4"></div>
+      <h2>Find Nearest Gyms</h2>
+      <input type="text" id="latitude" placeholder="Latitude" required /><br />
+      <input
+        type="text"
+        id="longitude"
+        placeholder="Longitude"
+        required
+      /><br />
+      <input
+        type="text"
+        id="authtoken"
+        placeholder="Authorization Token"
+        required
+      /><br />
+      <button onclick="getNearGyms()" class="btn btn-location">
+        Find Gyms Near Me
+      </button>
+    </div>
+    <div id="gyms-display" class="gyms-display mt-4"></div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+      function getLocation() {
+        if (navigator.geolocation) {
+          navigator.geolocation.getCurrentPosition(showPosition);
+        } else {
+          document.getElementById("location-display").innerHTML =
+            "Geolocation is not supported by this browser.";
+        }
+      }
+
+      function showPosition(position) {
+        document.getElementById("latitude").value = position.coords.latitude;
+        document.getElementById("longitude").value = position.coords.longitude;
+        document.getElementById(
+          "location-display"
+        ).innerHTML = `<strong>Your Current Location:</strong><br>Latitude: ${position.coords.latitude.toFixed(
+          6
+        )}<br>Longitude: ${position.coords.longitude.toFixed(6)}`;
+      }
+
+      function getNearGyms() {
+        getLocation();
+        const lat = document.getElementById("latitude").value;
+        const lng = document.getElementById("longitude").value;
+        const token = document.getElementById("authtoken").value;
+        const url = `<%= backend_url %>/api/v1/gyms/nearest?lat=${lat}&lng=${lng}`;
+
+        fetch(url, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        })
+          .then((response) => {
+            if (!response.ok) {
+              throw new Error("Network response was not ok");
+            }
+            return response.json();
+          })
+          .then((data) => {
+            console.log(data);
+            displayGyms(data);
+          })
+          .catch((error) => {
+            document.getElementById(
+              "gyms-display"
+            ).innerHTML = `<strong>Error:</strong> ${error.message}`;
+          });
+      }
+
+      function displayGyms({ data }) {
+        const gymsDisplay = document.getElementById("gyms-display");
+        gymsDisplay.innerHTML = "";
+        data.map((gym) => {
+          const gymCard = document.createElement("div");
+          gymCard.classList.add("gym-card");
+          gymCard.innerHTML = `
+          <h3>${gym.name}</h3>
+          <p><strong>Status:</strong> ${gym.business_status}</p>
+          <p><strong>Location:</strong> ${gym.vicinity}</p>
+          <p><strong>Rating:</strong> ${gym.rating || "N/A"}</p>
+        `;
+          gymsDisplay.appendChild(gymCard);
+        });
+      }
+    </script>
+  </body>
+</html>

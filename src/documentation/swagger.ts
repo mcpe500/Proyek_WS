@@ -1,3 +1,6 @@
+import { JSDOM } from "jsdom";
+import { SwaggerUIBundle } from "swagger-ui-dist";
+import { SwaggerUIStandalonePreset } from "swagger-ui-dist";
 import fs from "fs";
 import path from "path";
 import root from "./paths/root";
@@ -29,6 +32,11 @@ import getAndPostAndDeletePacket from "./paths/admin/getAndPostAndDeletePacket";
 import getExerciseByQuery from "./paths/user/plan/exercise/getExerciseByQuery";
 import getNewsFilterOrAllNews from "./paths/news/getNewsFilterOrAllNews";
 import getGoalByTitle from "./paths/user/plan/exercise/goals/getGoalByTitle";
+import getNearestGyms from "./paths/location/getNearestGyms";
+
+const { window } = new JSDOM();
+const $ = require("jquery")(window);
+
 const paths: any = {};
 paths["/"] = root;
 paths["/api/v1/auth/register"] = register;
@@ -61,7 +69,8 @@ paths["/api/v1/admin/users/{id}"] = getUserById;
 paths["/api/v1/admin/dashboard"] = adminDashboard; // GET
 paths["/api/v1/admin/user/profile/{userID}"] = getAndDeleteUserProfile; // GET and DELETE
 paths["/api/v1/admin/user/packet/{userID}"] = getAndPostAndDeletePacket; // GET and POST and DELETE
-// paths["/api/v1/admin/dashboard"] = {}
+
+paths["/api/v1/gyms/nearest"] = getNearestGyms;
 // paths["/api/v1/admin/dashboard"] = {}
 // paths["/api/v1/admin/dashboard"] = {}
 
@@ -94,6 +103,89 @@ const swaggerDocument = {
   },
   paths: paths,
 };
+
+// Execute the Swagger UI setup within jQuery document ready function
+// $(function () {
+//   // Initialize Swagger UI with bundled resources
+//   const ui = SwaggerUIBundle({
+//     spec: swaggerDocument,
+//     dom_id: "#swagger-ui",
+//     presets: [SwaggerUIBundle.presets.apis, SwaggerUIStandalonePreset],
+//     plugins: [
+//       SwaggerUIBundle.plugins.DownloadUrl,
+//       // Custom plugin to handle current location button
+//       function (system: any) {
+//         return {
+//           components: {
+//             // Define custom button component for current location
+//             CurrentLocationButton: function (props: any) {
+//               const { getComponent, specSelectors } = props;
+
+//               // Function to handle current location button click
+//               const onGetCurrentLocation = () => {
+//                 // Check if Geolocation API is supported
+//                 if (navigator.geolocation) {
+//                   navigator.geolocation.getCurrentPosition(
+//                     (position) => {
+//                       const latitude = position.coords.latitude;
+//                       const longitude = position.coords.longitude;
+//                       const radius = 1000; // Example radius
+
+//                       // Update Swagger UI with fetched location
+//                       const params = new URLSearchParams(
+//                         window.location.search
+//                       );
+//                       params.set("lat", latitude.toString());
+//                       params.set("lng", longitude.toString());
+//                       params.set("radius", radius.toString());
+//                       const newUrl = `${
+//                         window.location.pathname
+//                       }?${params.toString()}`;
+//                       window.history.replaceState({}, "", newUrl);
+
+//                       // Reload the page to reflect the updated query parameters
+//                       window.location.reload();
+//                     },
+//                     (error) => {
+//                       console.error("Error fetching location:", error);
+//                     }
+//                   );
+//                 } else {
+//                   console.error(
+//                     "Geolocation API is not supported by this browser."
+//                   );
+//                 }
+//               };
+
+//               return (
+//                 // Render the button in JSX
+//                 `<button onClick="(${onGetCurrentLocation.toString()})()">Get Current Location</button>`
+//               );
+//             },
+//           },
+//           wrapComponents: {
+//             // Wrap operation with custom button
+//             parameters: (Original: any, system: any) => {
+//               const CurrentLocationButton = system.getComponent(
+//                 "CurrentLocationButton"
+//               );
+//               return (props: any) => {
+//                 const { name } = props;
+//                 if (name === "x-sinap-get-current-location") {
+//                   return `<CurrentLocationButton ${props} />`;
+//                 }
+//                 return `<Original ${props} />`;
+//               };
+//             },
+//           },
+//         };
+//       },
+//     ],
+//   });
+
+//   // Expose Swagger UI instance to global scope for debugging
+//   (window as any).ui = ui;
+// });
 // console.log(swaggerDocument);
 // const directoryExists = (dirPath: string) => {
 //   try {
