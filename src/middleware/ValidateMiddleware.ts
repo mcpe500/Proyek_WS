@@ -28,6 +28,19 @@ export const validateParams = (schema: Schema) => {
   };
 };
 
+export const validateQuery = (schema: Schema) => {
+  return async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      await schema.validateAsync(req.query);
+      next();
+    } catch (err: any) {
+      res
+        .status(RESPONSE_STATUS.BAD_REQUEST)
+        .send({ error: err.details[0].message });
+    }
+  };
+};
+
 export const validateCookie = (schema: Schema) => {
   return async (req: Request, res: Response, next: NextFunction) => {
     try {
