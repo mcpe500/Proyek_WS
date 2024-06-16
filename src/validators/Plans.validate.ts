@@ -1,6 +1,8 @@
 import { JoiExtended } from ".";
 import { FITNESS_GOALS } from "../contracts/enum/FitnessRelated.enum";
 
+const FITNESS_GOAL_CODES = Object.values(FITNESS_GOALS).map(goal => goal.code);
+
 export const createUserPlanSchemaJoi = JoiExtended.object({
   name: JoiExtended.string().required().messages({
     "string.base": "Name must be a string",
@@ -11,8 +13,17 @@ export const createUserPlanSchemaJoi = JoiExtended.object({
     "any.required": "Description is a required field",
   }),
   goals: JoiExtended.array()
-    .items(JoiExtended.string().valid(...Object.values(FITNESS_GOALS)))
-    .optional(),
+  .items(
+    JoiExtended.string()
+      .valid(...FITNESS_GOAL_CODES)
+      .messages({
+        "any.only": `Goals must be one of ${FITNESS_GOAL_CODES.join(", ")}`,
+      })
+  )
+  .optional()
+  .messages({
+    "array.base": '"Goals" must be an array of valid fitness goals',
+  }),
   durationInWeeks: JoiExtended.number()
     .integer()
     .positive()
@@ -43,7 +54,7 @@ export const createUserPlanSchemaJoi = JoiExtended.object({
       "number.positive": "Rest days per week must be a positive number",
       "any.required": "Rest days per week is a required field",
     }),
-  intensity: JoiExtended.string().required().messages({
+  intensity: JoiExtended.number().required().messages({
     "number.base": "Intensity must be a number",
     "any.required": "Intensity is a required field",
   }),
@@ -100,15 +111,11 @@ export const createUserPlanSchemaJoi = JoiExtended.object({
           .optional(),
       })
     )
-    .required()
+    .optional()
     .messages({
       "any.required": "Exercises are required",
     }),
   nutritionPlan: JoiExtended.object().optional(),
-  createdBy: JoiExtended.string().required().messages({
-    "string.base": "Created by must be a string",
-    "any.required": "Created by is a required field",
-  }),
 });
 
 

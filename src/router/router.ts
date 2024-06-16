@@ -150,9 +150,9 @@ router.post("/users/subscribe", [validateAccessToken], subscribePacket);
 router.post(
   "/users/plan",
   [
-    validateAccessToken,
     validateBody(createUserPlanSchemaJoi),
-    checkAndIncreaseAPIHit,
+    validateAccessToken,
+    //checkAndIncreaseAPIHit,
   ],
   createExercisePlan
 );
