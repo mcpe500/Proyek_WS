@@ -393,7 +393,7 @@ export const topup = async (req: Request, res: Response) => {
 };
 
 export const subscribePacket = async (req: Request, res: Response) => {
-  const { paketId, user } = req.body;
+  const { user, paketId, month } = req.body;
 
   const paket = await Paket.findOne({
     where: {
@@ -405,6 +405,18 @@ export const subscribePacket = async (req: Request, res: Response) => {
     return res
       .status(RESPONSE_STATUS.NOT_FOUND)
       .json({ message: "Paket not found" });
+  }
+
+  if (paketId == "PAK001") {
+    return res
+      .status(RESPONSE_STATUS.BAD_REQUEST)
+      .json({ message: "You can't subscribe to this paket" });
+  }
+
+  if (month < 1) {
+    return res
+      .status(RESPONSE_STATUS.BAD_REQUEST)
+      .json({ message: "Invalid number of month" });
   }
 
   // check active subscription
@@ -421,7 +433,8 @@ export const subscribePacket = async (req: Request, res: Response) => {
   }
 
   // check balance
-  if (user.balance < paket.Paket_price) {
+  const totalCost = paket.Paket_price * parseInt(month);
+  if (user.balance < totalCost) {
     return res
       .status(RESPONSE_STATUS.BAD_REQUEST)
       .json({ message: "Not enough balance! Please topup first" });
@@ -429,7 +442,7 @@ export const subscribePacket = async (req: Request, res: Response) => {
 
   // update balance
   try {
-    user.balance -= paket.Paket_price;
+    user.balance -= totalCost;
     await user.save();
   } catch (error) {
     return res
@@ -438,7 +451,7 @@ export const subscribePacket = async (req: Request, res: Response) => {
   }
 
   let endDate = new Date();
-  endDate.setMonth(endDate.getMonth() + 1);
+  endDate.setMonth(endDate.getMonth() + parseInt(month));
   endDate.setDate(endDate.getDate() - 1);
   endDate.setHours(23);
   endDate.setMinutes(59);
@@ -449,6 +462,7 @@ export const subscribePacket = async (req: Request, res: Response) => {
     userId: user._id,
     paketId,
     endDate,
+    resetAt: new Date(new Date().getTime() + 60 * 1000)
   });
   const newSubscription = await subscription.save();
 
@@ -457,12 +471,77 @@ export const subscribePacket = async (req: Request, res: Response) => {
     .json({ subscription: newSubscription });
 };
 
-// Mau 1. paket jadi …k per bulan unlimited tembak,
-// [Free] rate limit 2 per 5 menit?
-// [Paket 1] rate limit 20 per 10 detik 50k?
-// [Paket 2] rate limit 50 per 10 detik 100k?
-// [Paket 3] rate limit 150 per 10 detik 250k?
-// [Enterprise] rate limit 1000 per detik 2000k?
+export const renewSubscription = async (req: Request, res: Response) => {
+  const { user, month } = req.body;
+
+  if (month < 1) {
+    return res
+      .status(RESPONSE_STATUS.BAD_REQUEST)
+      .json({ message: "Invalid number of months" });
+  }
+
+  // Check active subscription
+  const activeSubscription = await Subscription.findOne({
+    userId: user._id,
+    isActive: true,
+    endDate: { $gt: new Date() }, // Check if endDate is in the future
+  });
+
+  if (!activeSubscription) {
+    return res.status(RESPONSE_STATUS.BAD_REQUEST)
+      .json({ message: "No active subscription found" });
+  }
+
+  if (activeSubscription.paketId == "PAK001") {
+    return res.status(RESPONSE_STATUS.BAD_REQUEST)
+      .json({ message: "This paket can't be renewed" });
+  }
+
+  const paket = await Paket.findOne({
+    where: {
+      Paket_id: activeSubscription.paketId,
+    },
+  });
+
+  if (!paket) {
+    return res.status(RESPONSE_STATUS.BAD_REQUEST)
+      .json({ message: "Invalid paket" });
+  }
+
+  // Check balance
+  const totalCost = paket.Paket_price * parseInt(month);
+  if (user.balance < totalCost) {
+    return res.status(RESPONSE_STATUS.BAD_REQUEST)
+      .json({ message: "Not enough balance! Please top up first" });
+  }
+
+  // Update balance
+  try {
+    user.balance -= totalCost;
+    await user.save();
+  } catch (error) {
+    return res.status(RESPONSE_STATUS.INTERNAL_SERVER_ERROR)
+      .json({ message: "Internal server error" });
+  }
+
+  // Update subscription endDate
+  let endDate = new Date(activeSubscription.endDate);
+  endDate.setMonth(endDate.getMonth() + parseInt(month));
+
+  activeSubscription.endDate = endDate;
+
+  try {
+    await activeSubscription.save();
+  } catch (error) {
+    return res.status(RESPONSE_STATUS.INTERNAL_SERVER_ERROR)
+      .json({ message: "Failed to update subscription" });
+  }
+
+  return res
+    .status(RESPONSE_STATUS.SUCCESS)
+    .json({ subscription: activeSubscription });
+}
+
 
 //admin
 export const adminDashboard = async (req: Request, res: Response) => {

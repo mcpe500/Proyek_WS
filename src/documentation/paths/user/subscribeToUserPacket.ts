@@ -16,8 +16,9 @@ export default {
             type: "object",
             properties: {
               paketId: { type: "string" },
+              month: { type: "number" },
             },
-            required: ["paketId"],
+            required: ["paketId", "month"],
           },
         },
       },
@@ -32,6 +33,19 @@ export default {
               type: "object",
               properties: {
                 subscription: { type: "object" },
+              },
+            },
+          },
+        },
+      },
+      "400": {
+        description: "Invalid number of month",
+        content: {
+          "application/json": {
+            schema: {
+              type: "object",
+              properties: {
+                message: { type: "string" },
               },
             },
           },

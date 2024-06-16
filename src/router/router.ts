@@ -12,6 +12,7 @@ import {
   getApiKey,
   resetApiKey,
   subscribePacket,
+  renewSubscription,
   topup,
   adminDashboard,
   getUserProfile,
@@ -147,6 +148,7 @@ router.put(
   resetApiKey
 );
 router.post("/users/subscribe", [validateAccessToken], subscribePacket);
+router.put("/users/renew", [validateAccessToken], renewSubscription);
 router.post(
   "/users/plan",
   [
@@ -156,7 +158,7 @@ router.post(
   ],
   createExercisePlan
 );
-router.get("/users/plan", [validateAccessToken], getAllExercisePlanByUser);
+router.get("/users/plan", [validateAccessToken, checkAndIncreaseAPIHit], getAllExercisePlanByUser);
 router.get(
   "/users/plan/:id",
   [validateAccessToken, checkAndIncreaseAPIHit],
