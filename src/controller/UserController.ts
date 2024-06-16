@@ -125,35 +125,10 @@ export const loginUser = async (req: Request, res: Response) => {
   });
 };
 
-export const getUser = async (req: Request, res: Response) => {
-  const { id } = req.params;
-
-  if (!mongoose.Types.ObjectId.isValid(id)) {
-    return res
-      .status(RESPONSE_STATUS.BAD_REQUEST)
-      .json({ message: "Invalid user ID" });
-  }
-
-  const user = await User.findById(id).select("-password");
-  if (!user) {
-    return res
-      .status(RESPONSE_STATUS.NOT_FOUND)
-      .json({ message: "User not found" });
-  }
-
-  return res.status(RESPONSE_STATUS.SUCCESS).json({ user: user });
-};
-
-export const getAllUser = async (req: Request, res: Response) => {
-  const user = await User.find();
-
-  return res.status(RESPONSE_STATUS.SUCCESS).json({ user: user });
-};
-
 export const getDashboard = async (req: Request, res: Response) => {
   //   const { username, email } = req.body;
   //   const user = await User.findOne({ $or: [{ username }, { email }] });
-  const { user } = req.body;
+  const user = (req as any).user;
   return res.status(RESPONSE_STATUS.SUCCESS).json({ user: user });
 };
 
@@ -170,15 +145,16 @@ export const editProfile = async (req: Request, res: Response) => {
     weight,
     healthInformation,
   } = req.body;
-  let { user } = req.body;
-
+  const user = (req as any).user;
+  // console.log(user);
+  
   if (!user) {
     return res
       .status(RESPONSE_STATUS.NOT_FOUND)
       .json({ message: "User not found" });
   }
 
-  if (old_password != "") {
+  if (old_password && old_password != "") {
     const isPasswordValid = await verifyPassword(old_password, user.password);
     if (!isPasswordValid) {
       return res
@@ -186,7 +162,7 @@ export const editProfile = async (req: Request, res: Response) => {
         .json({ msg: "old_password is incorrect" });
     }
 
-    if (new_password == "") {
+    if (new_password && new_password == "") {
       return res
         .status(RESPONSE_STATUS.BAD_REQUEST)
         .json({ msg: "new_password must not be empty" });
@@ -203,13 +179,14 @@ export const editProfile = async (req: Request, res: Response) => {
   }
 
   // Update other fields if they are not empty
-  if (fullName != "") user.fullName = fullName;
-  if (phone != "") user.phone = phone;
-  if (age != "") user.age = age;
-  if (gender != "") user.gender = gender;
-  if (height != "") user.height = height;
-  if (weight != "") user.weight = weight;
-  if (healthInformation != "") user.healthInformation = healthInformation;
+  if (fullName && fullName != "") user.fullName = fullName;
+  if (phone && phone != "") user.phone = phone;
+  if (age && age != "") user.age = age;
+  if (gender && gender != "") user.gender = gender;
+  if (height && height != "") user.height = height;
+  if (weight && weight != "") user.weight = weight;
+  if (healthInformation && healthInformation != "") user.healthInformation = healthInformation;
+  if (req.file) user.profilePicture = req.file.path;
 
   // Save the updated user
   await user.save();
@@ -332,7 +309,7 @@ export const verifyEmail = async (req: Request, res: Response) => {
 };
 
 export const getApiKey = async (req: Request, res: Response) => {
-  const { user } = req.body;
+  const user = (req as any).user;
   try {
     // Jika pengguna ditemukan, kirimkan API key
     if (user.apiKey) {
@@ -350,7 +327,7 @@ export const getApiKey = async (req: Request, res: Response) => {
 };
 
 export const resetApiKey = async (req: Request, res: Response) => {
-  const { user } = req.body;
+  const user = (req as any).user;
   try {
     let apiKey = "";
     while (true) {
@@ -370,9 +347,10 @@ export const resetApiKey = async (req: Request, res: Response) => {
 };
 
 export const topup = async (req: Request, res: Response) => {
-  const { amount, user } = req.body;
-
-  if (amount <= 0) {
+  const { amount } = req.body;
+  const user = (req as any).user;
+  
+  if (!amount || amount <= 0) {
     return res
       .status(RESPONSE_STATUS.BAD_REQUEST)
       .json({ message: "Invalid amount" });
@@ -393,7 +371,8 @@ export const topup = async (req: Request, res: Response) => {
 };
 
 export const subscribePacket = async (req: Request, res: Response) => {
-  const { paketId, user } = req.body;
+  const { paketId, month } = req.body;
+  const user = (req as any).user;
 
   const paket = await Paket.findOne({
     where: {
@@ -405,6 +384,18 @@ export const subscribePacket = async (req: Request, res: Response) => {
     return res
       .status(RESPONSE_STATUS.NOT_FOUND)
       .json({ message: "Paket not found" });
+  }
+
+  if (paketId == "PAK001") {
+    return res
+      .status(RESPONSE_STATUS.BAD_REQUEST)
+      .json({ message: "You can't subscribe to this paket" });
+  }
+
+  if (month < 1) {
+    return res
+      .status(RESPONSE_STATUS.BAD_REQUEST)
+      .json({ message: "Invalid number of month" });
   }
 
   // check active subscription
@@ -421,7 +412,8 @@ export const subscribePacket = async (req: Request, res: Response) => {
   }
 
   // check balance
-  if (user.balance < paket.Paket_price) {
+  const totalCost = paket.Paket_price * parseInt(month);
+  if (user.balance < totalCost) {
     return res
       .status(RESPONSE_STATUS.BAD_REQUEST)
       .json({ message: "Not enough balance! Please topup first" });
@@ -429,7 +421,7 @@ export const subscribePacket = async (req: Request, res: Response) => {
 
   // update balance
   try {
-    user.balance -= paket.Paket_price;
+    user.balance -= totalCost;
     await user.save();
   } catch (error) {
     return res
@@ -438,7 +430,7 @@ export const subscribePacket = async (req: Request, res: Response) => {
   }
 
   let endDate = new Date();
-  endDate.setMonth(endDate.getMonth() + 1);
+  endDate.setMonth(endDate.getMonth() + parseInt(month));
   endDate.setDate(endDate.getDate() - 1);
   endDate.setHours(23);
   endDate.setMinutes(59);
@@ -449,6 +441,7 @@ export const subscribePacket = async (req: Request, res: Response) => {
     userId: user._id,
     paketId,
     endDate,
+    resetAt: new Date(new Date().getTime() + 60 * 1000)
   });
   const newSubscription = await subscription.save();
 
@@ -457,16 +450,129 @@ export const subscribePacket = async (req: Request, res: Response) => {
     .json({ subscription: newSubscription });
 };
 
-// Mau 1. paket jadi …k per bulan unlimited tembak,
-// [Free] rate limit 2 per 5 menit?
-// [Paket 1] rate limit 20 per 10 detik 50k?
-// [Paket 2] rate limit 50 per 10 detik 100k?
-// [Paket 3] rate limit 150 per 10 detik 250k?
-// [Enterprise] rate limit 1000 per detik 2000k?
+export const renewSubscription = async (req: Request, res: Response) => {
+  const { month } = req.body;
+  const user = (req as any).user;
+
+  if (month < 1) {
+    return res
+      .status(RESPONSE_STATUS.BAD_REQUEST)
+      .json({ message: "Invalid number of months" });
+  }
+
+  // Check active subscription
+  const activeSubscription = await Subscription.findOne({
+    userId: user._id,
+    isActive: true,
+    endDate: { $gt: new Date() }, // Check if endDate is in the future
+  });
+
+  if (!activeSubscription) {
+    return res.status(RESPONSE_STATUS.BAD_REQUEST)
+      .json({ message: "No active subscription found" });
+  }
+
+  if (activeSubscription.paketId == "PAK001") {
+    return res.status(RESPONSE_STATUS.BAD_REQUEST)
+      .json({ message: "This paket can't be renewed" });
+  }
+
+  const paket = await Paket.findOne({
+    where: {
+      Paket_id: activeSubscription.paketId,
+    },
+  });
+
+  if (!paket) {
+    return res.status(RESPONSE_STATUS.BAD_REQUEST)
+      .json({ message: "Invalid paket" });
+  }
+
+  // Check balance
+  const totalCost = paket.Paket_price * parseInt(month);
+  if (user.balance < totalCost) {
+    return res.status(RESPONSE_STATUS.BAD_REQUEST)
+      .json({ message: "Not enough balance! Please top up first" });
+  }
+
+  // Update balance
+  try {
+    user.balance -= totalCost;
+    await user.save();
+  } catch (error) {
+    return res.status(RESPONSE_STATUS.INTERNAL_SERVER_ERROR)
+      .json({ message: "Internal server error" });
+  }
+
+  // Update subscription endDate
+  let endDate = new Date(activeSubscription.endDate);
+  endDate.setMonth(endDate.getMonth() + parseInt(month));
+
+  activeSubscription.endDate = endDate;
+
+  try {
+    await activeSubscription.save();
+  } catch (error) {
+    return res.status(RESPONSE_STATUS.INTERNAL_SERVER_ERROR)
+      .json({ message: "Failed to update subscription" });
+  }
+
+  return res
+    .status(RESPONSE_STATUS.SUCCESS)
+    .json({ subscription: activeSubscription });
+}
+
 
 //admin
+export const getAllUser = async (req: Request, res: Response) => {
+  const { username, email, fullName, role } = req.query;
+
+  // Construct the query object
+  const query: any = {};
+
+  if (typeof username === 'string') {
+    query.username = { $regex: new RegExp(username) }; // Case-sensitive
+  }
+  if (typeof email === 'string') {
+    query.email = { $regex: new RegExp(email) }; // Case-sensitive
+  }
+  if (typeof fullName === 'string') {
+    query.fullName = { $regex: new RegExp(fullName) }; // Case-sensitive
+  }
+  if (typeof role === 'string') {
+    query.role = role;
+  }
+
+  try {
+    const users = await User.find(query);
+    return res.status(RESPONSE_STATUS.SUCCESS).json({ users });
+  } catch (error) {
+    return res.status(RESPONSE_STATUS.INTERNAL_SERVER_ERROR).json({ message: "Failed to fetch users" });
+  }
+};
+
+
+export const getUser = async (req: Request, res: Response) => {
+  const { id } = req.params;
+
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    return res
+      .status(RESPONSE_STATUS.BAD_REQUEST)
+      .json({ message: "Invalid user ID" });
+  }
+
+  const user = await User.findById(id).select("-password");
+  if (!user) {
+    return res
+      .status(RESPONSE_STATUS.NOT_FOUND)
+      .json({ message: "User not found" });
+  }
+
+  return res.status(RESPONSE_STATUS.SUCCESS).json({ user: user });
+};
+
 export const adminDashboard = async (req: Request, res: Response) => {
-    const { user } = req.body;
+    // const { user } = req as any; // TODO : CHECK IF NECESSARY
     const users = await User.find({ role: { $ne: "ADMIN" }, isEmailVerified: true }).exec();
     const subscription = await Subscription.find({ isActive: true }).exec();
     return res.status(RESPONSE_STATUS.SUCCESS).json({ 

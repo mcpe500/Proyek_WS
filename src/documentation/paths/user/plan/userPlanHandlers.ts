@@ -2,7 +2,7 @@ import { FITNESS_GOALS } from "../../../../contracts/enum/FitnessRelated.enum";
 
 export default {
   get: {
-    tags: ["users"],
+    tags: ["plans"],
     summary: "Get all user plans",
     description: "This endpoint returns all the plans of a user.",
     operationId: "getAllPlans",

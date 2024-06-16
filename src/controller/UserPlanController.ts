@@ -33,7 +33,7 @@ export const createExercisePlan = async (req: Request, res: Response) => {
       intensity,
       exercises,
       nutritionPlan,
-      createdBy: req.body.user.username,
+      createdBy: (req as any).user.username,
       status: PlansStatus.PENDING,
     });
     const savedPlan = await newPlan.save();
@@ -162,7 +162,7 @@ export const completeExercisePlan = async (req: Request, res: Response) => {
 export const addWorkoutToExercisePlan = async (req: Request, res: Response) => {
   const { id } = req.params;
   const { exerciseId } = req.body;
-  const user = req.body.user;
+  const user = (req as any).user;
 
   const plan = await Plans.findById(id);
 
@@ -196,8 +196,8 @@ export const addWorkoutToExercisePlan = async (req: Request, res: Response) => {
 
 export const exercisePlanDetails = async (req: Request, res: Response) => {
   const { id } = req.params;
-  const user = req.body.user;
-  const plan = await Plans.findById(id)
+  const user = (req as any).user;
+  const plan = await Plans.findById(id);
 
   if (!plan) {
     return res
@@ -212,25 +212,26 @@ export const exercisePlanDetails = async (req: Request, res: Response) => {
 };
 
 export const getAllExercisePlanByUser = async (req: Request, res: Response) => {
-  const user = req.body.user;
+  const user = (req as any).user;
   const plans = await Plans.find({
-    createdBy: user.username
-  }).select('_id, name createdDate status');
+    createdBy: user.username,
+  }).select("_id, name createdDate status");
 
   try {
-    return res
-      .status(RESPONSE_STATUS.SUCCESS)
-      .json({ plans: plans });
+    return res.status(RESPONSE_STATUS.SUCCESS).json({ plans: plans });
   } catch (error) {
-        return res
-            .status(RESPONSE_STATUS.INTERNAL_SERVER_ERROR)
-            .json({ message: "Internal server error" });
+    return res
+      .status(RESPONSE_STATUS.INTERNAL_SERVER_ERROR)
+      .json({ message: "Internal server error" });
   }
 };
 
-export const getExercisePlanDetailByUser = async (req: Request, res: Response) => {
+export const getExercisePlanDetailByUser = async (
+  req: Request,
+  res: Response
+) => {
   const { id } = req.params;
-  const user = req.body.user;
+  const user = (req as any).user;
   if (!mongoose.Types.ObjectId.isValid(id)) {
     return res
       .status(RESPONSE_STATUS.BAD_REQUEST)
@@ -251,23 +252,27 @@ export const getExercisePlanDetailByUser = async (req: Request, res: Response) =
   }
 
   try {
-    return res
-      .status(RESPONSE_STATUS.SUCCESS)
-      .json({ plan_detail: plan });
+    return res.status(RESPONSE_STATUS.SUCCESS).json({ plan_detail: plan });
   } catch (error) {
-        return res
-            .status(RESPONSE_STATUS.INTERNAL_SERVER_ERROR)
-            .json({ message: "Internal server error" });
+    return res
+      .status(RESPONSE_STATUS.INTERNAL_SERVER_ERROR)
+      .json({ message: "Internal server error" });
   }
 };
 
-export const pictureExercisePlanByUser = async (req: Request, res: Response) => {};
+export const pictureExercisePlanByUser = async (
+  req: Request,
+  res: Response
+) => {};
 
-export const trackerExercisePlanByUser = async (req: Request, res: Response) => {};
+export const trackerExercisePlanByUser = async (
+  req: Request,
+  res: Response
+) => {};
 
 export const cancelExercisePlanByUser = async (req: Request, res: Response) => {
   const { id } = req.params;
-  const user = req.body.user;
+  const user = (req as any).user;
   if (!mongoose.Types.ObjectId.isValid(id)) {
     return res
       .status(RESPONSE_STATUS.BAD_REQUEST)
@@ -296,13 +301,13 @@ export const cancelExercisePlanByUser = async (req: Request, res: Response) => {
   try {
     plan.status = PlansStatus.CANCELLED;
     await plan.save();
-    
+
     return res
       .status(RESPONSE_STATUS.SUCCESS)
       .json({ message: "Plan has been cancelled" });
   } catch (error) {
-        return res
-            .status(RESPONSE_STATUS.INTERNAL_SERVER_ERROR)
-            .json({ message: "Internal server error" });
+    return res
+      .status(RESPONSE_STATUS.INTERNAL_SERVER_ERROR)
+      .json({ message: "Internal server error" });
   }
 };

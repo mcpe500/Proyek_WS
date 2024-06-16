@@ -1,6 +1,6 @@
 export default {
   post: {
-    tags: ["users"],
+    tags: ["plans"],
     summary: "Start a specific user plan",
     description: "This endpoint starts a specific plan of a user.",
     operationId: "startPlan",

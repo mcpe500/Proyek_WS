@@ -1,6 +1,6 @@
 export default {
   get: {
-    tags: ["users"],
+    tags: ["plans"],
     summary: "Get a specific user plan",
     description: "This endpoint returns a specific plan of a user.",
     operationId: "getPlanById",

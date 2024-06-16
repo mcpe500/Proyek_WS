@@ -12,6 +12,7 @@ import {
   getApiKey,
   resetApiKey,
   subscribePacket,
+  renewSubscription,
   topup,
   adminDashboard,
   getUserProfile,
@@ -63,6 +64,7 @@ import { checkAndIncreaseAPIHit } from "../middleware/BusinessMiddleware";
 import { getFilteredNews, getSpecificNews } from "../controller/NewsController";
 import { getNearestGyms } from "../controller/GymsController";
 import { getGymsSchema } from "../validators/Maps.validate";
+import upload from "../middleware/Upload";
 
 const router = Router();
 
@@ -140,7 +142,11 @@ router.put("/users/topup", [validateAccessToken], topup);
 router.get("/users/dashboard", [validateAccessToken], getDashboard);
 router.put(
   "/users/profile",
-  [validateAccessToken, validateBody(editProfileSchemaJoi)],
+  [
+    validateAccessToken,
+    validateBody(editProfileSchemaJoi),
+    upload.single("profilePicture"),
+  ],
   editProfile
 );
 router.get("/users/apikey", [validateAccessToken], getApiKey);
@@ -150,46 +156,51 @@ router.put(
   resetApiKey
 );
 router.post("/users/subscribe", [validateAccessToken], subscribePacket);
+router.put("/users/renew", [validateAccessToken], renewSubscription);
 router.post(
   "/users/plan",
   [
     validateBody(createUserPlanSchemaJoi),
-    validateAccessToken,
-    //checkAndIncreaseAPIHit,
+    validateAccessToken, // TODO : Check with hansen mungkin ini error
+    checkAndIncreaseAPIHit(1),
   ],
   createExercisePlan
 );
-router.get("/users/plan", [validateAccessToken], getAllExercisePlanByUser);
+router.get(
+  "/users/plan",
+  [validateAccessToken, checkAndIncreaseAPIHit(1)],
+  getAllExercisePlanByUser
+);
 router.get(
   "/users/plan/:id",
-  [validateAccessToken, checkAndIncreaseAPIHit],
+  [validateAccessToken, checkAndIncreaseAPIHit(1)],
   getExercisePlanDetailByUser
 );
 
 // Exercise Plan Routes
 router.put(
   "/users/plan/edit/:id",
-  [validateAccessToken, checkAndIncreaseAPIHit],
+  [validateAccessToken, checkAndIncreaseAPIHit(1)],
   editExercisePlan
 );
 router.post(
   "/users/plan/start/:id",
-  [validateAccessToken, checkAndIncreaseAPIHit],
+  [validateAccessToken, checkAndIncreaseAPIHit(1)],
   startExercisePlan
 );
 router.put(
   "/users/plan/:id/workout/",
-  [validateAccessToken, checkAndIncreaseAPIHit],
+  [validateAccessToken, checkAndIncreaseAPIHit(1)],
   addWorkoutToExercisePlan
 );
 router.get(
   "/users/plan/:id/workout/",
-  [validateAccessToken, checkAndIncreaseAPIHit],
+  [validateAccessToken, checkAndIncreaseAPIHit(1)],
   exercisePlanDetails
 );
 router.post(
   "/users/plan/complete/:id",
-  [validateAccessToken, checkAndIncreaseAPIHit],
+  [validateAccessToken, checkAndIncreaseAPIHit(1)],
   completeExercisePlan
 );
 router.put(
@@ -208,8 +219,16 @@ router.get("/exercise/goals/:title", [validateAccessToken], getGoalByTitle);
 
 // News Routes
 // router.get("/news", getAllNews);
-router.get("/news", getFilteredNews);
-router.get("/news/:title", getSpecificNews);
+router.get(
+  "/news",
+  [validateAccessToken, checkAndIncreaseAPIHit(1)],
+  getFilteredNews
+);
+router.get(
+  "/news/:title",
+  [validateAccessToken, checkAndIncreaseAPIHit(1)],
+  getSpecificNews
+);
 
 // Maps Routes
 router.get(

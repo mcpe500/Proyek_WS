@@ -1,6 +1,6 @@
 export default {
   put: {
-    tags: ["users"],
+    tags: ["plans"],
     summary: "Edit a specific user plan",
     description: "This endpoint edits a specific plan of a user.",
     operationId: "editPlan",
