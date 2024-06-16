@@ -463,8 +463,13 @@ export const subscribePacket = async (req: Request, res: Response) => {
 //admin
 export const adminDashboard = async (req: Request, res: Response) => {
     const { user } = req.body;
-    
-    return res.status(RESPONSE_STATUS.SUCCESS).json({ data: user })
+    const users = await User.find({ role: { $ne: "ADMIN" }, isEmailVerified: true }).exec();
+    const subscription = await Subscription.find({ isActive: true }).exec();
+    return res.status(RESPONSE_STATUS.SUCCESS).json({ 
+      total_user: users.length,
+      free_package_user: subscription.filter((item) => item.paketId == "PAK001").length,
+      non_free_package_user: subscription.filter((item) => item.paketId != "PAK001").length
+    })
 };
 
 export const getUserProfile = async (req: Request, res: Response) => {
