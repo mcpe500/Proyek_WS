@@ -3,7 +3,11 @@ export default {
     tags: ["auth"],
     summary: "Login a user",
     description: "This endpoint logs in a user.",
-    security: [],
+    security: [
+      {
+        bearerAuth: [],
+      },
+    ],
     operationId: "loginUser",
     requestBody: {
       content: {
