@@ -154,41 +154,41 @@ router.post(
   [
     validateAccessToken,
     validateBody(createUserPlanSchemaJoi),
-    checkAndIncreaseAPIHit,
+    checkAndIncreaseAPIHit(1),
   ],
   createExercisePlan
 );
-router.get("/users/plan", [validateAccessToken, checkAndIncreaseAPIHit], getAllExercisePlanByUser);
+router.get("/users/plan", [validateAccessToken, checkAndIncreaseAPIHit(1)], getAllExercisePlanByUser);
 router.get(
   "/users/plan/:id",
-  [validateAccessToken, checkAndIncreaseAPIHit],
+  [validateAccessToken, checkAndIncreaseAPIHit(1)],
   getExercisePlanDetailByUser
 );
 
 // Exercise Plan Routes
 router.put(
   "/users/plan/edit/:id",
-  [validateAccessToken, checkAndIncreaseAPIHit],
+  [validateAccessToken, checkAndIncreaseAPIHit(1)],
   editExercisePlan
 );
 router.post(
   "/users/plan/start/:id",
-  [validateAccessToken, checkAndIncreaseAPIHit],
+  [validateAccessToken, checkAndIncreaseAPIHit(1)],
   startExercisePlan
 );
 router.put(
   "/users/plan/:id/workout/",
-  [validateAccessToken, checkAndIncreaseAPIHit],
+  [validateAccessToken, checkAndIncreaseAPIHit(1)],
   addWorkoutToExercisePlan
 );
 router.get(
   "/users/plan/:id/workout/",
-  [validateAccessToken, checkAndIncreaseAPIHit],
+  [validateAccessToken, checkAndIncreaseAPIHit(1)],
   exercisePlanDetails
 );
 router.post(
   "/users/plan/complete/:id",
-  [validateAccessToken, checkAndIncreaseAPIHit],
+  [validateAccessToken, checkAndIncreaseAPIHit(1)],
   completeExercisePlan
 );
 router.put(
@@ -207,7 +207,7 @@ router.get("/exercise/goals/:title", [validateAccessToken], getGoalByTitle);
 
 // News Routes
 // router.get("/news", getAllNews);
-router.get("/news", getFilteredNews);
-router.get("/news/:title", getSpecificNews);
+router.get("/news", [validateAccessToken, checkAndIncreaseAPIHit(1)], getFilteredNews);
+router.get("/news/:title", [validateAccessToken, checkAndIncreaseAPIHit(1)], getSpecificNews);
 
 export default router;
