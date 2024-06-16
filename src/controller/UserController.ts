@@ -125,31 +125,6 @@ export const loginUser = async (req: Request, res: Response) => {
   });
 };
 
-export const getUser = async (req: Request, res: Response) => {
-  const { id } = req.params;
-
-  if (!mongoose.Types.ObjectId.isValid(id)) {
-    return res
-      .status(RESPONSE_STATUS.BAD_REQUEST)
-      .json({ message: "Invalid user ID" });
-  }
-
-  const user = await User.findById(id).select("-password");
-  if (!user) {
-    return res
-      .status(RESPONSE_STATUS.NOT_FOUND)
-      .json({ message: "User not found" });
-  }
-
-  return res.status(RESPONSE_STATUS.SUCCESS).json({ user: user });
-};
-
-export const getAllUser = async (req: Request, res: Response) => {
-  const user = await User.find();
-
-  return res.status(RESPONSE_STATUS.SUCCESS).json({ user: user });
-};
-
 export const getDashboard = async (req: Request, res: Response) => {
   //   const { username, email } = req.body;
   //   const user = await User.findOne({ $or: [{ username }, { email }] });
@@ -544,6 +519,53 @@ export const renewSubscription = async (req: Request, res: Response) => {
 
 
 //admin
+export const getAllUser = async (req: Request, res: Response) => {
+  const { username, email, fullName, role } = req.query;
+
+  // Construct the query object
+  const query: any = {};
+
+  if (typeof username === 'string') {
+    query.username = { $regex: new RegExp(username) }; // Case-sensitive
+  }
+  if (typeof email === 'string') {
+    query.email = { $regex: new RegExp(email) }; // Case-sensitive
+  }
+  if (typeof fullName === 'string') {
+    query.fullName = { $regex: new RegExp(fullName) }; // Case-sensitive
+  }
+  if (typeof role === 'string') {
+    query.role = role;
+  }
+
+  try {
+    const users = await User.find(query);
+    return res.status(RESPONSE_STATUS.SUCCESS).json({ users });
+  } catch (error) {
+    return res.status(RESPONSE_STATUS.INTERNAL_SERVER_ERROR).json({ message: "Failed to fetch users" });
+  }
+};
+
+
+export const getUser = async (req: Request, res: Response) => {
+  const { id } = req.params;
+
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    return res
+      .status(RESPONSE_STATUS.BAD_REQUEST)
+      .json({ message: "Invalid user ID" });
+  }
+
+  const user = await User.findById(id).select("-password");
+  if (!user) {
+    return res
+      .status(RESPONSE_STATUS.NOT_FOUND)
+      .json({ message: "User not found" });
+  }
+
+  return res.status(RESPONSE_STATUS.SUCCESS).json({ user: user });
+};
+
 export const adminDashboard = async (req: Request, res: Response) => {
   const { user } = req.body;
   return res.status(RESPONSE_STATUS.SUCCESS).json({ data: user });
