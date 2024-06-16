@@ -92,19 +92,6 @@ export default {
             },
           },
         },
-        "404": {
-          description: "No users found",
-          content: {
-            "application/json": {
-              schema: {
-                type: "object",
-                properties: {
-                  msg: { type: "string" },
-                },
-              },
-            },
-          },
-        },
         "500": {
           description: "Internal server error",
           content: {
