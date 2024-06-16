@@ -4,6 +4,11 @@ export default {
     summary: "Register a new user",
     description: "This endpoint registers a new user.",
     operationId: "registerUser",
+    security: [
+      {
+        bearerAuth: [],
+      },
+    ],
     requestBody: {
       content: {
         "application/json": {

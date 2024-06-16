@@ -70,7 +70,12 @@ router.post(
   validateNotSignIn,
   registerUser
 );
-router.post("/auth/login", validateBody(loginSchemaJoi), loginUser);
+router.post(
+  "/auth/login",
+  validateBody(loginSchemaJoi),
+  validateNotSignIn,
+  loginUser
+);
 router.post(
   "/auth/token",
   validateCookie(validationTokenSchemaJoi),
