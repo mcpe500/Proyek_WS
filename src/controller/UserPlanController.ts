@@ -11,7 +11,6 @@ import mongoose from "mongoose";
 // Create Exercise Plan
 export const createExercisePlan = async (req: Request, res: Response) => {
   const {
-    id,
     name,
     description,
     goals,
@@ -26,7 +25,6 @@ export const createExercisePlan = async (req: Request, res: Response) => {
 
   try {
     const newPlan: IPlans = new Plans({
-      id,
       name,
       description,
       goals,
@@ -216,7 +214,6 @@ export const exercisePlanDetails = async (req: Request, res: Response) => {
 };
 
 export const getAllExercisePlanByUser = async (req: Request, res: Response) => {
-  const { id } = req.params;
   const user = req.body.user;
   const plans = await Plans.find({
     createdBy: user.username

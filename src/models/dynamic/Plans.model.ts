@@ -4,7 +4,6 @@ import { PlansStatus } from "../../contracts/enum/PlansRelated.enum";
 import { FITNESS_GOALS } from "../../contracts/enum/FitnessRelated.enum";
 
 const PlansSchema: Schema = new Schema({
-  id: { type: String, required: true },
   name: { type: String, required: true },
   description: { type: String, required: true },
   goals: [
@@ -17,7 +16,7 @@ const PlansSchema: Schema = new Schema({
   durationInWeeks: { type: Number, required: true },
   frequencyPerWeek: { type: Number, required: true },
   restDaysPerWeek: { type: Number, required: true },
-  intensity: { type: String, required: true },
+  intensity: { type: Number, required: true },
   exercises: [{ type: Schema.Types.ObjectId, ref: "Exercise" }],
   nutritionPlan: { type: Schema.Types.ObjectId, ref: "NutritionPlan" },
   createdBy: { type: String, required: true },

@@ -1,3 +1,5 @@
+import { FITNESS_GOALS } from "../../../../contracts/enum/FitnessRelated.enum";
+
 export default {
   get: {
     tags: ["users"],
@@ -16,7 +18,15 @@ export default {
           "application/json": {
             schema: {
               type: "array",
-              items: { type: "object" },
+              items: {
+                type: "object",
+                properties: {
+                  _id: { type: "string" },
+                  name: { type: "string" },
+                  createdDate: { type: "string", format: "date-time" },
+                  status: { type: "string" },
+                },
+              },
             },
           },
         },
@@ -41,7 +51,7 @@ export default {
             schema: {
               type: "object",
               properties: {
-                error: { type: "string" },
+                message: { type: "string" },
               },
             },
           },
@@ -60,12 +70,53 @@ export default {
       },
     ],
     requestBody: {
+      required: true,
       content: {
         "application/json": {
           schema: {
             type: "object",
             properties: {
-              // Define the properties of the request body here
+              name: { type: "string" },
+              description: { type: "string" },
+              goals: {
+                type: "array",
+                items: {
+                  type: "string",
+                  enum: Object.values(FITNESS_GOALS),
+                },
+                example: (Object.values(FITNESS_GOALS) as any).map(
+                  (fg: any) => fg.code
+                ),
+              },
+              durationInWeeks: { type: "number" },
+              frequencyPerWeek: { type: "number" },
+              restDaysPerWeek: { type: "number" },
+              intensity: { type: "string" },
+              exercises: {
+                type: "array",
+                items: {
+                  type: "object",
+                  properties: {
+                    name: { type: "string" },
+                    description: { type: "string" },
+                    sets: { type: "number" },
+                    repetitions: { type: "number" },
+                    restBetweenSetsInSeconds: { type: "number" },
+                    equipmentRequired: {
+                      type: "array",
+                      items: {
+                        type: "object",
+                        properties: {
+                          name: { type: "string" },
+                          description: { type: "string" },
+                        },
+                      },
+                    },
+                  },
+                },
+              },
+              nutritionPlan: { type: "object" },
+              createdBy: { type: "string" },
             },
           },
         },
@@ -79,7 +130,52 @@ export default {
             schema: {
               type: "object",
               properties: {
-                plan: { type: "object" },
+                msg: { type: "string" },
+                plan: {
+                  type: "object",
+                  properties: {
+                    id: { type: "string" },
+                    name: { type: "string" },
+                    description: { type: "string" },
+                    goals: {
+                      type: "array",
+                      items: {
+                        type: "string",
+                        enum: Object.values(FITNESS_GOALS),
+                      },
+                    },
+                    durationInWeeks: { type: "number" },
+                    frequencyPerWeek: { type: "number" },
+                    restDaysPerWeek: { type: "number" },
+                    intensity: { type: "number" },
+                    exercises: {
+                      type: "array",
+                      items: {
+                        type: "object",
+                        properties: {
+                          name: { type: "string" },
+                          description: { type: "string" },
+                          sets: { type: "number" },
+                          repetitions: { type: "number" },
+                          restBetweenSetsInSeconds: { type: "number" },
+                          equipmentRequired: {
+                            type: "array",
+                            items: {
+                              type: "object",
+                              properties: {
+                                name: { type: "string" },
+                                description: { type: "string" },
+                              },
+                            },
+                          },
+                        },
+                      },
+                    },
+                    nutritionPlan: { type: "object" },
+                    createdBy: { type: "string" },
+                    status: { type: "string" },
+                  },
+                },
               },
             },
           },
@@ -92,7 +188,7 @@ export default {
             schema: {
               type: "object",
               properties: {
-                msg: { type: "string" },
+                error: { type: "string" },
               },
             },
           },
@@ -118,6 +214,7 @@ export default {
             schema: {
               type: "object",
               properties: {
+                msg: { type: "string" },
                 error: { type: "string" },
               },
             },
