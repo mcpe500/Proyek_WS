@@ -245,9 +245,7 @@ export const getExercisePlanDetailByUser = async (
       .json({ msg: "Plan not found" });
   }
 
-  const userFromPlan = await User.findById(plan.createdBy);
-
-  if (userFromPlan?._id != user._id) {
+  if (plan.createdBy != user.username) {
     return res.status(RESPONSE_STATUS.NOT_FOUND).json({ msg: "Not Your Plan" });
   }
 
