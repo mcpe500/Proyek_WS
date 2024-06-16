@@ -154,9 +154,9 @@ export const getAllGoals = async (req: Request, res: Response) => {
   }
 };
 
-export const getGoalById = async (req: Request, res: Response) => {
+export const getGoalByTitle = async (req: Request, res: Response) => {
   try {
-    const goalTitle = req.params.id.toLowerCase();
+    const goalTitle = req.params.title.toLowerCase();
     const goal = Object.values(FITNESS_GOALS).find(
       (goal) => goal.title.toLowerCase() === goalTitle
     );
