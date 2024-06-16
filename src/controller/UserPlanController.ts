@@ -5,7 +5,7 @@ import { Plans } from "../models/dynamic/Plans.model";
 import { PlansStatus } from "../contracts/enum/PlansRelated.enum";
 import { FITNESS_GOALS } from "../contracts/enum/FitnessRelated.enum";
 import { User } from "../models/dynamic/User.model";
-import { Exercise } from "../models/dynamic/Exercise.model";
+import { Exercise, ExercisePlan } from "../models/dynamic/Exercise.model";
 import mongoose from "mongoose";
 
 // Create Exercise Plan
@@ -20,7 +20,6 @@ export const createExercisePlan = async (req: Request, res: Response) => {
     intensity,
     exercises,
     nutritionPlan,
-    createdBy,
   } = req.body;
 
   try {
@@ -34,10 +33,9 @@ export const createExercisePlan = async (req: Request, res: Response) => {
       intensity,
       exercises,
       nutritionPlan,
-      createdBy,
+      createdBy: req.body.user.username,
       status: PlansStatus.PENDING,
     });
-
     const savedPlan = await newPlan.save();
 
     return res.status(RESPONSE_STATUS.CREATED).json({
@@ -180,7 +178,7 @@ export const addWorkoutToExercisePlan = async (req: Request, res: Response) => {
     return res.status(RESPONSE_STATUS.NOT_FOUND).json({ msg: "Not Your Plan" });
   }
 
-  const exercise = await Exercise.findById(exerciseId);
+  const exercise = await ExercisePlan.findById(exerciseId);
 
   if (!exercise) {
     return res

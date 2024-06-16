@@ -42,9 +42,18 @@ export interface IPlans extends Document {
   frequencyPerWeek: number;
   restDaysPerWeek: number;
   intensity: number;
-  exercises: IExercise[];
+  exercises: IExercisePlan[];
   nutritionPlan?: INutritionPlan;
   createdBy: string;
   createdDate: Date;
   status: PlansStatus;
+}
+
+export interface IExercisePlan extends Document {
+  name: string;
+  description: string;
+  sets: number;
+  repetitions: number;
+  restBetweenSetsInSeconds: number;
+  equipmentRequired: IEquipment[];
 }
