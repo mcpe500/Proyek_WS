@@ -6,3 +6,9 @@ export const NewsSource: Array<INewsSource> = [
     name: "fitandwell",
   },
 ];
+export const NewsSourceSearch: Array<INewsSource> = [
+  {
+    url: "https://www.fitandwell.com/search?searchTerm=",
+    name: "fitandwell",
+  },
+];

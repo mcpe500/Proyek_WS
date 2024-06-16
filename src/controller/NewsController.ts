@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import puppeteer from "puppeteer";
-import { NewsSource } from "../config/NewsSources";
+import { NewsSource, NewsSourceSearch } from "../config/NewsSources";
 import { extractArticles } from "../utils/NewsUtils";
 import fs from "fs";
 import path from "path";
@@ -11,44 +11,149 @@ const launchBrowser = async () => {
   return await puppeteer.launch();
 };
 
-// Get all news articles from the sources
-export const getAllNews = async (req: Request, res: Response) => {
-  const sources = NewsSource;
-  const allArticles: any[] = [];
+// // Get all news articles from the sources
+// export const getAllNews = async (req: Request, res: Response) => {
+//   const sources = NewsSource;
+//   const allArticles: any[] = [];
 
-  try {
-    const browser = await launchBrowser();
-    console.log("sources", sources);
+//   try {
+//     const browser = await launchBrowser();
+//     console.log("sources", sources);
 
-    for (const source of sources) {
-      if (source.name === "fitandwell") {
-        try {
-          const page = await browser.newPage();
-          console.log(`Extracting articles from ${source.url}`);
-          await page.goto(source.url, {
-            waitUntil: "domcontentloaded",
-            timeout: 300000,
-          });
-          await page.waitForSelector(".listing__link", { timeout: 300000 });
-          const articles = await extractArticles(page);
-          allArticles.push(...articles);
-          await page.close();
-        } catch (error) {
-          console.error(
-            `Failed to extract articles from ${source.url}:`,
-            error
-          );
+//     for (const source of sources) {
+//       if (source.name === "fitandwell") {
+//         try {
+//           const page = await browser.newPage();
+//           console.log(`Extracting articles from ${source.url}`);
+//           await page.goto(source.url, {
+//             waitUntil: "domcontentloaded",
+//             timeout: 300000,
+//           });
+//           await page.waitForSelector(".listing__link", { timeout: 300000 });
+//           const articles = await extractArticles(page);
+//           allArticles.push(...articles);
+//           await page.close();
+//         } catch (error) {
+//           console.error(
+//             `Failed to extract articles from ${source.url}:`,
+//             error
+//           );
+//         }
+//       }
+//     }
+
+//     await browser.close();
+//   } catch (error) {
+//     console.error("An error occurred while extracting news:", error);
+//     return res.status(500).send("An error occurred while extracting news.");
+//   }
+
+//   return res.json(allArticles);
+// };
+
+export const getFilteredNews = async (req: Request, res: Response) => {
+  const isQueryEmpty = Object.keys(req.query).length === 0;
+  if (isQueryEmpty) {
+    const sources = NewsSource;
+    const allArticles: any[] = [];
+
+    try {
+      const browser = await launchBrowser();
+      console.log("sources", sources);
+
+      for (const source of sources) {
+        if (source.name === "fitandwell") {
+          try {
+            const page = await browser.newPage();
+            console.log(`Extracting articles from ${source.url}`);
+            await page.goto(source.url, {
+              waitUntil: "domcontentloaded",
+              timeout: 300000,
+            });
+            await page.waitForSelector(".listing__link", { timeout: 300000 });
+            const articles = await extractArticles(page);
+            allArticles.push(...articles);
+            await page.close();
+          } catch (error) {
+            console.error(
+              `Failed to extract articles from ${source.url}:`,
+              error
+            );
+          }
         }
       }
+
+      await browser.close();
+    } catch (error) {
+      console.error("An error occurred while extracting news:", error);
+      return res.status(500).send("An error occurred while extracting news.");
     }
 
-    await browser.close();
-  } catch (error) {
-    console.error("An error occurred while extracting news:", error);
-    return res.status(500).send("An error occurred while extracting news.");
+    return res.json(allArticles);
   }
 
-  return res.json(allArticles);
+  if (!isQueryEmpty) {
+    const sources = NewsSourceSearch;
+    const allArticles: any[] = [];
+    try {
+      const browser = await launchBrowser();
+
+      for (const source of sources) {
+        if (source.name === "fitandwell") {
+          const sourceFilter = source.url + req.query.title;
+          try {
+            const page = await browser.newPage();
+            await page.goto(sourceFilter, {
+              waitUntil: "domcontentloaded",
+              timeout: 300000,
+            });
+            await page.waitForSelector(".listing__link", { timeout: 300000 });
+            const articles = await page.evaluate(() => {
+              const links = Array.from(
+                document.querySelectorAll(".listing__link")
+              );
+              return links.map((link) => {
+                const title = link.querySelector(".listing__title")?.innerHTML;
+                const detail = link.querySelector(
+                  ".listing__text--strapline"
+                )?.innerHTML;
+                const type = link.querySelector(".listing__label")?.innerHTML;
+                const writer = link
+                  .querySelector(".listing__text--byline")
+                  ?.innerHTML.split("By ")[1];
+                const publishedDate = link
+                  .querySelector(".date")
+                  ?.getAttribute("datetime");
+                const url = link.getAttribute("href");
+                return { title, detail, type, writer, publishedDate, url };
+              });
+            });
+            allArticles.push(...articles);
+            await page.close();
+          } catch (error) {
+            console.error(
+              `Failed to extract articles from ${sourceFilter}:`,
+              error
+            );
+          }
+        }
+      }
+
+      if (allArticles.length === 0) {
+        console.log("No articles found.");
+        await browser.close();
+        return res.status(404).send("No articles found.");
+      }
+
+      await browser.close();
+      return res.json(allArticles);
+    } catch (error) {
+      console.error("An error occurred while setting up the browser:", error);
+      return res
+        .status(500)
+        .send("An error occurred while setting up the browser.");
+    }
+  }
 };
 // TODO : MAKE ENDPOINT FOR FILTERING NEWS https://www.fitandwell.com/search?searchTerm=hello
 // // Get specific news article by title
@@ -170,12 +275,13 @@ export const getSpecificNews = async (req: Request, res: Response) => {
     try {
       const page = await browser.newPage();
 
-      for (let i = 0; i < NewsSource.length; i++) {
-        source = NewsSource[i];
+      for (let i = 0; i < NewsSourceSearch.length; i++) {
+        source = NewsSourceSearch[i];
         if (source.name === "fitandwell") {
+          const sourceFilter = source.url + title;
           try {
-            console.log(`Extracting articles from ${source.url}`);
-            await page.goto(source.url, {
+            console.log(`Extracting articles from ${sourceFilter}`);
+            await page.goto(sourceFilter, {
               waitUntil: "domcontentloaded",
               timeout: 300000,
             });
@@ -190,7 +296,7 @@ export const getSpecificNews = async (req: Request, res: Response) => {
             }
           } catch (error) {
             console.error(
-              `Failed to extract articles from ${source.url}:`,
+              `Failed to extract articles from ${sourceFilter}:`,
               error
             );
           }

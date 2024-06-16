@@ -23,12 +23,12 @@ import addWorkoutToExercisePlan from "./paths/user/plan/exercise/workout/addWork
 import getNewsByTitle from "./paths/news/getNewsByTitle";
 import getAllGoals from "./paths/user/plan/exercise/goals/getAllGoals";
 import getGoalById from "./paths/user/plan/exercise/goals/getGoalById";
-import getAllNews from "./paths/news/getAllNews";
 import cancelPlanByUser from "./paths/user/plan/cancelPlanByUser";
 import adminDashboard from "./paths/admin/adminDashboard";
 import getAndDeleteUserProfile from "./paths/admin/getAndDeleteUserProfile";
 import getAndPostAndDeletePacket from "./paths/admin/getAndPostAndDeletePacket";
 import getExerciseByQuery from "./paths/user/plan/exercise/getExerciseByQuery";
+import getNewsFilterOrAllNews from "./paths/news/getNewsFilterOrAllNews";
 const paths: any = {};
 paths["/"] = root;
 paths["/api/v1/auth/register"] = register;
@@ -50,7 +50,7 @@ paths["/api/v1/users/plan/start/{id}"] = startUserPlanById;
 paths["/api/v1/users/plan/complete/{id}"] = completeUserPlanById;
 
 paths["/api/v1/users/plan/{id}/workout/"] = addWorkoutToExercisePlan;
-paths["/api/v1/news"] = getAllNews;
+paths["/api/v1/news"] = getNewsFilterOrAllNews;
 paths["/api/v1/news/{title}"] = getNewsByTitle;
 paths["/api/v1/exercise/goals"] = getAllGoals;
 paths["/api/v1/exercise/goals/{id}"] = getGoalById;

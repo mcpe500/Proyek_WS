@@ -266,7 +266,7 @@ import {
 } from "../controller/UserPlanController";
 import { createUserPlanSchemaJoi } from "../validators/Plans.validate";
 import { checkAndIncreaseAPIHit } from "../middleware/BusinessMiddleware";
-import { getAllNews, getSpecificNews } from "../controller/NewsController";
+import { getFilteredNews, getSpecificNews } from "../controller/NewsController";
 
 const router = Router();
 
@@ -406,7 +406,8 @@ router.get("/exercise/goals", [validateAccessToken], getAllGoals);
 router.get("/exercise/goals/:id", [validateAccessToken], getGoalById);
 
 // News Routes
-router.get("/news", getAllNews);
+// router.get("/news", getAllNews);
+router.get("/news", getFilteredNews);
 router.get("/news/:title", getSpecificNews);
 
 export default router;
