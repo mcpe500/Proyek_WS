@@ -42,7 +42,7 @@ import { getAllPricingPackages } from "../controller/PricingController";
 import {
   getExercise,
   getAllGoals,
-  getGoalById,
+  getGoalByTitle,
 } from "../controller/ExerciseController";
 import {
   completeExercisePlan,
@@ -201,7 +201,7 @@ router.get("/pricing", getAllPricingPackages);
 // Exercise Routes
 router.get("/exercise", [validateAccessToken], getExercise);
 router.get("/exercise/goals", [validateAccessToken], getAllGoals);
-router.get("/exercise/goals/:id", [validateAccessToken], getGoalById);
+router.get("/exercise/goals/:title", [validateAccessToken], getGoalByTitle);
 
 // News Routes
 // router.get("/news", getAllNews);
