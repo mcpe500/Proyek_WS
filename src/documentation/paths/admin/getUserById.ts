@@ -3,6 +3,11 @@ export default {
     tags: ["admin"],
     summary: "Get a user by ID",
     description: "This endpoint returns a user by ID.",
+    security: [
+      {
+        bearerAuth: [],
+      },
+    ],
     operationId: "getUser",
     parameters: [
       {
