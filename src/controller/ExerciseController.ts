@@ -22,10 +22,10 @@ import { FITNESS_GOALS } from "../contracts/enum/FitnessRelated.enum";
 export const getExercise = async (req: Request, res: Response) => {
   try {
     // Extract body parameters
-    const { exercise, type, muscle, difficulty } = req.body;
+    const { exercise, type, muscle, difficulty } = req.query;
 
     // Extract page from body with default value of 0
-    let page = req.body.page ?? 0;
+    let page = req.query.page ?? 0;
 
     // Define valid types and muscles for validation
     const validTypes = [
@@ -35,7 +35,7 @@ export const getExercise = async (req: Request, res: Response) => {
       "powerlifting",
       "strength",
       "stretching",
-      "strongman"
+      "strongman",
     ];
 
     const validMuscles = [
@@ -54,42 +54,56 @@ export const getExercise = async (req: Request, res: Response) => {
       "neck",
       "quadriceps",
       "traps",
-      "triceps"
+      "triceps",
     ];
 
-    const validDifficulty = [
-      "beginner",
-      "intermediate",
-      "expert"
-    ];
+    const validDifficulty = ["beginner", "intermediate", "expert"];
 
     // Define schemas for validation
-    const typeSchema = Joi.string().valid(...validTypes).insensitive();
-    const muscleSchema = Joi.string().valid(...validMuscles).insensitive();
-    const difficultySchema = Joi.string().valid(...validDifficulty).insensitive();
+    const typeSchema = Joi.string()
+      .valid(...validTypes)
+      .insensitive();
+    const muscleSchema = Joi.string()
+      .valid(...validMuscles)
+      .insensitive();
+    const difficultySchema = Joi.string()
+      .valid(...validDifficulty)
+      .insensitive();
 
     // Validate type, muscle, and difficulty
     if (type) {
       const { error } = typeSchema.validate(type);
       if (error) {
-        const errorMessage = `Type not valid. Valid types are: ${validTypes.join(', ')}`;
-        return res.status(RESPONSE_STATUS.BAD_REQUEST).json({ error: errorMessage });
+        const errorMessage = `Type not valid. Valid types are: ${validTypes.join(
+          ", "
+        )}`;
+        return res
+          .status(RESPONSE_STATUS.BAD_REQUEST)
+          .json({ error: errorMessage });
       }
     }
 
     if (muscle) {
       const { error } = muscleSchema.validate(muscle);
       if (error) {
-        const errorMessage = `Muscle not valid. Valid muscles are: ${validMuscles.join(', ')}`;
-        return res.status(RESPONSE_STATUS.BAD_REQUEST).json({ error: errorMessage });
+        const errorMessage = `Muscle not valid. Valid muscles are: ${validMuscles.join(
+          ", "
+        )}`;
+        return res
+          .status(RESPONSE_STATUS.BAD_REQUEST)
+          .json({ error: errorMessage });
       }
     }
 
     if (difficulty) {
       const { error } = difficultySchema.validate(difficulty);
       if (error) {
-        const errorMessage = `Difficulty not valid. Valid difficulty levels are: ${validDifficulty.join(', ')}`;
-        return res.status(RESPONSE_STATUS.BAD_REQUEST).json({ error: errorMessage });
+        const errorMessage = `Difficulty not valid. Valid difficulty levels are: ${validDifficulty.join(
+          ", "
+        )}`;
+        return res
+          .status(RESPONSE_STATUS.BAD_REQUEST)
+          .json({ error: errorMessage });
       }
     }
 
@@ -101,21 +115,24 @@ export const getExercise = async (req: Request, res: Response) => {
     if (difficulty) queryParams.difficulty = difficulty;
     queryParams.offset = page;
 
-    console.log('Query Parameters:', queryParams);
+    console.log("Query Parameters:", queryParams);
 
     // Make API call
-    const response = await Apis.API_NINJA_ApiService.get("", { params: queryParams });
+    const response = await Apis.API_NINJA_ApiService.get("", {
+      params: queryParams,
+    });
 
-    console.log('API Response:', response);
+    console.log("API Response:", response);
 
     // Check for empty response
     if ((response as any).length < 1) {
-      return res.status(RESPONSE_STATUS.NOT_FOUND).json({ error: `Exercise Not Found!` });
+      return res
+        .status(RESPONSE_STATUS.NOT_FOUND)
+        .json({ error: `Exercise Not Found!` });
     }
 
     // Return successful response
     return res.status(RESPONSE_STATUS.SUCCESS).json({ exercise: response });
-
   } catch (error: any) {
     console.error("Request failed:", error);
     return res.status(RESPONSE_STATUS.NOT_FOUND).json({ error: error.message });
@@ -124,38 +141,34 @@ export const getExercise = async (req: Request, res: Response) => {
 
 export const getAllGoals = async (req: Request, res: Response) => {
   try {
-    const goalsBrief = Object.values(FITNESS_GOALS).map(goal => ({
+    const goalsBrief = Object.values(FITNESS_GOALS).map((goal) => ({
       title: goal.title,
-      description: goal.description
+      description: goal.description,
     }));
-    
-    return res
-      .status(RESPONSE_STATUS.SUCCESS)
-      .json({ Goal_list: goalsBrief });
+
+    return res.status(RESPONSE_STATUS.SUCCESS).json({ Goal_list: goalsBrief });
   } catch (error) {
     return res
-        .status(RESPONSE_STATUS.INTERNAL_SERVER_ERROR)
-        .json({ message: "Internal server error" });
+      .status(RESPONSE_STATUS.INTERNAL_SERVER_ERROR)
+      .json({ message: "Internal server error" });
   }
 };
 
 export const getGoalById = async (req: Request, res: Response) => {
   try {
     const goalTitle = req.params.id.toLowerCase();
-    const goal = Object.values(FITNESS_GOALS).find(goal =>
-      goal.title.toLowerCase() === goalTitle
+    const goal = Object.values(FITNESS_GOALS).find(
+      (goal) => goal.title.toLowerCase() === goalTitle
     );
 
-  if (goal) {
-    return res
-      .status(RESPONSE_STATUS.SUCCESS)
-      .json({ Goal: goal });
-  } else {
-    res.status(RESPONSE_STATUS.NOT_FOUND).json({ message: 'Goal not found' });
-  }
+    if (goal) {
+      return res.status(RESPONSE_STATUS.SUCCESS).json({ Goal: goal });
+    } else {
+      res.status(RESPONSE_STATUS.NOT_FOUND).json({ message: "Goal not found" });
+    }
   } catch (error) {
     return res
-        .status(RESPONSE_STATUS.INTERNAL_SERVER_ERROR)
-        .json({ message: "Internal server error" });
+      .status(RESPONSE_STATUS.INTERNAL_SERVER_ERROR)
+      .json({ message: "Internal server error" });
   }
 };
