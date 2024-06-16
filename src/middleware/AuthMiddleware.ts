@@ -25,7 +25,7 @@ export const validateAccessToken = async (
     try {
       const user = await User.findOne({ $or: [{ username }, { email }] });
       if (user) {
-        req.body.user = user;
+        (req as any).user = user;
         next();
       } else {
         return res

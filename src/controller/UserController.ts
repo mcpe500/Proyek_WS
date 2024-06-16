@@ -128,7 +128,7 @@ export const loginUser = async (req: Request, res: Response) => {
 export const getDashboard = async (req: Request, res: Response) => {
   //   const { username, email } = req.body;
   //   const user = await User.findOne({ $or: [{ username }, { email }] });
-  const { user } = req.body;
+  const user = (req as any).user;
   return res.status(RESPONSE_STATUS.SUCCESS).json({ user: user });
 };
 
@@ -145,15 +145,16 @@ export const editProfile = async (req: Request, res: Response) => {
     weight,
     healthInformation,
   } = req.body;
-  let { user } = req.body;
-
+  const user = (req as any).user;
+  // console.log(user);
+  
   if (!user) {
     return res
       .status(RESPONSE_STATUS.NOT_FOUND)
       .json({ message: "User not found" });
   }
 
-  if (old_password != "") {
+  if (old_password && old_password != "") {
     const isPasswordValid = await verifyPassword(old_password, user.password);
     if (!isPasswordValid) {
       return res
@@ -161,7 +162,7 @@ export const editProfile = async (req: Request, res: Response) => {
         .json({ msg: "old_password is incorrect" });
     }
 
-    if (new_password == "") {
+    if (new_password && new_password == "") {
       return res
         .status(RESPONSE_STATUS.BAD_REQUEST)
         .json({ msg: "new_password must not be empty" });
@@ -178,13 +179,14 @@ export const editProfile = async (req: Request, res: Response) => {
   }
 
   // Update other fields if they are not empty
-  if (fullName != "") user.fullName = fullName;
-  if (phone != "") user.phone = phone;
-  if (age != "") user.age = age;
-  if (gender != "") user.gender = gender;
-  if (height != "") user.height = height;
-  if (weight != "") user.weight = weight;
-  if (healthInformation != "") user.healthInformation = healthInformation;
+  if (fullName && fullName != "") user.fullName = fullName;
+  if (phone && phone != "") user.phone = phone;
+  if (age && age != "") user.age = age;
+  if (gender && gender != "") user.gender = gender;
+  if (height && height != "") user.height = height;
+  if (weight && weight != "") user.weight = weight;
+  if (healthInformation && healthInformation != "") user.healthInformation = healthInformation;
+  if (req.file) user.profilePicture = req.file.path;
 
   // Save the updated user
   await user.save();
@@ -307,7 +309,7 @@ export const verifyEmail = async (req: Request, res: Response) => {
 };
 
 export const getApiKey = async (req: Request, res: Response) => {
-  const { user } = req.body;
+  const user = (req as any).user;
   try {
     // Jika pengguna ditemukan, kirimkan API key
     if (user.apiKey) {
@@ -325,7 +327,7 @@ export const getApiKey = async (req: Request, res: Response) => {
 };
 
 export const resetApiKey = async (req: Request, res: Response) => {
-  const { user } = req.body;
+  const user = (req as any).user;
   try {
     let apiKey = "";
     while (true) {
@@ -345,7 +347,8 @@ export const resetApiKey = async (req: Request, res: Response) => {
 };
 
 export const topup = async (req: Request, res: Response) => {
-  const { amount, user } = req.body;
+  const { amount } = req.body;
+  const user = (req as any).user;
   
   if (!amount || amount <= 0) {
     return res
@@ -368,7 +371,8 @@ export const topup = async (req: Request, res: Response) => {
 };
 
 export const subscribePacket = async (req: Request, res: Response) => {
-  const { user, paketId, month } = req.body;
+  const { paketId, month } = req.body;
+  const user = (req as any).user;
 
   const paket = await Paket.findOne({
     where: {
@@ -447,7 +451,8 @@ export const subscribePacket = async (req: Request, res: Response) => {
 };
 
 export const renewSubscription = async (req: Request, res: Response) => {
-  const { user, month } = req.body;
+  const { month } = req.body;
+  const user = (req as any).user;
 
   if (month < 1) {
     return res
@@ -567,7 +572,7 @@ export const getUser = async (req: Request, res: Response) => {
 };
 
 export const adminDashboard = async (req: Request, res: Response) => {
-  const { user } = req.body;
+  const user = (req as any).user;
   return res.status(RESPONSE_STATUS.SUCCESS).json({ data: user });
 };
 

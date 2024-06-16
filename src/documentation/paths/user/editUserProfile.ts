@@ -11,7 +11,7 @@ export default {
     ],
     requestBody: {
       content: {
-        "application/json": {
+        "multipart/form-data": {
           schema: {
             type: "object",
             properties: {
@@ -25,6 +25,11 @@ export default {
               height: { type: "number" },
               weight: { type: "number" },
               healthInformation: { type: "string" },
+              profilePicture: {
+                type: "string",
+                format: "binary",
+                description: "Profile picture file",
+              },
             },
           },
         },

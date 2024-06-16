@@ -164,7 +164,7 @@ export const completeExercisePlan = async (req: Request, res: Response) => {
 export const addWorkoutToExercisePlan = async (req: Request, res: Response) => {
   const { id } = req.params;
   const { exerciseId } = req.body;
-  const user = req.body.user;
+  const user = (req as any).user;
 
   const plan = await Plans.findById(id);
 
@@ -198,7 +198,7 @@ export const addWorkoutToExercisePlan = async (req: Request, res: Response) => {
 
 export const exercisePlanDetails = async (req: Request, res: Response) => {
   const { id } = req.params;
-  const user = req.body.user;
+  const user = (req as any).user;
   const plan = await Plans.findById(id)
 
   if (!plan) {
@@ -214,7 +214,7 @@ export const exercisePlanDetails = async (req: Request, res: Response) => {
 };
 
 export const getAllExercisePlanByUser = async (req: Request, res: Response) => {
-  const user = req.body.user;
+  const user = (req as any).user;
   const plans = await Plans.find({
     createdBy: user.username
   }).select('_id, name createdDate status');
@@ -232,7 +232,7 @@ export const getAllExercisePlanByUser = async (req: Request, res: Response) => {
 
 export const getExercisePlanDetailByUser = async (req: Request, res: Response) => {
   const { id } = req.params;
-  const user = req.body.user;
+  const user = (req as any).user;
   if (!mongoose.Types.ObjectId.isValid(id)) {
     return res
       .status(RESPONSE_STATUS.BAD_REQUEST)
@@ -269,7 +269,7 @@ export const trackerExercisePlanByUser = async (req: Request, res: Response) => 
 
 export const cancelExercisePlanByUser = async (req: Request, res: Response) => {
   const { id } = req.params;
-  const user = req.body.user;
+  const user = (req as any).user;
   if (!mongoose.Types.ObjectId.isValid(id)) {
     return res
       .status(RESPONSE_STATUS.BAD_REQUEST)

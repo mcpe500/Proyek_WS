@@ -61,6 +61,7 @@ import {
 import { createUserPlanSchemaJoi } from "../validators/Plans.validate";
 import { checkAndIncreaseAPIHit } from "../middleware/BusinessMiddleware";
 import { getFilteredNews, getSpecificNews } from "../controller/NewsController";
+import upload from "../middleware/Upload";
 
 const router = Router();
 
@@ -138,7 +139,7 @@ router.put("/users/topup", [validateAccessToken], topup);
 router.get("/users/dashboard", [validateAccessToken], getDashboard);
 router.put(
   "/users/profile",
-  [validateAccessToken, validateBody(editProfileSchemaJoi)],
+  [validateAccessToken, validateBody(editProfileSchemaJoi), upload.single('profilePicture')],
   editProfile
 );
 router.get("/users/apikey", [validateAccessToken], getApiKey);
