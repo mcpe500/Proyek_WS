@@ -371,8 +371,8 @@ export const resetApiKey = async (req: Request, res: Response) => {
 
 export const topup = async (req: Request, res: Response) => {
   const { amount, user } = req.body;
-
-  if (amount <= 0) {
+  
+  if (!amount || amount <= 0) {
     return res
       .status(RESPONSE_STATUS.BAD_REQUEST)
       .json({ message: "Invalid amount" });
