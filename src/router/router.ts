@@ -144,7 +144,7 @@ router.put(
 router.get("/users/apikey", [validateAccessToken], getApiKey);
 router.put(
   "/users/apikey/reset",
-  [validateAccessToken, checkAndIncreaseAPIHit],
+  [validateAccessToken, checkAndIncreaseAPIHit(1)],
   resetApiKey
 );
 router.post("/users/subscribe", [validateAccessToken], subscribePacket);

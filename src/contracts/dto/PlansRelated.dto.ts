@@ -35,14 +35,13 @@ export interface IIngredient extends Document {
 }
 
 export interface IPlans extends Document {
-  id: string;
   name: string;
   description: string;
   goals: string[];
   durationInWeeks: number;
   frequencyPerWeek: number;
   restDaysPerWeek: number;
-  intensity: string;
+  intensity: number;
   exercises: IExercise[];
   nutritionPlan?: INutritionPlan;
   createdBy: string;

@@ -2,10 +2,6 @@ import { JoiExtended } from ".";
 import { FITNESS_GOALS } from "../contracts/enum/FitnessRelated.enum";
 
 export const createUserPlanSchemaJoi = JoiExtended.object({
-  id: JoiExtended.string().required().messages({
-    "string.base": "ID must be a string",
-    "any.required": "ID is a required field",
-  }),
   name: JoiExtended.string().required().messages({
     "string.base": "Name must be a string",
     "any.required": "Name is a required field",
@@ -48,7 +44,7 @@ export const createUserPlanSchemaJoi = JoiExtended.object({
       "any.required": "Rest days per week is a required field",
     }),
   intensity: JoiExtended.string().required().messages({
-    "string.base": "Intensity must be a string",
+    "number.base": "Intensity must be a number",
     "any.required": "Intensity is a required field",
   }),
   exercises: JoiExtended.array()
