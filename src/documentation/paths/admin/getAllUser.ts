@@ -3,6 +3,11 @@ export default {
     tags: ["admin"],
     summary: "Allow admin to get all users",
     description: "This endpoint returns every user's data",
+    security: [
+      {
+        bearerAuth: [],
+      },
+    ],
     operationId: "getAllUser",
     responses: {
       "200": {

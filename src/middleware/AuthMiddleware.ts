@@ -48,8 +48,6 @@ export const validateAdmin = async (
   next: NextFunction
 ) => {
   const { user } = req.body;
-  // console.log(user);
-  
   if (user && user.role != "ADMIN")
     return res
       .status(RESPONSE_STATUS.UNAUTHORIZED)
