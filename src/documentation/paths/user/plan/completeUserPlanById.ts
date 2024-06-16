@@ -1,6 +1,6 @@
 export default {
   post: {
-    tags: ["users"],
+    tags: ["plans"],
     summary: "Complete a specific user plan",
     description: "This endpoint completes a specific plan of a user.",
     operationId: "completePlan",
