@@ -13,6 +13,7 @@ export default {
           schema: {
             type: "string",
           },
+          example: ""
         },
       ],
       security: [

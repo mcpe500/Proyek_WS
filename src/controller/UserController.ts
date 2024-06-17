@@ -29,6 +29,7 @@ import { Transaction } from "../models/dynamic/Transaction.model";
 import {
   ITransaction,
   ITransactionSubscriptionDetail,
+  ITransactionTopUpDetail,
   ITransationHeaderAdmin,
 } from "../contracts/dto/TransactionRelated.dto";
 import { topupSchema } from "../validators/Topup.validate";
@@ -775,21 +776,28 @@ export const addExercise = async (req: Request, res: Response) => {
     const parsedOffset = Math.floor(Number(offset));
     const parsedLimit = Math.floor(Number(limit_per_ten));
 
-    if (isNaN(parsedOffset) || isNaN(parsedLimit) || parsedLimit<0 || parsedOffset <0) {
+    if (
+      isNaN(parsedOffset) ||
+      isNaN(parsedLimit) ||
+      parsedLimit < 0 ||
+      parsedOffset < 0
+    ) {
       return res
-      .status(RESPONSE_STATUS.BAD_REQUEST)
-      .json({ msg: "Offset and limit must be non-negative integers." });
+        .status(RESPONSE_STATUS.BAD_REQUEST)
+        .json({ msg: "Offset and limit must be non-negative integers." });
     }
 
     const queryParams: any = {};
-    for (let i = parsedOffset; i < (parsedOffset+parsedLimit); i++) {
-      queryParams.offset = i*10;
+    for (let i = parsedOffset; i < parsedOffset + parsedLimit; i++) {
+      queryParams.offset = i * 10;
       let exercises: any[] = await Apis.API_NINJA_ApiService.get("", {
-      params: queryParams,
-    });
+        params: queryParams,
+      });
       for (const exercise of exercises) {
         // Check if the exercise already exists in the database
-        const existingExercise = await Exercise.findOne({ name: exercise.name });
+        const existingExercise = await Exercise.findOne({
+          name: exercise.name,
+        });
 
         // If the exercise does not exist, insert it into the database
         if (!existingExercise) {
@@ -816,23 +824,55 @@ export const addExercise = async (req: Request, res: Response) => {
 };
 
 export const topupFromAdmin = async (req: Request, res: Response) => {
-  const { userID } = req.params;
+  const { userID } = req.params; // if i empty it
   const { saldo } = req.body;
+  const admin = (req as any).user;
   try {
     const schema = topupSchema;
-    await schema.validateAsync({saldo});
+    await schema.validateAsync({ saldo });
   } catch (error) {
     if (error instanceof Error) {
-      return res.status(RESPONSE_STATUS.BAD_REQUEST).json({ msg: error.message });
+      return res
+        .status(RESPONSE_STATUS.BAD_REQUEST)
+        .json({ msg: error.message });
     }
-    return res.status(RESPONSE_STATUS.INTERNAL_SERVER_ERROR).json({ msg: 'Validation error' });
+    return res
+      .status(RESPONSE_STATUS.INTERNAL_SERVER_ERROR)
+      .json({ msg: "Validation error" });
   }
-    if(userID){
-        const user = await User.findOne({ _id: userID });
-        if(!user)  return res.status(RESPONSE_STATUS.NOT_FOUND).json({ msg: 'User not found'});
-        if(user.role == "ADMIN") return res.status(RESPONSE_STATUS.BAD_REQUEST).json({ msg: 'User is admin'});
-        await User.updateOne({ _id: userID }, { $inc: { balance: saldo } });
+  console.log(req.params);
+  mongoose.Types.ObjectId.isValid(userID);
+  if (userID && userID != "{userID}") {
+    const user = await User.findOne({ _id: userID });
+    if (!user)
+      return res
+        .status(RESPONSE_STATUS.NOT_FOUND)
+        .json({ msg: "User not found" });
+    if (user.role == "ADMIN")
+      return res
+        .status(RESPONSE_STATUS.BAD_REQUEST)
+        .json({ msg: "User is admin" });
+    await User.updateOne({ _id: userID }, { $inc: { balance: saldo } });
 
+    const transactionHeader: ITransationHeaderAdmin = {
+      transactionHeaderType: TransactionHeaderType.TOPUP,
+      date: new Date(), // current date make it use best practice
+      total: saldo,
+      userId: user._id,
+      adminId: admin._id,
+    };
+    const transactionDetails: ITransactionTopUpDetail[] = [];
+
+    transactionDetails.push({
+      transactionDetailType: TransactionDetailType.ADMIN_TOPUP,
+      subtotal: saldo,
+      message: `Admin ${admin.fullName} does action ${TransactionDetailType.ADMIN_TOPUP} topup user ${user.fullName} with saldo ${saldo}`,
+    });
+    const transaction: ITransaction = {
+      header: transactionHeader,
+      details: transactionDetails,
+    };
+    await Transaction.create(transaction);
     return res.status(RESPONSE_STATUS.SUCCESS).json({
       msg: "Balance updated successfully",
       username: user.username,
@@ -841,9 +881,31 @@ export const topupFromAdmin = async (req: Request, res: Response) => {
     });
   } else {
     const users = await User.updateMany(
-      { role: { $ne: "ADMIN" } },
+      { role: { $ne: "ADMIN" }, isEmailVerified: true },
       { $inc: { balance: saldo } }
     );
+    console.log(users);
+
+    // const transactionHeader: ITransationHeaderAdmin = {
+    //   transactionHeaderType: TransactionHeaderType.TOPUP,
+    //   date: new Date(), // current date make it use best practice
+    //   total: saldo,
+    //   userId: user._id,
+    //   adminId: admin._id,
+    // };
+    // const transactionDetails: ITransactionTopUpDetail[] = [];
+    // users.forEach((user) => {
+    //   transactionDetails.push({
+    //     transactionDetailType: TransactionDetailType.ADMIN_TOPUP,
+    //     subtotal: saldo,
+    //     message: `Admin ${admin.fullName} does action ${TransactionDetailType.ADMIN_TOPUP} topup user ${user.fullName} with saldo ${saldo}`,
+    //   });
+    // });
+    // const transaction: ITransaction = {
+    //   header: transactionHeader,
+    //   details: transactionDetails,
+    // };
+    // await Transaction.create(transaction);
     return res
       .status(RESPONSE_STATUS.SUCCESS)
       .json({ msg: "Balance updated for all users successfully" });

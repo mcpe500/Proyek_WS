@@ -14,8 +14,8 @@ export interface ITransationHeaderAdmin {
   transactionHeaderType: TransactionHeaderType;
   date: Date;
   total: number;
-  userId: Types.ObjectId;
-  adminId: boolean;
+  userId?: Types.ObjectId;
+  adminId: Types.ObjectId;
 }
 
 export interface ITransactionSubscriptionDetail {
@@ -31,6 +31,7 @@ export interface ITransactionTopUpDetail {
   transactionDetailType: TransactionDetailType;
   subtotal: number;
   message: string;
+  userId?: Types.ObjectId;
 }
 export interface ITransaction {
   header: ITransationHeaderUser | ITransationHeaderAdmin;

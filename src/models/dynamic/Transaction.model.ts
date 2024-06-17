@@ -22,10 +22,10 @@ const TransactionSchema: Schema = new Schema({
     },
     userId: {
       type: Schema.Types.ObjectId,
-      required: true,
+      required: false,
     },
-    isAdmin: {
-      type: Boolean,
+    adminId: {
+      type: Schema.Types.ObjectId,
       required: true,
     },
   },
@@ -42,6 +42,10 @@ const TransactionSchema: Schema = new Schema({
       price: Number,
       subtotal: Number,
       message: String,
+      userId: {
+        type: Schema.Types.ObjectId,
+        required: false,
+      },
     },
   ],
 });
