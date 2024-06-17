@@ -1,5 +1,6 @@
 import { faker } from "@faker-js/faker";
 import {
+  generateApiKey,
   generateEmailVerificationToken,
   hashPassword,
 } from "../utils/AuthUtils";
@@ -16,7 +17,7 @@ const createFreeSubscriptions = async (verifiedUsers: IUser[]) => {
       startDate: new Date(),
       endDate: new Date(),
       isActive: true,
-      apiKey: "",
+      apiKey: await generateApiKey(),
       resetAt: new Date(),
     };
     subscriptions.push(subscription);

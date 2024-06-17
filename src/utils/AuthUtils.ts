@@ -71,6 +71,7 @@ export const generateApiKey = async () => {
     });
     if (!temp) break;
   }
+  return apiKey;
 };
 
 export const generateEmailVerificationToken = (email: string) => {
