@@ -26,8 +26,11 @@ import {
   TransactionHeaderType,
 } from "../contracts/enum/TransactionRelated.enum";
 import { Transaction } from "../models/dynamic/Transaction.model";
-import { ITransationHeaderAdmin } from "../contracts/dto/TransactionRelated.dto";
-import { ObjectId } from "mongodb";
+import {
+  ITransaction,
+  ITransactionSubscriptionDetail,
+  ITransationHeaderAdmin,
+} from "../contracts/dto/TransactionRelated.dto";
 
 // const UserSchema: Schema = new Schema({
 //   fullName: { type: String, required: true },
@@ -670,8 +673,13 @@ export const getUserPacket = async (req: Request, res: Response) => {
 export const addUserPacket = async (req: Request, res: Response) => {
   const { userID } = req.params;
   const admin = (req as any).user;
-  const { paket_id } = req.body;
+  const { paket_id, month } = req.body;
   const user = await User.findOne({ _id: userID });
+  if (month < 1) {
+    return res
+      .status(RESPONSE_STATUS.BAD_REQUEST)
+      .send({ message: "Invalid number of month" });
+  }
   if (!user)
     return res
       .status(RESPONSE_STATUS.NOT_FOUND)
@@ -700,17 +708,36 @@ export const addUserPacket = async (req: Request, res: Response) => {
   });
   const newSubscription = await subs.save();
 
-  const transactionHeader: ITransationHeaderAdmin = {
-    transactionHeaderType: TransactionHeaderType.SUBSCRIBE,
-    date: new Date(), // current date make it use best practice
-    total: packet.Paket_price,
-    userId: new ObjectId(userID),
-    adminId: admin._id,
-  };
-  // TODO : Make can do multiple TransactionDetail
-  // const transactionDetails: ITransactionDetailAdmin[] = [];
-  // await Transaction.create({});
-  // TransactionDetailType.ADMIN_SUBSCRIBE
+  // const transactionHeader: ITransationHeaderAdmin = {
+  //   transactionHeaderType: TransactionHeaderType.SUBSCRIBE,
+  //   date: new Date(), // current date make it use best practice
+  //   total: packet.Paket_price,
+  //   userId: user._id,
+  //   adminId: admin._id,
+  // };
+  // // TODO : Make can do multiple TransactionDetail
+  // const transactionDetails: ITransactionSubscriptionDetail[] = [];
+
+  // transactionDetails.push({
+  //   transactionDetailType: TransactionDetailType.ADMIN_SUBSCRIBE,
+  //   paket_id: packet.Paket_id,
+  //   subscription_id: newSubscription._id,
+  //   month: month, // TODO : Mastiin yg admin perlu set berapa bulan nggak
+  //   price: packet.Paket_price,
+  //   subtotal: packet.Paket_price * month,
+  //   message: `Admin : ${admin.username}, did action = ${
+  //     TransactionDetailType.ADMIN_SUBSCRIBE
+  //   } gave ${user.username} subscription to ${
+  //     packet.Paket_name
+  //   } for ${month} month at ${packet.Paket_price} per month with total ${
+  //     packet.Paket_price * month
+  //   } with the subscription id ${newSubscription._id}`,
+  // });
+  // const transaction: ITransaction = {
+  //   header: transactionHeader,
+  //   details: transactionDetails,
+  // };
+  // await Transaction.create(transaction);
   return res
     .status(RESPONSE_STATUS.CREATED)
     .json({ subscription: newSubscription });
