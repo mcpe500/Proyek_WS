@@ -840,9 +840,7 @@ export const topupFromAdmin = async (req: Request, res: Response) => {
       .status(RESPONSE_STATUS.INTERNAL_SERVER_ERROR)
       .json({ msg: "Validation error" });
   }
-  console.log(req.params);
-  mongoose.Types.ObjectId.isValid(userID);
-  if (userID && userID != "{userID}") {
+  if (userID && mongoose.Types.ObjectId.isValid(userID)) {
     const user = await User.findOne({ _id: userID });
     if (!user)
       return res
