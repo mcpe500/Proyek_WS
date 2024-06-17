@@ -5,48 +5,30 @@ import Paket from "../models/static/Paket.model";
 
 export const checkAndIncreaseAPIHit = (apiIncreaseCount: number) => {
   return async (req: Request, res: Response, next: NextFunction) => {
+    const { apiKey } = req.query;
     const user = (req as any).user;
+
     try {
+      if (typeof apiKey !== 'string') {
+        return res.status(400).json({ error: 'Invalid API key format' });
+      }
+
       // Check for active subscription
-      let activeSubscription = await Subscription.findOne({
+      const activeSubscription = await Subscription.findOne({
         userId: user._id,
-        isActive: true,
+        apiKey: apiKey
       });
 
       if (!activeSubscription) {
-        return res
-          .status(RESPONSE_STATUS.NOT_FOUND)
-          .json({ msg: "Tidak ada paket yang aktif" });
+        return res.status(RESPONSE_STATUS.NOT_FOUND).json({ msg: "Invalid API Key" });
       }
 
       // Check if the subscription has expired
-      if (
-        activeSubscription.endDate &&
-        activeSubscription.endDate < new Date()
-      ) {
-        // set current subscription to inactive
-        await activeSubscription.updateOne({ isActive: false });
-
-        // set free subscription to active
-        activeSubscription = await Subscription.findOneAndUpdate(
-          {
-            userId: user._id,
-            paketId: "PAK001",
-          },
-          {
-            $set: { isActive: true },
-          },
-          {
-            new: true, // Return the updated document
-            useFindAndModify: false, // Deprecation warning fix
-          }
-        );
-
-        if (!activeSubscription) {
-          return res
-            .status(RESPONSE_STATUS.NOT_FOUND)
-            .json({ msg: "Tidak ada paket yang aktif" });
-        }
+      if (!activeSubscription.isActive || activeSubscription.endDate < new Date()) {
+        await activeSubscription.updateOne({
+          isActive: false
+        });
+        return res.status(RESPONSE_STATUS.BAD_REQUEST).json({ msg: "Your subscription has expired" });
       }
 
       // Check API hit limit
@@ -93,19 +75,3 @@ export const checkAndIncreaseAPIHit = (apiIncreaseCount: number) => {
     }
   };
 };
-
-
-export const checkAPIKey = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
-  const { apiKey } = req.query;
-  const user = (req as any).user;
-
-  if ( user.apiKey != apiKey && user.role != "ADMIN") {
-    return res.status(RESPONSE_STATUS.BAD_REQUEST).json({ msg: "Invalid API key" });
-  }
-
-  next();
-}

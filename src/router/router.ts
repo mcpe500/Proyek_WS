@@ -63,8 +63,7 @@ import {
 } from "../controller/UserPlanController";
 import { createUserPlanSchemaJoi } from "../validators/Plans.validate";
 import {
-  checkAndIncreaseAPIHit,
-  checkAPIKey,
+  checkAndIncreaseAPIHit
 } from "../middleware/BusinessMiddleware";
 import { getFilteredNews, getSpecificNews } from "../controller/NewsController";
 import { getNearestGyms } from "../controller/GymsController";
@@ -175,7 +174,7 @@ router.get(
 );
 router.put(
   "/users/apikey/reset",
-  [validateAccessToken, validateIsNotAdmin, checkAPIKey, checkAndIncreaseAPIHit(1)],
+  [validateAccessToken, validateIsNotAdmin, checkAndIncreaseAPIHit(1)],
   resetApiKey
 ); // TODO : bikin ini pake ApiKey (Hansen)
 router.post(
@@ -194,46 +193,45 @@ router.post(
     validateBody(createUserPlanSchemaJoi),
     validateAccessToken, // TODO : Check with hansen mungkin ini error (Should be fine, Hansen)
     validateIsNotAdmin,
-    checkAPIKey,
     checkAndIncreaseAPIHit(1),
   ],
   createExercisePlan
 ); // TODO : bikin ini pake ApiKey (Hansen)
 router.get(
   "/users/plan",
-  [validateAccessToken, validateIsNotAdmin, checkAPIKey, checkAndIncreaseAPIHit(1)],
+  [validateAccessToken, validateIsNotAdmin, checkAndIncreaseAPIHit(1)],
   getAllExercisePlanByUser
 ); // TODO : bikin ini pake ApiKey (Hansen)
 router.get(
   "/users/plan/:id",
-  [validateAccessToken, validateIsNotAdmin, checkAPIKey, checkAndIncreaseAPIHit(1)],
+  [validateAccessToken, validateIsNotAdmin, checkAndIncreaseAPIHit(1)],
   getExercisePlanDetailByUser
 ); // TODO : bikin ini pake ApiKey (Hansen)
 
 // Exercise Plan Routes
 router.put(
   "/users/plan/edit/:id",
-  [validateAccessToken, validateIsNotAdmin, checkAPIKey, checkAndIncreaseAPIHit(1)],
+  [validateAccessToken, validateIsNotAdmin, checkAndIncreaseAPIHit(1)],
   editExercisePlan
 ); // TODO : bikin ini pake ApiKey (Hansen)
 router.post(
   "/users/plan/start/:id",
-  [validateAccessToken, validateIsNotAdmin, checkAPIKey, checkAndIncreaseAPIHit(1)],
+  [validateAccessToken, validateIsNotAdmin, checkAndIncreaseAPIHit(1)],
   startExercisePlan
 ); // TODO : bikin ini pake ApiKey (Hansen)
 router.put(
   "/users/plan/:id/workout/",
-  [validateAccessToken, validateIsNotAdmin, checkAPIKey, checkAndIncreaseAPIHit(1)],
+  [validateAccessToken, validateIsNotAdmin, checkAndIncreaseAPIHit(1)],
   addWorkoutToExercisePlan
 ); // TODO : bikin ini pake ApiKey (Hansen)
 router.get(
   "/users/plan/:id/workout/",
-  [validateAccessToken, validateIsNotAdmin, checkAPIKey, checkAndIncreaseAPIHit(1)],
+  [validateAccessToken, validateIsNotAdmin, checkAndIncreaseAPIHit(1)],
   exercisePlanDetails
 ); // TODO : bikin ini pake ApiKey (Hansen)
 router.post(
   "/users/plan/complete/:id",
-  [validateAccessToken, validateIsNotAdmin, checkAPIKey, checkAndIncreaseAPIHit(1)],
+  [validateAccessToken, validateIsNotAdmin, checkAndIncreaseAPIHit(1)],
   completeExercisePlan
 ); // TODO : bikin ini pake ApiKey (Hansen)
 router.put(
@@ -254,12 +252,12 @@ router.get("/exercise/goals/:title", [validateAccessToken], getGoalByTitle);
 // router.get("/news", getAllNews);
 router.get(
   "/news",
-  [validateAccessToken, checkAPIKey, checkAndIncreaseAPIHit(1)],
+  [validateAccessToken, checkAndIncreaseAPIHit(1)],
   getFilteredNews
 ); // TODO : bikin ini pake ApiKey (Hansen)
 router.get(
   "/news/:title",
-  [validateAccessToken, checkAPIKey, checkAndIncreaseAPIHit(1)],
+  [validateAccessToken, checkAndIncreaseAPIHit(1)],
   getSpecificNews
 ); // TODO : bikin ini pake ApiKey (Hansen)
 
@@ -268,7 +266,6 @@ router.get(
   "/gyms/nearest",
   validateAccessToken,
   validateQuery(getGymsSchema),
-  checkAPIKey,
   getNearestGyms
 ); // TODO : bikin ini pake ApiKey (Hansen) sama nambah ApiHit
 

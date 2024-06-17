@@ -401,19 +401,6 @@ export const subscribePacket = async (req: Request, res: Response) => {
       .json({ message: "Invalid number of month" });
   }
 
-  // check active subscription
-  const activeSubscription = await Subscription.findOne({
-    userId: user._id,
-    isActive: true,
-    endDate: { $gt: new Date() }, // Check if endDate is in the future
-  });
-
-  if (activeSubscription) {
-    await activeSubscription.updateOne({
-      isActive: false,
-    });
-  }
-
   // check balance
   const totalCost = paket.Paket_price * parseInt(month);
   if (user.balance < totalCost) {
@@ -440,10 +427,12 @@ export const subscribePacket = async (req: Request, res: Response) => {
   endDate.setSeconds(59);
 
   //insert subscription
+  const apiKey = await generateApiKey();
   const subscription = new Subscription({
     userId: user._id,
     paketId,
     endDate,
+    apiKey,
     resetAt: new Date(new Date().getTime() + 60 * 1000),
   });
   const newSubscription = await subscription.save();
@@ -454,6 +443,7 @@ export const subscribePacket = async (req: Request, res: Response) => {
 };
 
 export const renewSubscription = async (req: Request, res: Response) => {
+  const { apiKey } = req.query;
   const { month } = req.body;
   const user = (req as any).user;
 
@@ -463,17 +453,27 @@ export const renewSubscription = async (req: Request, res: Response) => {
       .json({ message: "Invalid number of months" });
   }
 
+  if (typeof apiKey !== 'string') {
+    return res.status(400).json({ error: 'Invalid API key format' });
+  }
+
   // Check active subscription
   const activeSubscription = await Subscription.findOne({
     userId: user._id,
-    isActive: true,
-    endDate: { $gt: new Date() }, // Check if endDate is in the future
+    apiKey: apiKey,
   });
 
   if (!activeSubscription) {
     return res
-      .status(RESPONSE_STATUS.BAD_REQUEST)
+      .status(RESPONSE_STATUS.NOT_FOUND)
       .json({ message: "No active subscription found" });
+  }
+
+  if (!activeSubscription.isActive || activeSubscription.endDate < new Date()) {
+    await activeSubscription.updateOne({
+      isActive: false
+    });
+    return res.status(RESPONSE_STATUS.BAD_REQUEST).json({ msg: "Your subscription has expired" });
   }
 
   if (activeSubscription.paketId == "PAK001") {
