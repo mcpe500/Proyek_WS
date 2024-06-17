@@ -36,6 +36,7 @@ import getGoalByTitle from "./paths/user/plan/exercise/goals/getGoalByTitle";
 import getNearestGyms from "./paths/location/getNearestGyms";
 import getProfilePicture from "./paths/user/getProfilePicture";
 import getUserProfilePicture from "./paths/admin/getUserProfilePicture";
+import topupFromAdmin from "./paths/admin/topupFromAdmin";
 
 const { window } = new JSDOM();
 const $ = require("jquery")(window);
@@ -75,6 +76,7 @@ paths["/api/v1/admin/dashboard"] = adminDashboard; // GET
 paths["/api/v1/admin/user/profile/{userID}"] = getAndDeleteUserProfile; // GET and DELETE
 paths["/api/v1/admin/user/profile-picture/{userID}"] = getUserProfilePicture; // GET and DELETE
 paths["/api/v1/admin/user/packet/{userID}"] = getAndPostAndDeletePacket; // GET and POST and DELETE
+paths["/api/v1/admin/user/topup/{userID}"] = topupFromAdmin;
 
 paths["/api/v1/gyms/nearest"] = getNearestGyms;
 // paths["/api/v1/admin/dashboard"] = {}

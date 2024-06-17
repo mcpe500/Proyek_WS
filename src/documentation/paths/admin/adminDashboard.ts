@@ -17,9 +17,15 @@ export default {
             schema: {
               type: "object",
               properties: {
-                data: {
-                  type: "object",
+                total_user: {
+                  type: "number"
                 },
+                free_package_user:{
+                  type: "number"
+                },
+                non_free_package_user:{
+                  type: "number"
+                }
               },
             },
           },

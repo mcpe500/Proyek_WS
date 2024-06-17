@@ -31,6 +31,7 @@ import {
   ITransactionSubscriptionDetail,
   ITransationHeaderAdmin,
 } from "../contracts/dto/TransactionRelated.dto";
+import { topupSchema } from "../validators/Topup.validate";
 
 // const UserSchema: Schema = new Schema({
 //   fullName: { type: String, required: true },
@@ -817,18 +818,20 @@ export const addExercise = async (req: Request, res: Response) => {
 export const topupFromAdmin = async (req: Request, res: Response) => {
   const { userID } = req.params;
   const { saldo } = req.body;
-
-  if (userID) {
-    const user = await User.findOne({ _id: userID });
-    if (!user)
-      return res
-        .status(RESPONSE_STATUS.NOT_FOUND)
-        .json({ msg: "User not found" });
-    if (user.role == "ADMIN")
-      return res
-        .status(RESPONSE_STATUS.BAD_REQUEST)
-        .json({ msg: "User is admin" });
-    await User.updateOne({ _id: userID }, { $inc: { balance: saldo } });
+  try {
+    const schema = topupSchema;
+    await schema.validateAsync({saldo});
+  } catch (error) {
+    if (error instanceof Error) {
+      return res.status(RESPONSE_STATUS.BAD_REQUEST).json({ msg: error.message });
+    }
+    return res.status(RESPONSE_STATUS.INTERNAL_SERVER_ERROR).json({ msg: 'Validation error' });
+  }
+    if(userID){
+        const user = await User.findOne({ _id: userID });
+        if(!user)  return res.status(RESPONSE_STATUS.NOT_FOUND).json({ msg: 'User not found'});
+        if(user.role == "ADMIN") return res.status(RESPONSE_STATUS.BAD_REQUEST).json({ msg: 'User is admin'});
+        await User.updateOne({ _id: userID }, { $inc: { balance: saldo } });
 
     return res.status(RESPONSE_STATUS.SUCCESS).json({
       msg: "Balance updated successfully",
