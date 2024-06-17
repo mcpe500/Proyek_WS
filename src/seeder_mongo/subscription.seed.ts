@@ -37,7 +37,7 @@ const createOtherSubscription = async (user: IUser): Promise<ISubscription> => {
     const now = new Date();
     const endDate = new Date(now);
     endDate.setDate(endDate.getDate() + 30); // Set the actual end date based on your business logic
-
+    
     return {
       userId: user._id,
       paketId: paket.Paket_id,
@@ -59,7 +59,7 @@ export const createSubscriptions = async (
   amount: number
 ): Promise<ISubscription[]> => {
   const subscriptions: ISubscription[] = [];
-  const pakets: IPaket[] = await Paket.findAll({});
+  pakets = await Paket.findAll({});
 
   for (const user of verifiedUsers) {
     const freeSubscription = await createFreeSubscription(user);

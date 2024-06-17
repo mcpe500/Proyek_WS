@@ -7,6 +7,15 @@ export default {
     operationId: "getSpecificNews",
     parameters: [
       {
+        name: "apiKey",
+        in: "query",
+        description: "User's API key",
+        required: true,
+        schema: {
+          type: "string",
+        },
+      },
+      {
         name: "title",
         in: "path",
         required: true,

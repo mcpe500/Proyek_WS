@@ -11,6 +11,15 @@ export default {
     ],
     parameters: [
       {
+        name: "apiKey",
+        in: "query",
+        description: "User's API key",
+        required: true,
+        schema: {
+          type: "string",
+        },
+      },
+      {
         name: "id",
         in: "path",
         required: true,

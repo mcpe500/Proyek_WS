@@ -15,12 +15,19 @@ import { RESPONSE_STATUS } from "../contracts/enum/ResponseRelated.enum";
 import { User } from "../models/dynamic/User.model";
 import Paket from "../models/static/Paket.model";
 import { JwtPayload } from "jsonwebtoken";
-import mongoose from "mongoose";
+
 import crypto from "crypto";
 import { Subscription } from "../models/dynamic/Subscription.model";
 import { Exercise } from "../models/dynamic/Exercise.model";
 import { Apis } from "../services/ApiService";
 import { IExercise } from "../contracts/dto/PlansRelated.dto";
+import {
+  TransactionDetailType,
+  TransactionHeaderType,
+} from "../contracts/enum/TransactionRelated.enum";
+import { Transaction } from "../models/dynamic/Transaction.model";
+import { ITransationHeaderAdmin } from "../contracts/dto/TransactionRelated.dto";
+import { ObjectId } from "mongodb";
 
 // const UserSchema: Schema = new Schema({
 //   fullName: { type: String, required: true },
@@ -133,10 +140,10 @@ export const getDashboard = async (req: Request, res: Response) => {
   return res.status(RESPONSE_STATUS.SUCCESS).json({ user: user });
 };
 
-export const getProfPic = async (req: Request, res: Response) => { 
+export const getProfPic = async (req: Request, res: Response) => {
   const user = (req as any).user;
-  return res.sendFile(user.profilePicture, { root: "."});
-}
+  return res.sendFile(user.profilePicture, { root: "." });
+};
 
 export const editProfile = async (req: Request, res: Response) => {
   const {
@@ -313,11 +320,14 @@ export const verifyEmail = async (req: Request, res: Response) => {
 // TODO bikin ini response nya, list of ApiKey dari subscribe yg usernya lagi login (DONE, Hansen)
 export const getApiKey = async (req: Request, res: Response) => {
   const user = (req as any).user;
-  const subscribe = Subscription.findOne({userId: user._id});
+  const subscribe = await Subscription.findOne({ userId: user._id });
+
   try {
     // Jika pengguna ditemukan, kirimkan API key
     if ((subscribe as any).apiKey) {
-      return res.status(RESPONSE_STATUS.SUCCESS).json({ apiKey: (subscribe as any).apiKey });
+      return res
+        .status(RESPONSE_STATUS.SUCCESS)
+        .json({ apiKey: (subscribe as any).apiKey });
     } else {
       return res
         .status(RESPONSE_STATUS.NOT_FOUND)
@@ -340,7 +350,9 @@ export const resetApiKey = async (req: Request, res: Response) => {
       { $set: { apiKey: newApiKey } },
       { new: true, useFindAndModify: false } // Returns the updated document
     );
-    return res.status(RESPONSE_STATUS.SUCCESS).json({ apiKey: (updatedSubscribe as any).apiKey });
+    return res
+      .status(RESPONSE_STATUS.SUCCESS)
+      .json({ apiKey: (updatedSubscribe as any).apiKey });
   } catch (error) {
     return res
       .status(RESPONSE_STATUS.INTERNAL_SERVER_ERROR)
@@ -453,8 +465,8 @@ export const renewSubscription = async (req: Request, res: Response) => {
       .json({ message: "Invalid number of months" });
   }
 
-  if (typeof apiKey !== 'string') {
-    return res.status(400).json({ error: 'Invalid API key format' });
+  if (typeof apiKey !== "string") {
+    return res.status(400).json({ error: "Invalid API key format" });
   }
 
   // Check active subscription
@@ -471,9 +483,11 @@ export const renewSubscription = async (req: Request, res: Response) => {
 
   if (!activeSubscription.isActive || activeSubscription.endDate < new Date()) {
     await activeSubscription.updateOne({
-      isActive: false
+      isActive: false,
     });
-    return res.status(RESPONSE_STATUS.BAD_REQUEST).json({ msg: "Your subscription has expired" });
+    return res
+      .status(RESPONSE_STATUS.BAD_REQUEST)
+      .json({ msg: "Your subscription has expired" });
   }
 
   if (activeSubscription.paketId == "PAK001") {
@@ -597,8 +611,11 @@ export const getUserProfile = async (req: Request, res: Response) => {
 export const getUserProfilePicture = async (req: Request, res: Response) => {
   const { userID } = req.params;
   const user = await User.findOne({ _id: userID });
-  if(!user)  return res.status(RESPONSE_STATUS.NOT_FOUND).json({ msg: 'User not found'})
-  return res.sendFile(user.profilePicture, { root: "."});
+  if (!user)
+    return res
+      .status(RESPONSE_STATUS.NOT_FOUND)
+      .json({ msg: "User not found" });
+  return res.sendFile(user.profilePicture, { root: "." });
 };
 
 export const deleteUserProfile = async (req: Request, res: Response) => {
@@ -652,6 +669,7 @@ export const getUserPacket = async (req: Request, res: Response) => {
 
 export const addUserPacket = async (req: Request, res: Response) => {
   const { userID } = req.params;
+  const admin = (req as any).user;
   const { paket_id } = req.body;
   const user = await User.findOne({ _id: userID });
   if (!user)
@@ -682,6 +700,17 @@ export const addUserPacket = async (req: Request, res: Response) => {
   });
   const newSubscription = await subs.save();
 
+  const transactionHeader: ITransationHeaderAdmin = {
+    transactionHeaderType: TransactionHeaderType.SUBSCRIBE,
+    date: new Date(), // current date make it use best practice
+    total: packet.Paket_price,
+    userId: new ObjectId(userID),
+    adminId: admin._id,
+  };
+  // TODO : Make can do multiple TransactionDetail
+  // const transactionDetails: ITransactionDetailAdmin[] = [];
+  // await Transaction.create({});
+  // TransactionDetailType.ADMIN_SUBSCRIBE
   return res
     .status(RESPONSE_STATUS.CREATED)
     .json({ subscription: newSubscription });
