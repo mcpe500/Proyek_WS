@@ -711,30 +711,48 @@ export const deleteUserPacket = async (req: Request, res: Response) => {
 export const addExercise = async (req: Request, res: Response) => {
   try {
     // Fetch data from external API
-    const exercises: any[] = await Apis.API_NINJA_ApiService.get<any[]>("");
+    // const exercises: any[] = await Apis.API_NINJA_ApiService.get<any[]>("");
+    const { offset, limit_per_ten } = req.query;
 
-    for (const exercise of exercises) {
-      // Check if the exercise already exists in the database
-      const existingExercise = await Exercise.findOne({ name: exercise.name });
+    // Make API call
+    const parsedOffset = Math.floor(Number(offset));
+    const parsedLimit = Math.floor(Number(limit_per_ten));
 
-      // If the exercise does not exist, insert it into the database
-      if (!existingExercise) {
-        const newExercise = new Exercise({
-          name: exercise.name,
-          type: exercise.type,
-          targeted_muscle: exercise.muscle,
-          equipmentRequired: exercise.equipment ? exercise.equipment : "-",
-          description: exercise.instructions,
-        });
-        await newExercise.save();
+    if (isNaN(parsedOffset) || isNaN(parsedLimit) || parsedLimit<0 || parsedOffset <0) {
+      return res
+      .status(RESPONSE_STATUS.BAD_REQUEST)
+      .json({ msg: "Offset and limit must be non-negative integers." });
+    }
+
+    const queryParams: any = {};
+    for (let i = parsedOffset; i < (parsedOffset+parsedLimit); i++) {
+      queryParams.offset = i*10;
+      let exercises: any[] = await Apis.API_NINJA_ApiService.get("", {
+      params: queryParams,
+    });
+      for (const exercise of exercises) {
+        // Check if the exercise already exists in the database
+        const existingExercise = await Exercise.findOne({ name: exercise.name });
+
+        // If the exercise does not exist, insert it into the database
+        if (!existingExercise) {
+          const newExercise = new Exercise({
+            name: exercise.name,
+            type: exercise.type,
+            targeted_muscle: exercise.muscle,
+            equipmentRequired: exercise.equipment ? exercise.equipment : "-",
+            description: exercise.instructions,
+          });
+          await newExercise.save();
+        }
       }
     }
 
-    res
+    return res
       .status(RESPONSE_STATUS.SUCCESS)
       .json({ msg: "Exercises have been added/updated successfully." });
   } catch (error) {
-    res
+    return res
       .status(RESPONSE_STATUS.INTERNAL_SERVER_ERROR)
       .json({ msg: "Exercises added/updated failed." });
   }
