@@ -320,7 +320,8 @@ export const verifyEmail = async (req: Request, res: Response) => {
 // TODO bikin ini response nya, list of ApiKey dari subscribe yg usernya lagi login (DONE, Hansen)
 export const getApiKey = async (req: Request, res: Response) => {
   const user = (req as any).user;
-  const subscribe = Subscription.findOne({ userId: user._id });
+  const subscribe = await Subscription.findOne({ userId: user._id });
+
   try {
     // Jika pengguna ditemukan, kirimkan API key
     if ((subscribe as any).apiKey) {
