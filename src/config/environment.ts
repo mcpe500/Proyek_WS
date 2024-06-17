@@ -5,7 +5,7 @@ dotenv.config();
 
 export const ENV: EnvironmentStructure = {
   PORT: parseInt(process.env.PORT || "3000"),
-  BACKEND_API_URL: process.env.BACKEND_API_URL ?? "",
+  BACKEND_API_URL: process.env.BACKEND_API_URL ?? "", 
   SECRET_KEY: process.env.SECRET_KEY ?? "",
   REFRESH_TOKEN_SECRET: process.env.REFRESH_TOKEN_SECRET ?? "",
   ACCESS_TOKEN_SECRET: process.env.ACCESS_TOKEN_SECRET ?? "",
