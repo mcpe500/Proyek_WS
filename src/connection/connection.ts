@@ -1,6 +1,5 @@
 import mongoose, { ConnectOptions } from "mongoose";
 import { ENV } from "../config/environment";
-import { Sequelize } from "sequelize";
 
 const connectMongoDB = async (): Promise<void> => {
   try {
@@ -10,5 +9,13 @@ const connectMongoDB = async (): Promise<void> => {
     console.error(err.message);
   }
 };
+const closeMongoDB = async (): Promise<void> => {
+  try {
+    await mongoose.connection.close();
+    console.log("MongoDB connection closed...");
+  } catch (err: any) {
+    console.error(err.message);
+  }
+};
 
-export default connectMongoDB;
+export { connectMongoDB, closeMongoDB };
