@@ -22,11 +22,11 @@ const TransactionSchema: Schema = new Schema({
     },
     userId: {
       type: Schema.Types.ObjectId,
-      required: true,
+      required: false,
     },
-    isAdmin: {
-      type: Boolean,
-      required: true,
+    adminId: {
+      type: Schema.Types.ObjectId,
+      required: false,
     },
   },
   details: [

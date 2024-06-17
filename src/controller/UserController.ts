@@ -608,6 +608,8 @@ export const adminDashboard = async (req: Request, res: Response) => {
     role: { $ne: "ADMIN" },
     isEmailVerified: true,
   }).exec();
+  const transactions = await Transaction.find({ header: { adminId: null}});
+  const totalTransactionAmount = transactions == null ? 0 : transactions.reduce((acc, transaction) => acc + transaction.header.total, 0);
   const subscription = await Subscription.find({ isActive: true }).exec();
   return res.status(RESPONSE_STATUS.SUCCESS).json({
     total_user: users.length,
@@ -616,6 +618,7 @@ export const adminDashboard = async (req: Request, res: Response) => {
     non_free_package_user: subscription.filter(
       (item) => item.paketId != "PAK001"
     ).length,
+    total_transaction_amount: totalTransactionAmount,
   });
 };
 

@@ -15,7 +15,7 @@ export interface ITransationHeaderAdmin {
   date: Date;
   total: number;
   userId: Types.ObjectId;
-  adminId: boolean;
+  adminId: Types.ObjectId;
 }
 
 export interface ITransactionSubscriptionDetail {
