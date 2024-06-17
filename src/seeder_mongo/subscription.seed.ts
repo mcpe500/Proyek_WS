@@ -1,43 +1,52 @@
 import { faker } from "@faker-js/faker";
-import {
-  generateApiKey,
-  generateEmailVerificationToken,
-  hashPassword,
-} from "../utils/AuthUtils";
 import { IUser } from "../contracts/dto/UserRelated.dto";
 import { ISubscription } from "../contracts/dto/SubscriptionRelated.dto";
+import { generateApiKey } from "../utils/AuthUtils";
+import Paket from "../models/static/Paket.model";
 
-const createFreeSubscriptions = async (verifiedUsers: IUser[]) => {
+const FREE_PACKAGE_ID = "free";
+const FREE_API_HITS = 1000;
+Paket.findOne({ where: { Paket_id: "PAK001" } });
+
+const createFreeSubscription = async (user: IUser): Promise<ISubscription> => {
+  const apiKey = await generateApiKey();
+  const now = new Date();
+  const endDate = new Date(now);
+  endDate.setDate(endDate.getDate() + 30);
+
+  return {
+    userId: user._id,
+    paketId: FREE_PACKAGE_ID,
+    apiHit: FREE_API_HITS,
+    startDate: now,
+    endDate: endDate,
+    isActive: true,
+    apiKey,
+    resetAt: now,
+  } as ISubscription;
+};
+
+export const createSubscriptions = async (
+  verifiedUsers: IUser[],
+  amount: number
+): Promise<ISubscription[]> => {
   const subscriptions: ISubscription[] = [];
-  for (let i = 0; i < verifiedUsers.length; i++) {
-    const subscription: ISubscription = {
-      userId: verifiedUsers[i]._id,
-      paketId: "free",
-      apiHit: 1000,
-      startDate: new Date(),
-      endDate: new Date(),
-      isActive: true,
-      apiKey: await generateApiKey(),
-      resetAt: new Date(),
-    };
-    subscriptions.push(subscription);
+
+  for (const user of verifiedUsers) {
+    const freeSubscription = await createFreeSubscription(user);
+    subscriptions.push(freeSubscription);
   }
+
+  for (let i = 0; i < amount; i++) {}
+
+  // Add logic to create additional subscriptions (if needed)
 
   return subscriptions;
 };
-const createSubscription = async (amount: number) => {};
 
-export async function createSubscriptions(
-  verifiedUsers: IUser[],
-  amount: number
-) {
-  const subscriptions: ISubscription[] = [];
-  await createFreeSubscriptions(verifiedUsers);
+// Example usage:
+// const verifiedUsers: IUser[] = []; // Your verified users
+// const amount = 10; // Number of additional subscriptions
 
-  for (let i = 0; i < amount; i++) {
-    // const subscription = await createSubscription(verifiedUsers, amount);
-    // subscriptions.push(subscription);
-  }
-
-  return subscriptions;
-}
+// const allSubscriptions = await createSubscriptions(verifiedUsers, amount);
+// console.log("All Subscriptions:", allSubscriptions);

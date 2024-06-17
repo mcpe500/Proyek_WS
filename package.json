@@ -9,7 +9,7 @@
     "deploy": "node ./output/run.js",
     "dev": "nodemon ./src/run.ts --config nodemon.json",
     "migrate": "npx sequelize-cli db:migrate",
-    "seed": "npx sequelize-cli db:seed:all && node ./src/seeder_mongo/index.seed.ts",
+    "seed": "npx sequelize-cli db:seed:all",
     "seed:mongo": "ts-node ./src/seeder_mongo/index.seed.ts",
     "rollback": "npx sequelize-cli db:migrate:undo:all",
     "seed:undo": "npx sequelize-cli db:seed:undo:all",

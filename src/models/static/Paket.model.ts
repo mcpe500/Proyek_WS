@@ -1,13 +1,15 @@
 // models/Paket.ts
 import { DataTypes, Model } from "sequelize";
 import sequelize from "../../connection/connectionStatic";
+import { IPaket } from "../../contracts/dto/Paket.dto";
 
-class Paket extends Model {
+class Paket extends Model<IPaket> {
   public Paket_id!: number;
   public Paket_name!: string;
   public Paket_description!: string;
   public Paket_Limit!: number;
   public Paket_price!: number;
+  public Paket_price_currency!: string;
 }
 
 Paket.init(
