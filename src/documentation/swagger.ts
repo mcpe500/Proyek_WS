@@ -81,8 +81,9 @@ paths["/api/v1/gyms/nearest"] = getNearestGyms;
 const swaggerDocument = {
   openapi: "3.0.0",
   info: {
-    title: "Your API Title",
-    description: "",
+    title: "We Fit",
+    description:
+      "We Fit is a fitness-oriented web service that helps users find nearby gyms, track their workouts, and stay motivated on their fitness journey. Whether you’re a seasoned athlete or just starting out, We Fit provides a seamless experience to help you achieve your fitness goals.",
     version: "1.0.0",
   },
   components: {

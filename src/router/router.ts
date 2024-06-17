@@ -61,7 +61,10 @@ import {
   cancelExercisePlanByUser,
 } from "../controller/UserPlanController";
 import { createUserPlanSchemaJoi } from "../validators/Plans.validate";
-import { checkAndIncreaseAPIHit, checkAPIKey } from "../middleware/BusinessMiddleware";
+import {
+  checkAndIncreaseAPIHit,
+  checkAPIKey,
+} from "../middleware/BusinessMiddleware";
 import { getFilteredNews, getSpecificNews } from "../controller/NewsController";
 import { getNearestGyms } from "../controller/GymsController";
 import { getGymsSchema } from "../validators/Maps.validate";
@@ -140,10 +143,14 @@ router.put(
 
 // User Routes
 router.put("/users/topup", [validateAccessToken, validateIsNotAdmin], topup);
-router.get("/users/dashboard", [validateAccessToken, validateIsNotAdmin], getDashboard);
+router.get(
+  "/users/dashboard",
+  [validateAccessToken, validateIsNotAdmin],
+  getDashboard
+);
 router.put(
   "/users/profile",
-  [ 
+  [
     validateBody(editProfileSchemaJoi), // Check if this works or not (Hansen)
     validateAccessToken,
     validateIsNotAdmin,
@@ -151,14 +158,26 @@ router.put(
   ],
   editProfile
 );
-router.get("/users/apikey", [validateAccessToken, validateIsNotAdmin], getApiKey);
+router.get(
+  "/users/apikey",
+  [validateAccessToken, validateIsNotAdmin],
+  getApiKey
+);
 router.put(
   "/users/apikey/reset",
   [validateAccessToken, validateIsNotAdmin, checkAndIncreaseAPIHit(1)],
   resetApiKey
+); // TODO : bikin ini pake ApiKey (Hansen)
+router.post(
+  "/users/subscribe",
+  [validateAccessToken, validateIsNotAdmin],
+  subscribePacket
 );
-router.post("/users/subscribe", [validateAccessToken, validateIsNotAdmin], subscribePacket);
-router.put("/users/renew", [validateAccessToken, validateIsNotAdmin], renewSubscription);
+router.put(
+  "/users/renew",
+  [validateAccessToken, validateIsNotAdmin],
+  renewSubscription
+);
 router.post(
   "/users/plan",
   [
@@ -168,44 +187,44 @@ router.post(
     checkAndIncreaseAPIHit(1),
   ],
   createExercisePlan
-);
+); // TODO : bikin ini pake ApiKey (Hansen)
 router.get(
   "/users/plan",
   [validateAccessToken, validateIsNotAdmin, checkAndIncreaseAPIHit(1)],
   getAllExercisePlanByUser
-);
+); // TODO : bikin ini pake ApiKey (Hansen)
 router.get(
   "/users/plan/:id",
   [validateAccessToken, validateIsNotAdmin, checkAndIncreaseAPIHit(1)],
   getExercisePlanDetailByUser
-);
+); // TODO : bikin ini pake ApiKey (Hansen)
 
 // Exercise Plan Routes
 router.put(
   "/users/plan/edit/:id",
   [validateAccessToken, validateIsNotAdmin, checkAndIncreaseAPIHit(1)],
   editExercisePlan
-);
+); // TODO : bikin ini pake ApiKey (Hansen)
 router.post(
   "/users/plan/start/:id",
   [validateAccessToken, validateIsNotAdmin, checkAndIncreaseAPIHit(1)],
   startExercisePlan
-);
+); // TODO : bikin ini pake ApiKey (Hansen)
 router.put(
   "/users/plan/:id/workout/",
   [validateAccessToken, validateIsNotAdmin, checkAndIncreaseAPIHit(1)],
   addWorkoutToExercisePlan
-);
+); // TODO : bikin ini pake ApiKey (Hansen)
 router.get(
   "/users/plan/:id/workout/",
   [validateAccessToken, validateIsNotAdmin, checkAndIncreaseAPIHit(1)],
   exercisePlanDetails
-);
+); // TODO : bikin ini pake ApiKey (Hansen)
 router.post(
   "/users/plan/complete/:id",
   [validateAccessToken, validateIsNotAdmin, checkAndIncreaseAPIHit(1)],
   completeExercisePlan
-);
+); // TODO : bikin ini pake ApiKey (Hansen)
 router.put(
   "/users/plan/cancel/:id",
   [validateAccessToken, validateIsNotAdmin],
@@ -226,12 +245,12 @@ router.get(
   "/news",
   [validateAccessToken, checkAndIncreaseAPIHit(1)],
   getFilteredNews
-);
+); // TODO : bikin ini pake ApiKey (Hansen)
 router.get(
   "/news/:title",
   [validateAccessToken, checkAndIncreaseAPIHit(1)],
   getSpecificNews
-);
+); // TODO : bikin ini pake ApiKey (Hansen)
 
 // Maps Routes
 router.get(
@@ -239,6 +258,6 @@ router.get(
   validateAccessToken,
   validateQuery(getGymsSchema),
   getNearestGyms
-);
+);// TODO : bikin ini pake ApiKey (Hansen) sama nambah ApiHit
 
 export default router;

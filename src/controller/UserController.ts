@@ -147,7 +147,7 @@ export const editProfile = async (req: Request, res: Response) => {
   } = req.body;
   const user = (req as any).user;
   // console.log(user);
-  
+
   if (!user) {
     return res
       .status(RESPONSE_STATUS.NOT_FOUND)
@@ -185,7 +185,8 @@ export const editProfile = async (req: Request, res: Response) => {
   if (gender && gender != "") user.gender = gender;
   if (height && height != "") user.height = height;
   if (weight && weight != "") user.weight = weight;
-  if (healthInformation && healthInformation != "") user.healthInformation = healthInformation;
+  if (healthInformation && healthInformation != "")
+    user.healthInformation = healthInformation;
   if (req.file) user.profilePicture = req.file.path;
 
   // Save the updated user
@@ -275,10 +276,11 @@ export const verifyEmail = async (req: Request, res: Response) => {
         .status(RESPONSE_STATUS.NOT_FOUND)
         .json({ message: "User not found" });
     }
+    // TODO : (Make sure it works)Bikin ngasi ApiKey waktu subscribe, sama Api Key masuk ke subscription udh bukan di user
     let apiKey = "";
     while (true) {
       apiKey = crypto.randomBytes(32).toString("hex");
-      const temp = await User.findOne({
+      const temp = await Subscription.findOne({
         apiKey: apiKey,
       });
       if (!temp) break;
@@ -286,7 +288,6 @@ export const verifyEmail = async (req: Request, res: Response) => {
     await user.updateOne({
       isEmailVerified: true,
       emailVerificationToken: null,
-      apiKey,
     });
 
     const subscription = new Subscription({
@@ -294,6 +295,7 @@ export const verifyEmail = async (req: Request, res: Response) => {
       paketId: "PAK001",
       endDate: new Date("9999-12-31T23:59:59.999Z"),
       resetAt: new Date(new Date().getTime() + 60 * 1000),
+      apiKey: apiKey,
     });
     await subscription.save();
 
@@ -308,6 +310,7 @@ export const verifyEmail = async (req: Request, res: Response) => {
   }
 };
 
+// TODO bikin ini response nya, list of ApiKey dari subscribe yg usernya lagi login
 export const getApiKey = async (req: Request, res: Response) => {
   const user = (req as any).user;
   try {
@@ -326,6 +329,7 @@ export const getApiKey = async (req: Request, res: Response) => {
   }
 };
 
+// TODO bikin ini supaya ngereset apikey dari subscription
 export const resetApiKey = async (req: Request, res: Response) => {
   const user = (req as any).user;
   try {
@@ -349,7 +353,7 @@ export const resetApiKey = async (req: Request, res: Response) => {
 export const topup = async (req: Request, res: Response) => {
   const { amount } = req.body;
   const user = (req as any).user;
-  
+
   if (!amount || amount <= 0) {
     return res
       .status(RESPONSE_STATUS.BAD_REQUEST)
@@ -370,6 +374,8 @@ export const topup = async (req: Request, res: Response) => {
   }
 };
 
+
+// TODO bikin ini supaya ada api key nya
 export const subscribePacket = async (req: Request, res: Response) => {
   const { paketId, month } = req.body;
   const user = (req as any).user;
@@ -441,7 +447,7 @@ export const subscribePacket = async (req: Request, res: Response) => {
     userId: user._id,
     paketId,
     endDate,
-    resetAt: new Date(new Date().getTime() + 60 * 1000)
+    resetAt: new Date(new Date().getTime() + 60 * 1000),
   });
   const newSubscription = await subscription.save();
 
@@ -468,12 +474,14 @@ export const renewSubscription = async (req: Request, res: Response) => {
   });
 
   if (!activeSubscription) {
-    return res.status(RESPONSE_STATUS.BAD_REQUEST)
+    return res
+      .status(RESPONSE_STATUS.BAD_REQUEST)
       .json({ message: "No active subscription found" });
   }
 
   if (activeSubscription.paketId == "PAK001") {
-    return res.status(RESPONSE_STATUS.BAD_REQUEST)
+    return res
+      .status(RESPONSE_STATUS.BAD_REQUEST)
       .json({ message: "This paket can't be renewed" });
   }
 
@@ -484,14 +492,16 @@ export const renewSubscription = async (req: Request, res: Response) => {
   });
 
   if (!paket) {
-    return res.status(RESPONSE_STATUS.BAD_REQUEST)
+    return res
+      .status(RESPONSE_STATUS.BAD_REQUEST)
       .json({ message: "Invalid paket" });
   }
 
   // Check balance
   const totalCost = paket.Paket_price * parseInt(month);
   if (user.balance < totalCost) {
-    return res.status(RESPONSE_STATUS.BAD_REQUEST)
+    return res
+      .status(RESPONSE_STATUS.BAD_REQUEST)
       .json({ message: "Not enough balance! Please top up first" });
   }
 
@@ -500,7 +510,8 @@ export const renewSubscription = async (req: Request, res: Response) => {
     user.balance -= totalCost;
     await user.save();
   } catch (error) {
-    return res.status(RESPONSE_STATUS.INTERNAL_SERVER_ERROR)
+    return res
+      .status(RESPONSE_STATUS.INTERNAL_SERVER_ERROR)
       .json({ message: "Internal server error" });
   }
 
@@ -513,15 +524,15 @@ export const renewSubscription = async (req: Request, res: Response) => {
   try {
     await activeSubscription.save();
   } catch (error) {
-    return res.status(RESPONSE_STATUS.INTERNAL_SERVER_ERROR)
+    return res
+      .status(RESPONSE_STATUS.INTERNAL_SERVER_ERROR)
       .json({ message: "Failed to update subscription" });
   }
 
   return res
     .status(RESPONSE_STATUS.SUCCESS)
     .json({ subscription: activeSubscription });
-}
-
+};
 
 //admin
 export const getAllUser = async (req: Request, res: Response) => {
@@ -530,16 +541,16 @@ export const getAllUser = async (req: Request, res: Response) => {
   // Construct the query object
   const query: any = {};
 
-  if (typeof username === 'string') {
+  if (typeof username === "string") {
     query.username = { $regex: new RegExp(username) }; // Case-sensitive
   }
-  if (typeof email === 'string') {
+  if (typeof email === "string") {
     query.email = { $regex: new RegExp(email) }; // Case-sensitive
   }
-  if (typeof fullName === 'string') {
+  if (typeof fullName === "string") {
     query.fullName = { $regex: new RegExp(fullName) }; // Case-sensitive
   }
-  if (typeof role === 'string') {
+  if (typeof role === "string") {
     query.role = role;
   }
 
@@ -547,10 +558,11 @@ export const getAllUser = async (req: Request, res: Response) => {
     const users = await User.find(query);
     return res.status(RESPONSE_STATUS.SUCCESS).json({ users });
   } catch (error) {
-    return res.status(RESPONSE_STATUS.INTERNAL_SERVER_ERROR).json({ message: "Failed to fetch users" });
+    return res
+      .status(RESPONSE_STATUS.INTERNAL_SERVER_ERROR)
+      .json({ message: "Failed to fetch users" });
   }
 };
-
 
 export const getUser = async (req: Request, res: Response) => {
   const { id } = req.params;
@@ -572,92 +584,143 @@ export const getUser = async (req: Request, res: Response) => {
 };
 
 export const adminDashboard = async (req: Request, res: Response) => {
-    // const { user } = req as any; // TODO : CHECK IF NECESSARY
-    const users = await User.find({ role: { $ne: "ADMIN" }, isEmailVerified: true }).exec();
-    const subscription = await Subscription.find({ isActive: true }).exec();
-    return res.status(RESPONSE_STATUS.SUCCESS).json({ 
-      total_user: users.length,
-      free_package_user: subscription.filter((item) => item.paketId == "PAK001").length,
-      non_free_package_user: subscription.filter((item) => item.paketId != "PAK001").length
-    })
+  // const { user } = req as any; // TODO : CHECK IF NECESSARY
+  const users = await User.find({
+    role: { $ne: "ADMIN" },
+    isEmailVerified: true,
+  }).exec();
+  const subscription = await Subscription.find({ isActive: true }).exec();
+  return res.status(RESPONSE_STATUS.SUCCESS).json({
+    total_user: users.length,
+    free_package_user: subscription.filter((item) => item.paketId == "PAK001")
+      .length,
+    non_free_package_user: subscription.filter(
+      (item) => item.paketId != "PAK001"
+    ).length,
+  });
 };
 
 export const getUserProfile = async (req: Request, res: Response) => {
-    const { userID } = req.params;
-    const user = await User.findOne({ _id: userID });
-    if(!user)  return res.status(RESPONSE_STATUS.NOT_FOUND).json({ msg: 'User not found'})
-    return res.status(RESPONSE_STATUS.SUCCESS).json({ 
-      username: user.username,
-      full_name: user.fullName,
-      email: user.email,
-      phone: user.phone,
-      balance: user.balance,
-    })
+  const { userID } = req.params;
+  const user = await User.findOne({ _id: userID });
+  if (!user)
+    return res
+      .status(RESPONSE_STATUS.NOT_FOUND)
+      .json({ msg: "User not found" });
+  return res.status(RESPONSE_STATUS.SUCCESS).json({
+    username: user.username,
+    full_name: user.fullName,
+    email: user.email,
+    phone: user.phone,
+    balance: user.balance,
+  });
 };
 
 export const deleteUserProfile = async (req: Request, res: Response) => {
-    const { userID } = req.params;
-    const user = await User.findOne({ _id: userID });
-    if(!user)  return res.status(RESPONSE_STATUS.NOT_FOUND).json({ msg: 'User not found'})
-    const subscription = await Subscription.findOne({ userId: userID, isActive: true });
-    if(subscription) await subscription.updateOne({ isActive: false });
-    await User.deleteOne({_id: user._id});
-    return res.status(RESPONSE_STATUS.SUCCESS).json({ msg: `User "${user.username}" deleted successfully` });
+  const { userID } = req.params;
+  const user = await User.findOne({ _id: userID });
+  if (!user)
+    return res
+      .status(RESPONSE_STATUS.NOT_FOUND)
+      .json({ msg: "User not found" });
+  const subscription = await Subscription.findOne({
+    userId: userID,
+    isActive: true,
+  });
+  if (subscription) await subscription.updateOne({ isActive: false });
+  await User.deleteOne({ _id: user._id });
+  return res
+    .status(RESPONSE_STATUS.SUCCESS)
+    .json({ msg: `User "${user.username}" deleted successfully` });
 };
 
 export const getUserPacket = async (req: Request, res: Response) => {
-    const { userID } = req.params;
-    const user = await User.findOne({ _id: userID });
-    if(!user) return res.status(RESPONSE_STATUS.NOT_FOUND).json({ msg: 'User not found'});
-    const subscription = await Subscription.findOne({ userId: userID, isActive: true });
-    if(!subscription) return res.status(RESPONSE_STATUS.NOT_FOUND).json({ msg: "User doesn't have any subscription" });
-    const packet = await Paket.findOne({ where: {Paket_id: subscription.paketId} });
-    if(!packet) return res.status(RESPONSE_STATUS.NOT_FOUND).json({ msg: 'Packet not found'});
-    return res.status(RESPONSE_STATUS.SUCCESS).json({ 
-        username: user.username,
-        nama: user.fullName,
-        subscription_start: subscription.startDate,
-        subscription_end: subscription.endDate,
-        packet:packet
-    });
+  const { userID } = req.params;
+  const user = await User.findOne({ _id: userID });
+  if (!user)
+    return res
+      .status(RESPONSE_STATUS.NOT_FOUND)
+      .json({ msg: "User not found" });
+  const subscription = await Subscription.findOne({
+    userId: userID,
+    isActive: true,
+  });
+  if (!subscription)
+    return res
+      .status(RESPONSE_STATUS.NOT_FOUND)
+      .json({ msg: "User doesn't have any subscription" });
+  const packet = await Paket.findOne({
+    where: { Paket_id: subscription.paketId },
+  });
+  if (!packet)
+    return res
+      .status(RESPONSE_STATUS.NOT_FOUND)
+      .json({ msg: "Packet not found" });
+  return res.status(RESPONSE_STATUS.SUCCESS).json({
+    username: user.username,
+    nama: user.fullName,
+    subscription_start: subscription.startDate,
+    subscription_end: subscription.endDate,
+    packet: packet,
+  });
 };
 
 export const addUserPacket = async (req: Request, res: Response) => {
-    const { userID } = req.params;
-    const { paket_id } = req.body;
-    const user = await User.findOne({ _id: userID });
-    if(!user)  return res.status(RESPONSE_STATUS.NOT_FOUND).json({ msg: 'User not found'});
-    const subscription = await Subscription.findOne({ userId: userID, isActive: true });
-    if(subscription) await subscription.updateOne({ isActive: false });
-    let endDate = new Date();
-    endDate.setMonth(endDate.getMonth() + 1);
-    endDate.setDate(endDate.getDate() - 1);
-    endDate.setHours(23);
-    endDate.setMinutes(59);
-    endDate.setSeconds(59);
-    const packet = await Paket.findOne({ where: {Paket_id: paket_id } });
-    if(!packet) return res.status(RESPONSE_STATUS.NOT_FOUND).json({ msg: 'Packet not found'});
-    const subs = new Subscription({
-        userId: user._id,
-        paketId: packet.Paket_id,
-        apiHit: packet.Paket_Limit,
-        endDate,
-      });
-      const newSubscription = await subs.save();
-    
-      return res
-        .status(RESPONSE_STATUS.CREATED)
-        .json({ subscription: newSubscription });
+  const { userID } = req.params;
+  const { paket_id } = req.body;
+  const user = await User.findOne({ _id: userID });
+  if (!user)
+    return res
+      .status(RESPONSE_STATUS.NOT_FOUND)
+      .json({ msg: "User not found" });
+  const subscription = await Subscription.findOne({
+    userId: userID,
+    isActive: true,
+  });
+  if (subscription) await subscription.updateOne({ isActive: false });
+  let endDate = new Date();
+  endDate.setMonth(endDate.getMonth() + 1);
+  endDate.setDate(endDate.getDate() - 1);
+  endDate.setHours(23);
+  endDate.setMinutes(59);
+  endDate.setSeconds(59);
+  const packet = await Paket.findOne({ where: { Paket_id: paket_id } });
+  if (!packet)
+    return res
+      .status(RESPONSE_STATUS.NOT_FOUND)
+      .json({ msg: "Packet not found" });
+  const subs = new Subscription({
+    userId: user._id,
+    paketId: packet.Paket_id,
+    apiHit: packet.Paket_Limit,
+    endDate,
+  });
+  const newSubscription = await subs.save();
+
+  return res
+    .status(RESPONSE_STATUS.CREATED)
+    .json({ subscription: newSubscription });
 };
 
 export const deleteUserPacket = async (req: Request, res: Response) => {
-    const { userID } = req.params;
-    const user = await User.findOne({ _id: userID });
-    if(!user)  return res.status(RESPONSE_STATUS.NOT_FOUND).json({ msg: 'User not found'});
-    const subscription = await Subscription.findOne({ userId: userID, isActive: true });
-    if(!subscription) return res.status(RESPONSE_STATUS.NOT_FOUND).json({ msg: "User doesn't have any subscription" });
-    await subscription.updateOne({ isActive: false });
-    return res.status(RESPONSE_STATUS.SUCCESS).json({ msg: "Subscription deleted successfully" });
+  const { userID } = req.params;
+  const user = await User.findOne({ _id: userID });
+  if (!user)
+    return res
+      .status(RESPONSE_STATUS.NOT_FOUND)
+      .json({ msg: "User not found" });
+  const subscription = await Subscription.findOne({
+    userId: userID,
+    isActive: true,
+  });
+  if (!subscription)
+    return res
+      .status(RESPONSE_STATUS.NOT_FOUND)
+      .json({ msg: "User doesn't have any subscription" });
+  await subscription.updateOne({ isActive: false });
+  return res
+    .status(RESPONSE_STATUS.SUCCESS)
+    .json({ msg: "Subscription deleted successfully" });
 };
 
 export const addExercise = async (req: Request, res: Response) => {
@@ -696,21 +759,31 @@ export const topupFromAdmin = async (req: Request, res: Response) => {
   const { userID } = req.params;
   const { saldo } = req.body;
 
-    if(userID){
-        const user = await User.findOne({ _id: userID });
-        if(!user)  return res.status(RESPONSE_STATUS.NOT_FOUND).json({ msg: 'User not found'});
-        if(user.role == "ADMIN") return res.status(RESPONSE_STATUS.BAD_REQUEST).json({ msg: 'User is admin'});
-        await User.updateOne({ _id: userID }, { $inc: { balance: saldo } });
+  if (userID) {
+    const user = await User.findOne({ _id: userID });
+    if (!user)
+      return res
+        .status(RESPONSE_STATUS.NOT_FOUND)
+        .json({ msg: "User not found" });
+    if (user.role == "ADMIN")
+      return res
+        .status(RESPONSE_STATUS.BAD_REQUEST)
+        .json({ msg: "User is admin" });
+    await User.updateOne({ _id: userID }, { $inc: { balance: saldo } });
 
-        return res.status(RESPONSE_STATUS.SUCCESS).json({ 
-            msg: 'Balance updated successfully', 
-            username: user.username, 
-            full_name: user.fullName, 
-            newBalance: user.balance + parseInt(saldo)
-        });
-    }   
-    else{
-        const users = await User.updateMany({ role: { $ne: "ADMIN" } }, { $inc: { balance: saldo } });
-        return res.status(RESPONSE_STATUS.SUCCESS).json({ msg: 'Balance updated for all users successfully' });
-    }
+    return res.status(RESPONSE_STATUS.SUCCESS).json({
+      msg: "Balance updated successfully",
+      username: user.username,
+      full_name: user.fullName,
+      newBalance: user.balance + parseInt(saldo),
+    });
+  } else {
+    const users = await User.updateMany(
+      { role: { $ne: "ADMIN" } },
+      { $inc: { balance: saldo } }
+    );
+    return res
+      .status(RESPONSE_STATUS.SUCCESS)
+      .json({ msg: "Balance updated for all users successfully" });
+  }
 };
