@@ -11,6 +11,17 @@ export default {
         bearerAuth: [],
       },
     ],
+    parameters: [
+      {
+        name: "apiKey",
+        in: "query",
+        description: "User's API key",
+        required: true,
+        schema: {
+          type: "string",
+        },
+      },
+    ],
     responses: {
       "200": {
         description: "User plans retrieved successfully",
@@ -67,6 +78,17 @@ export default {
     security: [
       {
         bearerAuth: [],
+      },
+    ],
+    parameters: [
+      {
+        name: "apiKey",
+        in: "query",
+        description: "User's API key",
+        required: true,
+        schema: {
+          type: "string",
+        },
       },
     ],
     requestBody: {

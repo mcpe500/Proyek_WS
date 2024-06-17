@@ -8,6 +8,17 @@ export default {
       },
     ],
     tags: ["users"],
+    parameters: [
+      {
+        name: "apiKey",
+        in: "query",
+        description: "User's API key",
+        required: true,
+        schema: {
+          type: "string",
+        },
+      },
+    ],
     responses: {
       "200": {
         description: "Successful response with new API key data",
