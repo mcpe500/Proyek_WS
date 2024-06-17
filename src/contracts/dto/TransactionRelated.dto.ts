@@ -4,12 +4,18 @@ import {
   TransactionHeaderType,
 } from "../enum/TransactionRelated.enum";
 
-export interface ITransationHeader {
+export interface ITransationHeaderUser {
   transactionHeaderType: TransactionHeaderType;
   date: Date;
   total: number;
   userId: Types.ObjectId;
-  isAdmin: boolean;
+}
+export interface ITransationHeaderAdmin {
+  transactionHeaderType: TransactionHeaderType;
+  date: Date;
+  total: number;
+  userId: Types.ObjectId;
+  adminId: boolean;
 }
 
 export interface ITransactionSubscriptionDetail {
@@ -27,6 +33,6 @@ export interface ITransactionTopUpDetail {
   message: string;
 }
 export interface ITransaction {
-  header: ITransationHeader;
+  header: ITransationHeaderUser | ITransationHeaderAdmin;
   details: ITransactionSubscriptionDetail[] | ITransactionTopUpDetail[];
 }

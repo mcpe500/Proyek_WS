@@ -15,7 +15,7 @@ import { RESPONSE_STATUS } from "../contracts/enum/ResponseRelated.enum";
 import { User } from "../models/dynamic/User.model";
 import Paket from "../models/static/Paket.model";
 import { JwtPayload } from "jsonwebtoken";
-import mongoose from "mongoose";
+
 import crypto from "crypto";
 import { Subscription } from "../models/dynamic/Subscription.model";
 import { Exercise } from "../models/dynamic/Exercise.model";
@@ -26,6 +26,8 @@ import {
   TransactionHeaderType,
 } from "../contracts/enum/TransactionRelated.enum";
 import { Transaction } from "../models/dynamic/Transaction.model";
+import { ITransationHeaderAdmin } from "../contracts/dto/TransactionRelated.dto";
+import { ObjectId } from "mongodb";
 
 // const UserSchema: Schema = new Schema({
 //   fullName: { type: String, required: true },
@@ -462,8 +464,8 @@ export const renewSubscription = async (req: Request, res: Response) => {
       .json({ message: "Invalid number of months" });
   }
 
-  if (typeof apiKey !== 'string') {
-    return res.status(400).json({ error: 'Invalid API key format' });
+  if (typeof apiKey !== "string") {
+    return res.status(400).json({ error: "Invalid API key format" });
   }
 
   // Check active subscription
@@ -480,9 +482,11 @@ export const renewSubscription = async (req: Request, res: Response) => {
 
   if (!activeSubscription.isActive || activeSubscription.endDate < new Date()) {
     await activeSubscription.updateOne({
-      isActive: false
+      isActive: false,
     });
-    return res.status(RESPONSE_STATUS.BAD_REQUEST).json({ msg: "Your subscription has expired" });
+    return res
+      .status(RESPONSE_STATUS.BAD_REQUEST)
+      .json({ msg: "Your subscription has expired" });
   }
 
   if (activeSubscription.paketId == "PAK001") {
@@ -664,6 +668,7 @@ export const getUserPacket = async (req: Request, res: Response) => {
 
 export const addUserPacket = async (req: Request, res: Response) => {
   const { userID } = req.params;
+  const admin = (req as any).user;
   const { paket_id } = req.body;
   const user = await User.findOne({ _id: userID });
   if (!user)
@@ -693,7 +698,16 @@ export const addUserPacket = async (req: Request, res: Response) => {
     endDate,
   });
   const newSubscription = await subs.save();
-  // TODO : IVAN WAS HERE
+
+  const transactionHeader: ITransationHeaderAdmin = {
+    transactionHeaderType: TransactionHeaderType.SUBSCRIBE,
+    date: new Date(), // current date make it use best practice
+    total: packet.Paket_price,
+    userId: new ObjectId(userID),
+    adminId: admin._id,
+  };
+  // TODO : Make can do multiple TransactionDetail
+  // const transactionDetails: ITransactionDetailAdmin[] = [];
   // await Transaction.create({});
   // TransactionDetailType.ADMIN_SUBSCRIBE
   return res
