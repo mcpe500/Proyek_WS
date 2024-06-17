@@ -97,6 +97,13 @@ const swaggerDocument = {
         in: "header",
         name: "authorization",
       },
+      apiKeyAuth: {
+        type: "http",
+        // scheme: "bearer",
+        // bearerFormat: "JWT",
+        in: "query",
+        name: "x-api-key",
+      },
       cookieAuth: {
         type: "apiKey",
         in: "cookie",
