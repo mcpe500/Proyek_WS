@@ -26,7 +26,7 @@ const TransactionSchema: Schema = new Schema({
     },
     adminId: {
       type: Schema.Types.ObjectId,
-      required: true,
+      required: false,
     },
   },
   details: [
