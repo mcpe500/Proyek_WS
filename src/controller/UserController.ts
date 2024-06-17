@@ -34,6 +34,7 @@ import {
   ITransationHeaderUser,
 } from "../contracts/dto/TransactionRelated.dto";
 import { topupSchema } from "../validators/Topup.validate";
+import mongoose from "mongoose";
 
 // const UserSchema: Schema = new Schema({
 //   fullName: { type: String, required: true },
