@@ -29,7 +29,9 @@ import { Transaction } from "../models/dynamic/Transaction.model";
 import {
   ITransaction,
   ITransactionSubscriptionDetail,
+  ITransactionTopUpDetail,
   ITransationHeaderAdmin,
+  ITransationHeaderUser,
 } from "../contracts/dto/TransactionRelated.dto";
 import { topupSchema } from "../validators/Topup.validate";
 
@@ -375,6 +377,27 @@ export const topup = async (req: Request, res: Response) => {
   }
 
   try {
+    const transactionHeader: ITransationHeaderUser = {
+        transactionHeaderType: TransactionHeaderType.TOPUP,
+        date: new Date(), // current date make it use best practice
+        total: amount,
+        userId: user._id,
+      };
+      // TODO : Make can do multiple TransactionDetail
+      const transactionDetails: ITransactionTopUpDetail[] = [];
+    
+      transactionDetails.push({
+        transactionDetailType: TransactionDetailType.USER_TOPUP,
+        subtotal: amount,
+        message: `User : ${user.username}, does action = ${
+          TransactionDetailType.USER_TOPUP
+        } with amount = ${amount}`,
+      });
+      const transaction: ITransaction = {
+        header: transactionHeader,
+        details: transactionDetails,
+      };
+      await Transaction.create(transaction);
     user.balance += amount;
     const updatedUser = await user.save();
 
