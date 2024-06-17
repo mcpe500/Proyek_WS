@@ -7,7 +7,7 @@ import { ROUTES } from "./contracts/enum/RoutesRelated.enum";
 import cors from "cors";
 import swaggerDocument from "./documentation/swagger";
 import { RESPONSE_STATUS } from "./contracts/enum/ResponseRelated.enum";
-import connectMongoDB from "./connection/connection";
+import { connectMongoDB } from "./connection/connection";
 import sequelize from "./connection/connectionStatic";
 import Paket from "./models/static/Paket.model";
 import path from "path";

@@ -21,6 +21,7 @@ import { Subscription } from "../models/dynamic/Subscription.model";
 import { Exercise } from "../models/dynamic/Exercise.model";
 import { Apis } from "../services/ApiService";
 import { IExercise } from "../contracts/dto/PlansRelated.dto";
+import { TransactionDetailType, TransactionHeaderType } from "../contracts/enum/TransactionRelated.enum";
 
 // const UserSchema: Schema = new Schema({
 //   fullName: { type: String, required: true },
@@ -681,7 +682,7 @@ export const addUserPacket = async (req: Request, res: Response) => {
     endDate,
   });
   const newSubscription = await subs.save();
-
+  // TransactionDetailType.ADMIN_SUBSCRIBE
   return res
     .status(RESPONSE_STATUS.CREATED)
     .json({ subscription: newSubscription });
