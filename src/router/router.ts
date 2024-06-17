@@ -236,7 +236,7 @@ router.post(
 ); // TODO : bikin ini pake ApiKey (Hansen)
 router.put(
   "/users/plan/cancel/:id",
-  [validateAccessToken, validateIsNotAdmin],
+  [validateAccessToken, validateIsNotAdmin, checkAndIncreaseAPIHit(1)],
   cancelExercisePlanByUser
 );
 
