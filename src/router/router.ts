@@ -27,6 +27,7 @@ import {
   validateAccessToken,
   validateAdmin,
   validateNotSignIn,
+  validateIsNotAdmin,
 } from "../middleware/AuthMiddleware";
 import {
   validateBody,
@@ -138,74 +139,76 @@ router.put(
 );
 
 // User Routes
-router.put("/users/topup", [validateAccessToken], topup);
-router.get("/users/dashboard", [validateAccessToken], getDashboard);
+router.put("/users/topup", [validateAccessToken, validateIsNotAdmin], topup);
+router.get("/users/dashboard", [validateAccessToken, validateIsNotAdmin], getDashboard);
 router.put(
   "/users/profile",
-  [
+  [ 
+    validateBody(editProfileSchemaJoi), // Check if this works or not (Hansen)
     validateAccessToken,
-    validateBody(editProfileSchemaJoi),
+    validateIsNotAdmin,
     upload.single("profilePicture"),
   ],
   editProfile
 );
-router.get("/users/apikey", [validateAccessToken], getApiKey);
+router.get("/users/apikey", [validateAccessToken, validateIsNotAdmin], getApiKey);
 router.put(
   "/users/apikey/reset",
-  [validateAccessToken, checkAndIncreaseAPIHit(1)],
+  [validateAccessToken, validateIsNotAdmin, checkAndIncreaseAPIHit(1)],
   resetApiKey
 );
-router.post("/users/subscribe", [validateAccessToken], subscribePacket);
-router.put("/users/renew", [validateAccessToken], renewSubscription);
+router.post("/users/subscribe", [validateAccessToken, validateIsNotAdmin], subscribePacket);
+router.put("/users/renew", [validateAccessToken, validateIsNotAdmin], renewSubscription);
 router.post(
   "/users/plan",
   [
     validateBody(createUserPlanSchemaJoi),
-    validateAccessToken, // TODO : Check with hansen mungkin ini error
+    validateAccessToken, // TODO : Check with hansen mungkin ini error (Should be fine, Hansen)
+    validateIsNotAdmin,
     checkAndIncreaseAPIHit(1),
   ],
   createExercisePlan
 );
 router.get(
   "/users/plan",
-  [validateAccessToken, checkAndIncreaseAPIHit(1)],
+  [validateAccessToken, validateIsNotAdmin, checkAndIncreaseAPIHit(1)],
   getAllExercisePlanByUser
 );
 router.get(
   "/users/plan/:id",
-  [validateAccessToken, checkAndIncreaseAPIHit(1)],
+  [validateAccessToken, validateIsNotAdmin, checkAndIncreaseAPIHit(1)],
   getExercisePlanDetailByUser
 );
 
 // Exercise Plan Routes
 router.put(
   "/users/plan/edit/:id",
-  [validateAccessToken, checkAndIncreaseAPIHit(1)],
+  [validateAccessToken, validateIsNotAdmin, checkAndIncreaseAPIHit(1)],
   editExercisePlan
 );
 router.post(
   "/users/plan/start/:id",
-  [validateAccessToken, checkAndIncreaseAPIHit(1)],
+  [validateAccessToken, validateIsNotAdmin, checkAndIncreaseAPIHit(1)],
   startExercisePlan
 );
 router.put(
   "/users/plan/:id/workout/",
-  [validateAccessToken, checkAndIncreaseAPIHit(1)],
+  [validateAccessToken, validateIsNotAdmin, checkAndIncreaseAPIHit(1)],
   addWorkoutToExercisePlan
 );
 router.get(
   "/users/plan/:id/workout/",
-  [validateAccessToken, checkAndIncreaseAPIHit(1)],
+  [validateAccessToken, validateIsNotAdmin, checkAndIncreaseAPIHit(1)],
   exercisePlanDetails
 );
 router.post(
   "/users/plan/complete/:id",
-  [validateAccessToken, checkAndIncreaseAPIHit(1)],
+  [validateAccessToken, validateIsNotAdmin, checkAndIncreaseAPIHit(1)],
   completeExercisePlan
 );
 router.put(
   "/users/plan/cancel/:id",
-  [validateAccessToken],
+  [validateAccessToken, validateIsNotAdmin],
   cancelExercisePlanByUser
 );
 

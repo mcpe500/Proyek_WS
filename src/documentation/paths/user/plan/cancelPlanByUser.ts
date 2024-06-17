@@ -4,6 +4,11 @@ export default {
       summary: "Cancel an exercise plan by user",
       description: "This endpoint allows a user to cancel their exercise plan.",
       operationId: "cancelExercisePlanByUser",
+      security: [
+        {
+          bearerAuth: [],
+        },
+      ],
       parameters: [
         {
           name: "id",
