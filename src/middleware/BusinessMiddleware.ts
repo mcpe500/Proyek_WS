@@ -100,10 +100,10 @@ export const checkAPIKey = async (
   res: Response,
   next: NextFunction
 ) => {
-  const { apiKey } = req.body;
+  const { apiKey } = req.query;
   const user = (req as any).user;
 
-  if ( user.apiKey != apiKey ) {
+  if ( user.apiKey != apiKey && user.role != "ADMIN") {
     return res.status(RESPONSE_STATUS.BAD_REQUEST).json({ msg: "Invalid API key" });
   }
 
