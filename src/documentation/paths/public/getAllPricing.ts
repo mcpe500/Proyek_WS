@@ -3,6 +3,11 @@ export default {
     tags: ["pricing"],
     summary: "Get all pricing packages",
     description: "Retrieves all pricing packages available.",
+    security: [
+      {
+        bearerAuth: [],
+      },
+    ],
     responses: {
       "200": {
         description: "Successful response with pricing packages data",
