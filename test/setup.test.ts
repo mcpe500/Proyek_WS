@@ -6,6 +6,7 @@ import request from "supertest";
 let server: any;
 let refreshToken = "";
 let accessToken = "";
+let firstValidUser: any = {};
 
 beforeAll(async () => {
   const httpServer = createServer(app);
@@ -143,12 +144,19 @@ describe("Admin API", () => {
       .expect("Content-Type", /json/)
       .expect(200);
 
+    response.body.users.forEach((u: any) => {
+      if (u.isEmailVerified == true) {
+        firstValidUser = u;
+        return;
+      }
+    });
+
     expect(response.body.users).toBeDefined();
   });
 
   it("GET /api/v1/admin/users/{id} - Get a user by ID", async () => {
-    const userId = "66252b93bc337b727f77fcb0";
-
+    // const userId = "66252ce53e09d8a230f75998";
+    const userId = firstValidUser._id;
     const response = await request(server)
       .get(`/api/v1/admin/users/${userId}`)
       .set("Authorization", `Bearer ${accessToken}`)
@@ -165,23 +173,29 @@ describe("Admin API", () => {
       .expect("Content-Type", /json/)
       .expect(200);
 
-    expect(response.body.dashboard).toBeDefined();
+    expect(response.body.total_user).toBeDefined();
+    expect(response.body.free_package_user).toBeDefined();
+    expect(response.body.non_free_package_user).toBeDefined();
   });
 
   it("GET /api/v1/admin/user/profile/{userID} - Get user profile", async () => {
-    const userId = "66252b93bc337b727f77fcb0";
+    // const userId = "66252b93bc337b727f77fcb0";
+    const userId = firstValidUser._id;
 
     const response = await request(server)
       .get(`/api/v1/admin/user/profile/${userId}`)
       .set("Authorization", `Bearer ${accessToken}`)
       .expect("Content-Type", /json/)
       .expect(200);
-
-    expect(response.body.userProfile).toBeDefined();
+    expect(response.body.username).toBeDefined();
+    expect(response.body.full_name).toBeDefined();
+    expect(response.body.email).toBeDefined();
+    expect(response.body.phone).toBeDefined();
+    expect(response.body.balance).toBeDefined();
   });
 
   it("DELETE /api/v1/admin/user/profile/{userID} - Delete user profile", async () => {
-    const userId = "66252b93bc337b727f77fcb0";
+    const userId = "0";
 
     const response = await request(server)
       .delete(`/api/v1/admin/user/profile/${userId}`)
@@ -193,15 +207,26 @@ describe("Admin API", () => {
   });
 
   it("GET /api/v1/admin/user/packet/{userID} - Get user packet", async () => {
-    const userId = "66252b93bc337b727f77fcb0";
+    // const userId = "66252b93bc337b727f77fcb0";
+    const userId = firstValidUser._id;
 
     const response = await request(server)
       .get(`/api/v1/admin/user/packet/${userId}`)
       .set("Authorization", `Bearer ${accessToken}`)
       .expect("Content-Type", /json/)
       .expect(200);
-
-    expect(response.body.userPacket).toBeDefined();
+      
+    expect(response.body.username).toBeDefined();
+    expect(response.body.nama).toBeDefined();
+    expect(response.body.subscription_start).toBeDefined();
+    expect(response.body.subscription_end).toBeDefined();
+    expect(response.body.packet).toBeDefined();
+    expect(response.body.packet.Paket_id).toBeDefined();
+    expect(response.body.packet.Paket_name).toBeDefined();
+    expect(response.body.packet.Paket_description).toBeDefined();
+    expect(response.body.packet.Paket_Limit).toBeDefined();
+    expect(response.body.packet.Paket_price).toBeDefined();
+    expect(response.body.packet.Paket_price_currency).toBeDefined();
   });
 
   it("POST /api/v1/admin/user/packet/{userID} - Add user packet", async () => {
