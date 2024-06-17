@@ -32,7 +32,16 @@ export default {
                 nama: { type: "string" },
                 subscription_start: { type: "string", format: "date-time" },
                 subscription_end: { type: "string", format: "date-time" },
-                packet: { type: "object" },
+                packet: { type: "object",
+                  properties:{
+                    Paket_id: { type: "string" },
+                    Paket_name: { type: "string" },
+                    Paket_description: { type: "string" },
+                    Paket_limit: { type: "number" },
+                    Paket_price: { type: "number" },
+                    Paket_currency: { type: "string" },
+                  }
+                 },
               },
             },
           },
