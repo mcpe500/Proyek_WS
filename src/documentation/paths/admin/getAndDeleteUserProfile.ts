@@ -28,9 +28,11 @@ export default {
             schema: {
               type: "object",
               properties: {
-                data: {
-                  type: "object",
-                },
+                username: { type: "string" },
+                full_name: { type: "string" },
+                email: { type: "string" },
+                phone: { type: "string" },
+                balance: { type: "number" },
               },
             },
           },

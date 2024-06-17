@@ -20,6 +20,7 @@ import { Subscription } from "../models/dynamic/Subscription.model";
 import { Exercise } from "../models/dynamic/Exercise.model";
 import { Apis } from "../services/ApiService";
 import { IExercise } from "../contracts/dto/PlansRelated.dto";
+import { topupSchema } from "../validators/Topup.validate";
 
 // const UserSchema: Schema = new Schema({
 //   fullName: { type: String, required: true },
@@ -695,7 +696,15 @@ export const addExercise = async (req: Request, res: Response) => {
 export const topupFromAdmin = async (req: Request, res: Response) => {
   const { userID } = req.params;
   const { saldo } = req.body;
-
+  try {
+    const schema = topupSchema;
+    await schema.validateAsync({saldo});
+  } catch (error) {
+    if (error instanceof Error) {
+      return res.status(RESPONSE_STATUS.BAD_REQUEST).json({ msg: error.message });
+    }
+    return res.status(RESPONSE_STATUS.INTERNAL_SERVER_ERROR).json({ msg: 'Validation error' });
+  }
     if(userID){
         const user = await User.findOne({ _id: userID });
         if(!user)  return res.status(RESPONSE_STATUS.NOT_FOUND).json({ msg: 'User not found'});
