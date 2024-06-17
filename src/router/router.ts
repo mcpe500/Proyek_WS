@@ -4,7 +4,6 @@ import {
   generateNewAccessToken,
   getAllUser,
   getDashboard,
-  getUser,
   loginUser,
   newRefreshToken,
   registerUser,
@@ -22,6 +21,8 @@ import {
   deleteUserPacket,
   addExercise,
   topupFromAdmin,
+  getProfPic,
+  getUserProfilePicture,
 } from "../controller/UserController";
 import {
   validateAccessToken,
@@ -99,7 +100,6 @@ router.get("/auth/verify/:emailVerificationToken", verifyEmail);
 
 // Admin Routes
 router.get("/admin/users", [validateAccessToken, validateAdmin], getAllUser);
-router.get("/admin/users/:id", [validateAccessToken, validateAdmin], getUser);
 router.get(
   "/admin/dashboard",
   [validateAccessToken, validateAdmin],
@@ -114,6 +114,11 @@ router.delete(
   "/admin/user/profile/:userID",
   [validateAccessToken, validateAdmin],
   deleteUserProfile
+);
+router.get(
+  "/admin/user/profile-picture/:userID",
+  [validateAccessToken, validateAdmin],
+  getUserProfilePicture
 );
 router.get(
   "/admin/user/packet/:userID",
@@ -147,6 +152,11 @@ router.get(
   "/users/dashboard",
   [validateAccessToken, validateIsNotAdmin],
   getDashboard
+);
+router.get(
+  "/users/profile-picture",
+  [validateAccessToken, validateIsNotAdmin],
+  getProfPic
 );
 router.put(
   "/users/profile",
@@ -260,6 +270,6 @@ router.get(
   validateQuery(getGymsSchema),
   checkAPIKey,
   getNearestGyms
-);// TODO : bikin ini pake ApiKey (Hansen) sama nambah ApiHit
+); // TODO : bikin ini pake ApiKey (Hansen) sama nambah ApiHit
 
 export default router;
