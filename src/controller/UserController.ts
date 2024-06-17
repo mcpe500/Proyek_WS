@@ -133,6 +133,11 @@ export const getDashboard = async (req: Request, res: Response) => {
   return res.status(RESPONSE_STATUS.SUCCESS).json({ user: user });
 };
 
+export const getProfPic = async (req: Request, res: Response) => { 
+  const user = (req as any).user;
+  return res.sendFile(user.profilePicture, { root: "."});
+}
+
 export const editProfile = async (req: Request, res: Response) => {
   const {
     old_password,
@@ -551,25 +556,6 @@ export const getAllUser = async (req: Request, res: Response) => {
   }
 };
 
-export const getUser = async (req: Request, res: Response) => {
-  const { id } = req.params;
-
-  if (!mongoose.Types.ObjectId.isValid(id)) {
-    return res
-      .status(RESPONSE_STATUS.BAD_REQUEST)
-      .json({ message: "Invalid user ID" });
-  }
-
-  const user = await User.findById(id).select("-password");
-  if (!user) {
-    return res
-      .status(RESPONSE_STATUS.NOT_FOUND)
-      .json({ message: "User not found" });
-  }
-
-  return res.status(RESPONSE_STATUS.SUCCESS).json({ user: user });
-};
-
 export const adminDashboard = async (req: Request, res: Response) => {
   // const { user } = req as any; // TODO : CHECK IF NECESSARY
   const users = await User.find({
@@ -601,6 +587,13 @@ export const getUserProfile = async (req: Request, res: Response) => {
     phone: user.phone,
     balance: user.balance,
   });
+};
+
+export const getUserProfilePicture = async (req: Request, res: Response) => {
+  const { userID } = req.params;
+  const user = await User.findOne({ _id: userID });
+  if(!user)  return res.status(RESPONSE_STATUS.NOT_FOUND).json({ msg: 'User not found'})
+  return res.sendFile(user.profilePicture, { root: "."});
 };
 
 export const deleteUserProfile = async (req: Request, res: Response) => {
