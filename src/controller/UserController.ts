@@ -15,7 +15,7 @@ import { RESPONSE_STATUS } from "../contracts/enum/ResponseRelated.enum";
 import { User } from "../models/dynamic/User.model";
 import Paket from "../models/static/Paket.model";
 import { JwtPayload } from "jsonwebtoken";
-import mongoose from "mongoose";
+
 import crypto from "crypto";
 import { Subscription } from "../models/dynamic/Subscription.model";
 import { Exercise } from "../models/dynamic/Exercise.model";
@@ -26,6 +26,15 @@ import {
   TransactionHeaderType,
 } from "../contracts/enum/TransactionRelated.enum";
 import { Transaction } from "../models/dynamic/Transaction.model";
+import {
+  ITransaction,
+  ITransactionSubscriptionDetail,
+  ITransactionTopUpDetail,
+  ITransationHeaderAdmin,
+  ITransationHeaderUser,
+} from "../contracts/dto/TransactionRelated.dto";
+import { topupSchema } from "../validators/Topup.validate";
+import mongoose from "mongoose";
 
 // const UserSchema: Schema = new Schema({
 //   fullName: { type: String, required: true },
@@ -318,7 +327,8 @@ export const verifyEmail = async (req: Request, res: Response) => {
 // TODO bikin ini response nya, list of ApiKey dari subscribe yg usernya lagi login (DONE, Hansen)
 export const getApiKey = async (req: Request, res: Response) => {
   const user = (req as any).user;
-  const subscribe = Subscription.findOne({ userId: user._id });
+  const subscribe = await Subscription.findOne({ userId: user._id });
+
   try {
     // Jika pengguna ditemukan, kirimkan API key
     if ((subscribe as any).apiKey) {
@@ -368,6 +378,27 @@ export const topup = async (req: Request, res: Response) => {
   }
 
   try {
+    const transactionHeader: ITransationHeaderUser = {
+        transactionHeaderType: TransactionHeaderType.TOPUP,
+        date: new Date(), // current date make it use best practice
+        total: amount,
+        userId: user._id,
+      };
+      // TODO : Make can do multiple TransactionDetail
+      const transactionDetails: ITransactionTopUpDetail[] = [];
+    
+      transactionDetails.push({
+        transactionDetailType: TransactionDetailType.USER_TOPUP,
+        subtotal: amount,
+        message: `User : ${user.username}, does action = ${
+          TransactionDetailType.USER_TOPUP
+        } with amount = ${amount}`,
+      });
+      const transaction: ITransaction = {
+        header: transactionHeader,
+        details: transactionDetails,
+      };
+      await Transaction.create(transaction);
     user.balance += amount;
     const updatedUser = await user.save();
 
@@ -511,8 +542,8 @@ export const renewSubscription = async (req: Request, res: Response) => {
       .json({ message: "Invalid number of months" });
   }
 
-  if (typeof apiKey !== 'string') {
-    return res.status(400).json({ error: 'Invalid API key format' });
+  if (typeof apiKey !== "string") {
+    return res.status(400).json({ error: "Invalid API key format" });
   }
 
   // Check active subscription
@@ -529,9 +560,11 @@ export const renewSubscription = async (req: Request, res: Response) => {
 
   if (!activeSubscription.isActive || activeSubscription.endDate < new Date()) {
     await activeSubscription.updateOne({
-      isActive: false
+      isActive: false,
     });
-    return res.status(RESPONSE_STATUS.BAD_REQUEST).json({ msg: "Your subscription has expired" });
+    return res
+      .status(RESPONSE_STATUS.BAD_REQUEST)
+      .json({ msg: "Your subscription has expired" });
   }
 
   if (activeSubscription.paketId == "PAK001") {
@@ -625,6 +658,8 @@ export const adminDashboard = async (req: Request, res: Response) => {
     role: { $ne: "ADMIN" },
     isEmailVerified: true,
   }).exec();
+  const transactions = await Transaction.find({ header: { adminId: null}});
+  const totalTransactionAmount = transactions == null ? 0 : transactions.reduce((acc, transaction) => acc + transaction.header.total, 0);
   const subscription = await Subscription.find({ isActive: true }).exec();
   return res.status(RESPONSE_STATUS.SUCCESS).json({
     total_user: users.length,
@@ -633,6 +668,7 @@ export const adminDashboard = async (req: Request, res: Response) => {
     non_free_package_user: subscription.filter(
       (item) => item.paketId != "PAK001"
     ).length,
+    total_transaction_amount: totalTransactionAmount,
   });
 };
 
@@ -713,8 +749,14 @@ export const getUserPacket = async (req: Request, res: Response) => {
 
 export const addUserPacket = async (req: Request, res: Response) => {
   const { userID } = req.params;
-  const { paket_id } = req.body;
+  const admin = (req as any).user;
+  const { paket_id, month } = req.body;
   const user = await User.findOne({ _id: userID });
+  if (month < 1) {
+    return res
+      .status(RESPONSE_STATUS.BAD_REQUEST)
+      .send({ message: "Invalid number of month" });
+  }
   if (!user)
     return res
       .status(RESPONSE_STATUS.NOT_FOUND)
@@ -742,9 +784,37 @@ export const addUserPacket = async (req: Request, res: Response) => {
     endDate,
   });
   const newSubscription = await subs.save();
-  // TODO : IVAN WAS HERE
-  // await Transaction.create({});
-  // TransactionDetailType.ADMIN_SUBSCRIBE
+
+  // const transactionHeader: ITransationHeaderAdmin = {
+  //   transactionHeaderType: TransactionHeaderType.SUBSCRIBE,
+  //   date: new Date(), // current date make it use best practice
+  //   total: packet.Paket_price,
+  //   userId: user._id,
+  //   adminId: admin._id,
+  // };
+  // // TODO : Make can do multiple TransactionDetail
+  // const transactionDetails: ITransactionSubscriptionDetail[] = [];
+
+  // transactionDetails.push({
+  //   transactionDetailType: TransactionDetailType.ADMIN_SUBSCRIBE,
+  //   paket_id: packet.Paket_id,
+  //   subscription_id: newSubscription._id,
+  //   month: month, // TODO : Mastiin yg admin perlu set berapa bulan nggak
+  //   price: packet.Paket_price,
+  //   subtotal: packet.Paket_price * month,
+  //   message: `Admin : ${admin.username}, did action = ${
+  //     TransactionDetailType.ADMIN_SUBSCRIBE
+  //   } gave ${user.username} subscription to ${
+  //     packet.Paket_name
+  //   } for ${month} month at ${packet.Paket_price} per month with total ${
+  //     packet.Paket_price * month
+  //   } with the subscription id ${newSubscription._id}`,
+  // });
+  // const transaction: ITransaction = {
+  //   header: transactionHeader,
+  //   details: transactionDetails,
+  // };
+  // await Transaction.create(transaction);
   return res
     .status(RESPONSE_STATUS.CREATED)
     .json({ subscription: newSubscription });
@@ -774,40 +844,78 @@ export const deleteUserPacket = async (req: Request, res: Response) => {
 export const addExercise = async (req: Request, res: Response) => {
   try {
     // Fetch data from external API
-    const exercises: any[] = await Apis.API_NINJA_ApiService.get<any[]>("");
+    // const exercises: any[] = await Apis.API_NINJA_ApiService.get<any[]>("");
+    const { offset, limit_per_ten } = req.query;
 
-    for (const exercise of exercises) {
-      // Check if the exercise already exists in the database
-      const existingExercise = await Exercise.findOne({ name: exercise.name });
+    // Make API call
+    const parsedOffset = Math.floor(Number(offset));
+    const parsedLimit = Math.floor(Number(limit_per_ten));
 
-      // If the exercise does not exist, insert it into the database
-      if (!existingExercise) {
-        const newExercise = new Exercise({
+    if (
+      isNaN(parsedOffset) ||
+      isNaN(parsedLimit) ||
+      parsedLimit < 0 ||
+      parsedOffset < 0
+    ) {
+      return res
+        .status(RESPONSE_STATUS.BAD_REQUEST)
+        .json({ msg: "Offset and limit must be non-negative integers." });
+    }
+
+    const queryParams: any = {};
+    for (let i = parsedOffset; i < parsedOffset + parsedLimit; i++) {
+      queryParams.offset = i * 10;
+      let exercises: any[] = await Apis.API_NINJA_ApiService.get("", {
+        params: queryParams,
+      });
+      for (const exercise of exercises) {
+        // Check if the exercise already exists in the database
+        const existingExercise = await Exercise.findOne({
           name: exercise.name,
-          type: exercise.type,
-          targeted_muscle: exercise.muscle,
-          equipmentRequired: exercise.equipment ? exercise.equipment : "-",
-          description: exercise.instructions,
         });
-        await newExercise.save();
+
+        // If the exercise does not exist, insert it into the database
+        if (!existingExercise) {
+          const newExercise = new Exercise({
+            name: exercise.name,
+            type: exercise.type,
+            targeted_muscle: exercise.muscle,
+            equipmentRequired: exercise.equipment ? exercise.equipment : "-",
+            description: exercise.instructions,
+          });
+          await newExercise.save();
+        }
       }
     }
 
-    res
+    return res
       .status(RESPONSE_STATUS.SUCCESS)
       .json({ msg: "Exercises have been added/updated successfully." });
   } catch (error) {
-    res
+    return res
       .status(RESPONSE_STATUS.INTERNAL_SERVER_ERROR)
       .json({ msg: "Exercises added/updated failed." });
   }
 };
 
 export const topupFromAdmin = async (req: Request, res: Response) => {
-  const { userID } = req.params;
+  const { userID } = req.params; // if i empty it
   const { saldo } = req.body;
-
-  if (userID) {
+  const admin = (req as any).user;
+  try {
+    const schema = topupSchema;
+    await schema.validateAsync({ saldo });
+  } catch (error) {
+    if (error instanceof Error) {
+      return res
+        .status(RESPONSE_STATUS.BAD_REQUEST)
+        .json({ msg: error.message });
+    }
+    return res
+      .status(RESPONSE_STATUS.INTERNAL_SERVER_ERROR)
+      .json({ msg: "Validation error" });
+  }
+  if (userID && mongoose.Types.ObjectId.isValid(userID)) {
     const user = await User.findOne({ _id: userID });
     if (!user)
       return res
@@ -819,6 +927,25 @@ export const topupFromAdmin = async (req: Request, res: Response) => {
         .json({ msg: "User is admin" });
     await User.updateOne({ _id: userID }, { $inc: { balance: saldo } });
 
+    const transactionHeader: ITransationHeaderAdmin = {
+      transactionHeaderType: TransactionHeaderType.TOPUP,
+      date: new Date(), // current date make it use best practice
+      total: saldo,
+      userId: user._id,
+      adminId: admin._id,
+    };
+    const transactionDetails: ITransactionTopUpDetail[] = [];
+
+    transactionDetails.push({
+      transactionDetailType: TransactionDetailType.ADMIN_TOPUP,
+      subtotal: saldo,
+      message: `Admin ${admin.fullName} does action ${TransactionDetailType.ADMIN_TOPUP} topup user ${user.fullName} with saldo ${saldo}`,
+    });
+    const transaction: ITransaction = {
+      header: transactionHeader,
+      details: transactionDetails,
+    };
+    await Transaction.create(transaction);
     return res.status(RESPONSE_STATUS.SUCCESS).json({
       msg: "Balance updated successfully",
       username: user.username,
@@ -827,9 +954,31 @@ export const topupFromAdmin = async (req: Request, res: Response) => {
     });
   } else {
     const users = await User.updateMany(
-      { role: { $ne: "ADMIN" } },
+      { role: { $ne: "ADMIN" }, isEmailVerified: true },
       { $inc: { balance: saldo } }
     );
+    console.log(users);
+
+    // const transactionHeader: ITransationHeaderAdmin = {
+    //   transactionHeaderType: TransactionHeaderType.TOPUP,
+    //   date: new Date(), // current date make it use best practice
+    //   total: saldo,
+    //   userId: user._id,
+    //   adminId: admin._id,
+    // };
+    // const transactionDetails: ITransactionTopUpDetail[] = [];
+    // users.forEach((user) => {
+    //   transactionDetails.push({
+    //     transactionDetailType: TransactionDetailType.ADMIN_TOPUP,
+    //     subtotal: saldo,
+    //     message: `Admin ${admin.fullName} does action ${TransactionDetailType.ADMIN_TOPUP} topup user ${user.fullName} with saldo ${saldo}`,
+    //   });
+    // });
+    // const transaction: ITransaction = {
+    //   header: transactionHeader,
+    //   details: transactionDetails,
+    // };
+    // await Transaction.create(transaction);
     return res
       .status(RESPONSE_STATUS.SUCCESS)
       .json({ msg: "Balance updated for all users successfully" });
