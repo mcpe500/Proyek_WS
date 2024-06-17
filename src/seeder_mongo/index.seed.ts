@@ -6,6 +6,7 @@ async function runSeed() {
   const subscriptions = await createSubscriptions(verifiedUsers, 10);
   console.log(verifiedUsers);
   console.log(unverifiedUsers);
+  console.log(subscriptions);
 }
 
 runSeed();

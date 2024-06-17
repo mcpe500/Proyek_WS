@@ -3,27 +3,55 @@ import { IUser } from "../contracts/dto/UserRelated.dto";
 import { ISubscription } from "../contracts/dto/SubscriptionRelated.dto";
 import { generateApiKey } from "../utils/AuthUtils";
 import Paket from "../models/static/Paket.model";
+import { IPaket } from "../contracts/dto/Paket.dto";
 
-const FREE_PACKAGE_ID = "free";
-const FREE_API_HITS = 1000;
-Paket.findOne({ where: { Paket_id: "PAK001" } });
+let pakets: IPaket[] = [];
 
 const createFreeSubscription = async (user: IUser): Promise<ISubscription> => {
-  const apiKey = await generateApiKey();
-  const now = new Date();
-  const endDate = new Date(now);
-  endDate.setDate(endDate.getDate() + 30);
+  try {
+    const apiKey = await generateApiKey();
+    const now = new Date();
+    const endDate = new Date(now);
+    endDate.setDate(endDate.getDate() + 30); // Set the actual end date based on your business logic
 
-  return {
-    userId: user._id,
-    paketId: FREE_PACKAGE_ID,
-    apiHit: FREE_API_HITS,
-    startDate: now,
-    endDate: endDate,
-    isActive: true,
-    apiKey,
-    resetAt: now,
-  } as ISubscription;
+    return {
+      userId: user._id,
+      paketId: "PAK001",
+      apiHit: 0,
+      startDate: now,
+      endDate: endDate,
+      isActive: true,
+      apiKey,
+      resetAt: now,
+    } as ISubscription;
+  } catch (error) {
+    console.error("Error creating free subscription:", error);
+    throw error; // Rethrow the error or handle it as needed
+  }
+};
+
+const createOtherSubscription = async (user: IUser): Promise<ISubscription> => {
+  try {
+    const paket = pakets[Math.floor(Math.random() * pakets.length)];
+    const apiKey = await generateApiKey();
+    const now = new Date();
+    const endDate = new Date(now);
+    endDate.setDate(endDate.getDate() + 30); // Set the actual end date based on your business logic
+
+    return {
+      userId: user._id,
+      paketId: paket.Paket_id,
+      apiHit: 0,
+      startDate: now,
+      endDate: endDate,
+      isActive: true,
+      apiKey,
+      resetAt: now,
+    } as ISubscription;
+  } catch (error) {
+    console.error("Error creating other subscription:", error);
+    throw error; // Rethrow the error or handle it as needed
+  }
 };
 
 export const createSubscriptions = async (
@@ -31,22 +59,19 @@ export const createSubscriptions = async (
   amount: number
 ): Promise<ISubscription[]> => {
   const subscriptions: ISubscription[] = [];
+  const pakets: IPaket[] = await Paket.findAll({});
 
   for (const user of verifiedUsers) {
     const freeSubscription = await createFreeSubscription(user);
     subscriptions.push(freeSubscription);
   }
 
-  for (let i = 0; i < amount; i++) {}
-
-  // Add logic to create additional subscriptions (if needed)
+  if (amount <= verifiedUsers.length) {
+    for (let i = 0; i < amount; i++) {
+      const otherSubscription = await createOtherSubscription(verifiedUsers[i]);
+      subscriptions.push(otherSubscription);
+    }
+  }
 
   return subscriptions;
 };
-
-// Example usage:
-// const verifiedUsers: IUser[] = []; // Your verified users
-// const amount = 10; // Number of additional subscriptions
-
-// const allSubscriptions = await createSubscriptions(verifiedUsers, amount);
-// console.log("All Subscriptions:", allSubscriptions);

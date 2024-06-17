@@ -66,9 +66,11 @@ export const generateApiKey = async () => {
   let apiKey = "";
   while (true) {
     apiKey = crypto.randomBytes(32).toString("hex");
+    console.log(apiKey);
     const temp = await Subscription.findOne({
       apiKey: apiKey,
     });
+    console.log(temp);
     if (!temp) break;
   }
   return apiKey;

@@ -4,7 +4,7 @@ import sequelize from "../../connection/connectionStatic";
 import { IPaket } from "../../contracts/dto/Paket.dto";
 
 class Paket extends Model<IPaket> {
-  public Paket_id!: number;
+  public Paket_id!: string;
   public Paket_name!: string;
   public Paket_description!: string;
   public Paket_Limit!: number;
