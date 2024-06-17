@@ -1,10 +1,11 @@
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { ENV } from "../config/environment";
-
+import crypto from "crypto";
 import nodemailer, { SendMailOptions } from "nodemailer";
 import ejs from "ejs";
 import path from "path";
+import { Subscription } from "../models/dynamic/Subscription.model";
 
 // Use a secret key from environment variables
 // const SECRET_KEY = process.env.SECRET_KEY || 'your-default-secret-key';
@@ -61,6 +62,17 @@ export const verifyRefreshToken = (token: string): any => {
   }
 };
 
+export const generateApiKey = async () => {
+  let apiKey = "";
+  while (true) {
+    apiKey = crypto.randomBytes(32).toString("hex");
+    const temp = await Subscription.findOne({
+      apiKey: apiKey,
+    });
+    if (!temp) break;
+  }
+};
+
 export const generateEmailVerificationToken = (email: string) => {
   return jwt.sign({ email }, ENV.EMAIL_VERIFICATION_TOKEN_SECRET, {
     expiresIn: ENV.EMAIL_VERIFICATION_AGE,
@@ -95,11 +107,14 @@ export const sendVerificationEmail = async (
     to: email, // Use the email parameter
     subject: "Test Mail",
   };
-  console.log(email, token, username)
+  console.log(email, token, username);
 
   ejs.renderFile(
     path.join(__dirname, "../templates", "verification_email_template.ejs"),
-    { name: username, token: `http://localhost:3000/api/v1/auth/verify/${token}` },
+    {
+      name: username,
+      token: `http://localhost:3000/api/v1/auth/verify/${token}`,
+    },
     (err, data) => {
       if (err) {
         console.log(err);

@@ -3,6 +3,7 @@ import { Request, Response } from "express";
 import {
   createAccessToken,
   createRefreshToken,
+  generateApiKey,
   generateEmailVerificationToken,
   hashPassword,
   sendVerificationEmail,
@@ -277,14 +278,8 @@ export const verifyEmail = async (req: Request, res: Response) => {
         .json({ message: "User not found" });
     }
     // TODO : (Make sure it works)Bikin ngasi ApiKey waktu subscribe, sama Api Key masuk ke subscription udh bukan di user
-    let apiKey = "";
-    while (true) {
-      apiKey = crypto.randomBytes(32).toString("hex");
-      const temp = await Subscription.findOne({
-        apiKey: apiKey,
-      });
-      if (!temp) break;
-    }
+
+    let apiKey = await generateApiKey();
     await user.updateOne({
       isEmailVerified: true,
       emailVerificationToken: null,
@@ -333,14 +328,7 @@ export const getApiKey = async (req: Request, res: Response) => {
 export const resetApiKey = async (req: Request, res: Response) => {
   const user = (req as any).user;
   try {
-    let apiKey = "";
-    while (true) {
-      apiKey = crypto.randomBytes(32).toString("hex");
-      const temp = await User.findOne({
-        apiKey: apiKey,
-      });
-      if (!temp) break;
-    }
+    let apiKey = await generateApiKey();
     await user.updateOne({ apiKey });
     return res.status(RESPONSE_STATUS.SUCCESS).json({ apiKey: user.apiKey });
   } catch (error) {
@@ -373,7 +361,6 @@ export const topup = async (req: Request, res: Response) => {
       .json({ message: "Internal server error" });
   }
 };
-
 
 // TODO bikin ini supaya ada api key nya
 export const subscribePacket = async (req: Request, res: Response) => {
