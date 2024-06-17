@@ -60,7 +60,7 @@ import {
   cancelExercisePlanByUser,
 } from "../controller/UserPlanController";
 import { createUserPlanSchemaJoi } from "../validators/Plans.validate";
-import { checkAndIncreaseAPIHit } from "../middleware/BusinessMiddleware";
+import { checkAndIncreaseAPIHit, checkAPIKey } from "../middleware/BusinessMiddleware";
 import { getFilteredNews, getSpecificNews } from "../controller/NewsController";
 import { getNearestGyms } from "../controller/GymsController";
 import { getGymsSchema } from "../validators/Maps.validate";

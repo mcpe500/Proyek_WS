@@ -94,3 +94,19 @@ export const checkAndIncreaseAPIHit = (apiIncreaseCount: number) => {
     }
   };
 };
+
+
+export const checkAPIKey = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  const { apiKey } = req.body;
+  const user = (req as any).user;
+
+  if ( user.apiKey != apiKey ) {
+    return res.status(RESPONSE_STATUS.BAD_REQUEST).json({ msg: "Invalid API key" });
+  }
+
+  next();
+}
