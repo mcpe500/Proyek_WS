@@ -489,7 +489,7 @@ export const subscribePacket = async (req: Request, res: Response) => {
         month: month,
         price: paket.Paket_price,
         subtotal: totalCost,
-        message: `Subscribed to paket: ${paketId} for ${month} month(s)`,
+        message: `User: ${user.username} bought a subscription to ${paket.Paket_name} for ${month} month(s) at Rp${paket.Paket_price} per month.`,
       });
     }
 
@@ -499,8 +499,7 @@ export const subscribePacket = async (req: Request, res: Response) => {
         transactionHeaderType: TransactionHeaderType.SUBSCRIBE,
         date: new Date(),
         total: transactionDetails.reduce((acc, detail) => acc + detail.subtotal, 0),
-        userId: user._id,
-        isAdmin: false,
+        userId: user._id
       },
       details: transactionDetails,
     });
@@ -515,7 +514,7 @@ export const subscribePacket = async (req: Request, res: Response) => {
         message: 'All subscriptions created successfully',
         transaction: transaction.header,
         subscriptions: transactionDetails,
-        remainingBalance: user.balance
+        remainingBalance: `Rp${user.balance}`
       });
   } catch (error) {
     await session.abortTransaction();
@@ -750,75 +749,124 @@ export const getUserPacket = async (req: Request, res: Response) => {
 export const addUserPacket = async (req: Request, res: Response) => {
   const { userID } = req.params;
   const admin = (req as any).user;
-  const { paket_id, month } = req.body;
+  const subscriptions = req.body; // This should be an array of { paket_id, month }
   const user = await User.findOne({ _id: userID });
-  if (month < 1) {
-    return res
-      .status(RESPONSE_STATUS.BAD_REQUEST)
-      .send({ message: "Invalid number of month" });
-  }
-  if (!user)
+
+  if (!user) {
     return res
       .status(RESPONSE_STATUS.NOT_FOUND)
       .json({ msg: "User not found" });
-  const subscription = await Subscription.findOne({
-    userId: userID,
-    isActive: true,
-  });
-  if (subscription) await subscription.updateOne({ isActive: false });
-  let endDate = new Date();
-  endDate.setMonth(endDate.getMonth() + 1);
-  endDate.setDate(endDate.getDate() - 1);
-  endDate.setHours(23);
-  endDate.setMinutes(59);
-  endDate.setSeconds(59);
-  const packet = await Paket.findOne({ where: { Paket_id: paket_id } });
-  if (!packet)
+  }
+
+  if (!Array.isArray(subscriptions)) {
     return res
-      .status(RESPONSE_STATUS.NOT_FOUND)
-      .json({ msg: "Packet not found" });
-  const subs = new Subscription({
-    userId: user._id,
-    paketId: packet.Paket_id,
-    apiHit: packet.Paket_Limit,
-    endDate,
-  });
-  const newSubscription = await subs.save();
+      .status(RESPONSE_STATUS.BAD_REQUEST)
+      .json({ message: "Invalid request format. Expected an array of subscriptions." });
+  }
 
-  // const transactionHeader: ITransationHeaderAdmin = {
-  //   transactionHeaderType: TransactionHeaderType.SUBSCRIBE,
-  //   date: new Date(), // current date make it use best practice
-  //   total: packet.Paket_price,
-  //   userId: user._id,
-  //   adminId: admin._id,
-  // };
-  // // TODO : Make can do multiple TransactionDetail
-  // const transactionDetails: ITransactionSubscriptionDetail[] = [];
+  const session = await mongoose.startSession();
+  session.startTransaction();
 
-  // transactionDetails.push({
-  //   transactionDetailType: TransactionDetailType.ADMIN_SUBSCRIBE,
-  //   paket_id: packet.Paket_id,
-  //   subscription_id: newSubscription._id,
-  //   month: month, // TODO : Mastiin yg admin perlu set berapa bulan nggak
-  //   price: packet.Paket_price,
-  //   subtotal: packet.Paket_price * month,
-  //   message: `Admin : ${admin.username}, did action = ${
-  //     TransactionDetailType.ADMIN_SUBSCRIBE
-  //   } gave ${user.username} subscription to ${
-  //     packet.Paket_name
-  //   } for ${month} month at ${packet.Paket_price} per month with total ${
-  //     packet.Paket_price * month
-  //   } with the subscription id ${newSubscription._id}`,
-  // });
-  // const transaction: ITransaction = {
-  //   header: transactionHeader,
-  //   details: transactionDetails,
-  // };
-  // await Transaction.create(transaction);
-  return res
-    .status(RESPONSE_STATUS.CREATED)
-    .json({ subscription: newSubscription });
+  try {
+    const transactionDetails = [];
+
+    for (const sub of subscriptions) {
+      const { paket_id, month } = sub;
+
+      if (!paket_id || month === undefined) {
+        throw { status: RESPONSE_STATUS.BAD_REQUEST, message: `Request fields not valid` };
+      }
+
+      if (month < 1) {
+        throw { status: RESPONSE_STATUS.BAD_REQUEST, message: `Invalid number of months for paket: ${paket_id}` };
+      }
+
+      const paket = await Paket.findOne({
+        where: {
+          Paket_id: paket_id,
+        },
+      });
+
+      if (!paket) {
+        throw { status: RESPONSE_STATUS.NOT_FOUND, message: `Paket not found: ${paket_id}` };
+      }
+
+      // Deactivate current active subscription if it exists
+      const activeSubscription = await Subscription.findOne({
+        userId: userID,
+        isActive: true,
+      });
+      if (activeSubscription) {
+        await activeSubscription.updateOne({ isActive: false });
+      }
+
+      let endDate = new Date();
+      endDate.setMonth(endDate.getMonth() + month);
+      endDate.setDate(endDate.getDate() - 1);
+      endDate.setHours(23);
+      endDate.setMinutes(59);
+      endDate.setSeconds(59);
+
+      const apiKey = await generateApiKey();
+
+      // Create new subscription
+      const subs = new Subscription({
+        userId: user._id,
+        paketId: paket_id,
+        endDate,
+        apiKey,
+        resetAt: new Date(new Date().getTime() + 60 * 1000),
+      });
+      const newSubscription = await subs.save({ session });
+
+      transactionDetails.push({
+        transactionDetailType: TransactionDetailType.ADMIN_SUBSCRIBE,
+        paket_id: paket.Paket_id,
+        subscription_id: newSubscription._id,
+        month: month,
+        price: paket.Paket_price,
+        subtotal: paket.Paket_price * month,
+        message: `Admin: ${admin.username}, gave ${user.username} a subscription to ${paket.Paket_name} for ${month} month(s) at Rp${paket.Paket_price} per month.`,
+      });
+    }
+
+    // Insert transaction log
+    const transaction = new Transaction({
+      header: {
+        transactionHeaderType: TransactionHeaderType.SUBSCRIBE,
+        date: new Date(),
+        total: transactionDetails.reduce((acc, detail) => acc + detail.subtotal, 0),
+        userId: user._id,
+        adminId: admin._id,
+      },
+      details: transactionDetails,
+    });
+    await transaction.save({ session });
+
+    await session.commitTransaction();
+    session.endSession();
+
+    return res
+      .status(RESPONSE_STATUS.CREATED)
+      .json({
+        message: 'All subscriptions created successfully',
+        transaction: transaction.header,
+        subscriptions: transactionDetails,
+      });
+  } catch (error) {
+    await session.abortTransaction();
+    session.endSession();
+
+    // Ensure the error has status and message properties
+    const status = (error as any).status || RESPONSE_STATUS.INTERNAL_SERVER_ERROR;
+    const errorMessage = (error as any).message || 'Internal server error';
+
+    return res
+      .status(status)
+      .json({ message: errorMessage });
+  }
 };
+
 
 export const deleteUserPacket = async (req: Request, res: Response) => {
   const { userID } = req.params;

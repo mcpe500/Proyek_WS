@@ -119,25 +119,64 @@ export default {
       content: {
         "application/json": {
           schema: {
-            type: "object",
-            properties: {
-              paket_id: { type: "string" },
+            type: "array",
+            items: {
+              type: "object",
+              properties: {
+                paket_id: { type: "string" },
+                month: { type: "number" },
+              },
+              required: ["paket_id", "month"],
             },
-            required: ["paket_id"],
           },
+          example: [
+            {
+              paket_id: "PAK002",
+              month: 1,
+            },
+            {
+              paket_id: "PAK003",
+              month: 2,
+            },
+          ],
         },
       },
       required: true,
     },
     responses: {
       "201": {
-        description: "Subscription created successfully",
+        description: "Subscriptions created successfully",
         content: {
           "application/json": {
             schema: {
               type: "object",
               properties: {
-                subscription: { type: "object" },
+                message: { type: "string" },
+                transaction: {
+                  type: "object",
+                  properties: {
+                    transactionHeaderType: { type: "string" },
+                    date: { type: "string", format: "date-time" },
+                    total: { type: "number" },
+                    userId: { type: "string" },
+                    isAdmin: { type: "boolean" },
+                  },
+                },
+                subscriptions: {
+                  type: "array",
+                  items: {
+                    type: "object",
+                    properties: {
+                      transactionDetailType: { type: "string" },
+                      paket_id: { type: "string" },
+                      subscription_id: { type: "string" },
+                      month: { type: "number" },
+                      price: { type: "number" },
+                      subtotal: { type: "number" },
+                      message: { type: "string" },
+                    },
+                  },
+                },
               },
             },
           },
@@ -150,9 +189,7 @@ export default {
             schema: {
               type: "object",
               properties: {
-                msg: {
-                  type: "string",
-                },
+                msg: { type: "string" },
               },
             },
           },
@@ -165,9 +202,7 @@ export default {
             schema: {
               type: "object",
               properties: {
-                msg: {
-                  type: "string",
-                },
+                msg: { type: "string" },
               },
             },
           },
@@ -180,9 +215,7 @@ export default {
             schema: {
               type: "object",
               properties: {
-                msg: {
-                  type: "string",
-                },
+                msg: { type: "string" },
               },
             },
           },
