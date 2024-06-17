@@ -383,72 +383,121 @@ export const topup = async (req: Request, res: Response) => {
 
 // TODO bikin ini supaya ada api key nya
 export const subscribePacket = async (req: Request, res: Response) => {
-  const { paketId, month } = req.body;
+  const subscriptions = req.body; // This should be an array of { paketId, month }
   const user = (req as any).user;
 
-  const paket = await Paket.findOne({
-    where: {
-      Paket_id: paketId,
-    },
-  });
-
-  if (!paket) {
-    return res
-      .status(RESPONSE_STATUS.NOT_FOUND)
-      .json({ message: "Paket not found" });
-  }
-
-  if (paketId == "PAK001") {
+  if (!Array.isArray(subscriptions)) {
     return res
       .status(RESPONSE_STATUS.BAD_REQUEST)
-      .json({ message: "You can't subscribe to this paket" });
+      .json({ message: "Invalid request format. Expected an array of subscriptions." });
   }
 
-  if (month < 1) {
-    return res
-      .status(RESPONSE_STATUS.BAD_REQUEST)
-      .json({ message: "Invalid number of month" });
-  }
+  const session = await mongoose.startSession();
+  session.startTransaction();
 
-  // check balance
-  const totalCost = paket.Paket_price * parseInt(month);
-  if (user.balance < totalCost) {
-    return res
-      .status(RESPONSE_STATUS.BAD_REQUEST)
-      .json({ message: "Not enough balance! Please topup first" });
-  }
-
-  // update balance
   try {
-    user.balance -= totalCost;
-    await user.save();
-  } catch (error) {
+    const transactionDetails = [];
+
+    for (const sub of subscriptions) {
+      const { paketId, month } = sub;
+
+      if (!paketId || !month) {
+        throw { status: RESPONSE_STATUS.BAD_REQUEST, message: `Request fields not valid` };
+      }
+
+      const paket = await Paket.findOne({
+        where: {
+          Paket_id: paketId,
+        },
+      });
+
+      if (!paket) {
+        throw { status: RESPONSE_STATUS.NOT_FOUND, message: `Paket not found: ${paketId}` };
+      }
+
+      if (paketId === "PAK001") {
+        throw { status: RESPONSE_STATUS.BAD_REQUEST, message: `You can't subscribe to this paket: ${paketId}` };
+      }
+
+      if (month < 1) {
+        throw { status: RESPONSE_STATUS.BAD_REQUEST, message: `Invalid number of months for paket: ${paketId}` };
+      }
+
+      // Check balance
+      const totalCost = paket.Paket_price * parseInt(month);
+      if (user.balance < totalCost) {
+        throw { status: RESPONSE_STATUS.BAD_REQUEST, message: "Not enough balance! Please top up first" };
+      }
+
+      // Update balance
+      user.balance -= totalCost;
+      await user.save({ session });
+
+      let endDate = new Date();
+      endDate.setMonth(endDate.getMonth() + parseInt(month));
+      endDate.setDate(endDate.getDate() - 1);
+      endDate.setHours(23);
+      endDate.setMinutes(59);
+      endDate.setSeconds(59);
+
+      // Insert subscription
+      const apiKey = await generateApiKey();
+      const subscription = new Subscription({
+        userId: user._id,
+        paketId,
+        endDate,
+        apiKey,
+        resetAt: new Date(new Date().getTime() + 60 * 1000),
+      });
+      await subscription.save({ session });
+
+      transactionDetails.push({
+        transactionDetailType: TransactionDetailType.USER_SUBSCRIBE,
+        paket_id: paketId,
+        subscription_id: subscription._id,
+        month: month,
+        price: paket.Paket_price,
+        subtotal: totalCost,
+        message: `Subscribed to paket: ${paketId} for ${month} month(s)`,
+      });
+    }
+
+    // Insert transaction log
+    const transaction = new Transaction({
+      header: {
+        transactionHeaderType: TransactionHeaderType.SUBSCRIBE,
+        date: new Date(),
+        total: transactionDetails.reduce((acc, detail) => acc + detail.subtotal, 0),
+        userId: user._id,
+        isAdmin: false,
+      },
+      details: transactionDetails,
+    });
+    await transaction.save({ session });
+
+    await session.commitTransaction();
+    session.endSession();
+
     return res
-      .status(RESPONSE_STATUS.INTERNAL_SERVER_ERROR)
-      .json({ message: "Internal server error" });
+      .status(RESPONSE_STATUS.CREATED)
+      .json({
+        message: 'All subscriptions created successfully',
+        transaction: transaction.header,
+        subscriptions: transactionDetails,
+        remainingBalance: user.balance
+      });
+  } catch (error) {
+    await session.abortTransaction();
+    session.endSession();
+
+    // Ensure the error has status and message properties
+    const status = (error as any).status || RESPONSE_STATUS.INTERNAL_SERVER_ERROR;
+    const errorMessage = (error as any).message || 'Internal server error';
+
+    return res
+      .status(status)
+      .json({ message: errorMessage });
   }
-
-  let endDate = new Date();
-  endDate.setMonth(endDate.getMonth() + parseInt(month));
-  endDate.setDate(endDate.getDate() - 1);
-  endDate.setHours(23);
-  endDate.setMinutes(59);
-  endDate.setSeconds(59);
-
-  //insert subscription
-  const apiKey = await generateApiKey();
-  const subscription = new Subscription({
-    userId: user._id,
-    paketId,
-    endDate,
-    apiKey,
-    resetAt: new Date(new Date().getTime() + 60 * 1000),
-  });
-  const newSubscription = await subscription.save();
-
-  return res
-    .status(RESPONSE_STATUS.CREATED)
-    .json({ subscription: newSubscription });
 };
 
 export const renewSubscription = async (req: Request, res: Response) => {
