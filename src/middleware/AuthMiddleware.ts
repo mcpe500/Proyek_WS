@@ -55,6 +55,19 @@ export const validateAdmin = async (
   next();
 };
 
+export const validateIsNotAdmin = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  const user = (req as any).user;
+  if (user && user.role == "ADMIN")
+    return res
+      .status(RESPONSE_STATUS.UNAUTHORIZED)
+      .json({ msg: "Only Customers Are Allowed!" });
+  next();
+};
+
 export const validateNotSignIn = async (
   req: Request,
   res: Response,
@@ -62,7 +75,7 @@ export const validateNotSignIn = async (
 ) => {
   const token = req.headers.authorization;
   if (token) {
-    return res.status(RESPONSE_STATUS.UNAUTHORIZED).send("Unauthorized");
+    return res.status(RESPONSE_STATUS.UNAUTHORIZED).send("Please Logout First!");
   }
   next();
 };

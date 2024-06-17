@@ -5,8 +5,7 @@ import Paket from "../models/static/Paket.model";
 
 export const checkAndIncreaseAPIHit = (apiIncreaseCount: number) => {
   return async (req: Request, res: Response, next: NextFunction) => {
-    const { user } = req.body;
-
+    const user = (req as any).user;
     try {
       // Check for active subscription
       let activeSubscription = await Subscription.findOne({
