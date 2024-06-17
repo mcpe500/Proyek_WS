@@ -10,7 +10,6 @@ import newAccessTokenFromRefreshToken from "./paths/auth/newAccessTokenFromRefre
 import newRefreshToken from "./paths/auth/newRefreshToken";
 import verifyEmail from "./paths/auth/verifyEmail";
 import getAllUser from "./paths/admin/getAllUser";
-import getUserById from "./paths/admin/getUserById";
 import topup from "./paths/user/topup";
 import userDashboard from "./paths/user/userDashboard";
 import editUserProfile from "./paths/user/editUserProfile";
@@ -35,6 +34,8 @@ import getExerciseByQuery from "./paths/user/plan/exercise/getExerciseByQuery";
 import getNewsFilterOrAllNews from "./paths/news/getNewsFilterOrAllNews";
 import getGoalByTitle from "./paths/user/plan/exercise/goals/getGoalByTitle";
 import getNearestGyms from "./paths/location/getNearestGyms";
+import getProfilePicture from "./paths/user/getProfilePicture";
+import getUserProfilePicture from "./paths/admin/getUserProfilePicture";
 
 const { window } = new JSDOM();
 const $ = require("jquery")(window);
@@ -48,6 +49,7 @@ paths["/api/v1/auth/refresh_token"] = newRefreshToken;
 paths["/api/v1/auth/verify/{emailVerificationToken}"] = verifyEmail;
 paths["/api/v1/users/topup"] = topup;
 paths["/api/v1/users/dashboard"] = userDashboard;
+paths["/api/v1/users/profile-picture"] = getProfilePicture;
 paths["/api/v1/users/profile"] = editUserProfile;
 paths["/api/v1/pricing"] = getAllPricing;
 paths["/api/v1/users/apikey"] = getUserAPIKey;
@@ -69,9 +71,9 @@ paths["/api/v1/exercise/goals/{title}"] = getGoalByTitle;
 paths["/api/v1/users/plan/cancel/{id}"] = cancelPlanByUser;
 
 paths["/api/v1/admin/users"] = getAllUser;
-paths["/api/v1/admin/users/{id}"] = getUserById;
 paths["/api/v1/admin/dashboard"] = adminDashboard; // GET
 paths["/api/v1/admin/user/profile/{userID}"] = getAndDeleteUserProfile; // GET and DELETE
+paths["/api/v1/admin/user/profile-picture/{userID}"] = getUserProfilePicture; // GET and DELETE
 paths["/api/v1/admin/user/packet/{userID}"] = getAndPostAndDeletePacket; // GET and POST and DELETE
 
 paths["/api/v1/gyms/nearest"] = getNearestGyms;
