@@ -1,6 +1,6 @@
 export default {
   get: {
-    tags: ["goals"],
+    tags: ["exercises"],
     summary: "Get all fitness goals",
     description: "This endpoint retrieves a list of all fitness goals.",
     security: [

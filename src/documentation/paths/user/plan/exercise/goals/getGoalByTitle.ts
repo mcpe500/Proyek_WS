@@ -1,6 +1,6 @@
 export default {
   get: {
-    tags: ["goals"],
+    tags: ["exercises"],
     summary: "Get fitness goal by ID",
     description: "This endpoint retrieves a specific fitness goal by its ID.",
     operationId: "getGoalById",

@@ -366,7 +366,7 @@ export const resetApiKey = async (req: Request, res: Response) => {
   try {
     let newApiKey = await generateApiKey();
     const updatedSubscribe = await Subscription.findOneAndUpdate(
-      { userId: user._id, apiKey: (apiKey as any)},
+      { userId: user._id, apiKey: apiKey as any },
       { $set: { apiKey: newApiKey } },
       { new: true, useFindAndModify: false } // Returns the updated document
     );
@@ -422,7 +422,7 @@ export const topup = async (req: Request, res: Response) => {
 
     return res.status(RESPONSE_STATUS.SUCCESS).json({
       message: "Balance updated successfully.",
-      currentBalance: user.balance,
+      currentBalance: "Rp" + user.balance,
     });
   } catch (error) {
     await session.abortTransaction();
@@ -522,7 +522,7 @@ export const subscribePacket = async (req: Request, res: Response) => {
       transactionDetails.push({
         transactionDetailType: TransactionDetailType.USER_SUBSCRIBE,
         paket_id: paketId,
-        subscription_id: subscription._id,
+        subscription_id: String(subscription._id) as string,
         month: month,
         price: paket.Paket_price,
         subtotal: totalCost,
@@ -649,7 +649,7 @@ export const renewSubscription = async (req: Request, res: Response) => {
       {
         transactionDetailType: TransactionDetailType.USER_RENEW,
         paket_id: activeSubscription.paketId,
-        subscription_id: activeSubscription._id,
+        subscription_id: String(activeSubscription._id) as string,
         month: month,
         price: paket.Paket_price,
         subtotal: totalCost,
@@ -818,7 +818,7 @@ export const deleteUserProfile = async (req: Request, res: Response) => {
       { $set: { isActive: false } }
     );
   }
-  await User.updateOne({ deletedAt: new Date(new Date().getTime())});
+  await User.updateOne({ deletedAt: new Date(new Date().getTime()) });
   return res
     .status(RESPONSE_STATUS.SUCCESS)
     .json({ message: `User "${user.username}" deleted successfully` });
@@ -945,7 +945,7 @@ export const addUserPacket = async (req: Request, res: Response) => {
         transactionDetails.push({
           transactionDetailType: TransactionDetailType.ADMIN_SUBSCRIBE,
           paket_id: paket.Paket_id,
-          subscription_id: newSubscription._id,
+          subscription_id: String(newSubscription._id) as string,
           month: month,
           price: paket.Paket_price,
           subtotal: paket.Paket_price * month,
@@ -998,17 +998,17 @@ export const deleteUserPacket = async (req: Request, res: Response) => {
     return res
       .status(RESPONSE_STATUS.NOT_FOUND)
       .json({ message: "User not found" });
-      const subscription = await Subscription.find({
-        userId: userID,
-        isActive: true,
-        paketId: { $ne: "PAK001" }
-      });
-      if (subscription.length > 0) {
-        await Subscription.updateMany(
-          { userId: userID, isActive: true },
-          { $set: { isActive: false } }
-        );
-      }
+  const subscription = await Subscription.find({
+    userId: userID,
+    isActive: true,
+    paketId: { $ne: "PAK001" },
+  });
+  if (subscription.length > 0) {
+    await Subscription.updateMany(
+      { userId: userID, isActive: true },
+      { $set: { isActive: false } }
+    );
+  }
   return res
     .status(RESPONSE_STATUS.SUCCESS)
     .json({ message: "Subscription deleted successfully" });
@@ -1028,8 +1028,8 @@ export const addExercise = async (req: Request, res: Response) => {
     }
 
     if (
-      isNaN(parsedOffset) && parsedOffset != 0 ||
-      isNaN(parsedLimit) && parsedLimit != 0 ||
+      (isNaN(parsedOffset) && parsedOffset != 0) ||
+      (isNaN(parsedLimit) && parsedLimit != 0) ||
       parsedLimit < 0 ||
       parsedOffset < 0
     ) {

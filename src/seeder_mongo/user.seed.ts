@@ -6,12 +6,38 @@ import {
 import { IUser } from "../contracts/dto/UserRelated.dto";
 
 const userRoles = ["USER", "ADMIN", "SUPER_ADMIN"];
+
+const existingUsernames = new Set<string>();
+const existingEmails = new Set<string>();
+
+const generateUniqueUsername = (): string => {
+  let username = faker.internet.userName();
+  while (existingUsernames.has(username)) {
+    username = faker.internet.userName();
+  }
+  existingUsernames.add(username);
+  return username;
+};
+
+const generateUniqueEmail = (): string => {
+  let email = faker.internet.email();
+  while (existingEmails.has(email)) {
+    email = faker.internet.email();
+  }
+  existingEmails.add(email);
+  return email;
+};
+
 const createSuperAdmin = async (): Promise<IUser> => {
   const username = "super";
   const password = "string";
   const hashedPassword = await hashPassword(password);
   const email = "super@example.com";
   const emailToken = generateEmailVerificationToken(email);
+
+  // Add super admin username and email to sets
+  existingUsernames.add(username);
+  existingEmails.add(email);
 
   return {
     fullName: "SUPER ADMIN GENGSSS",
@@ -28,11 +54,16 @@ const createSuperAdmin = async (): Promise<IUser> => {
   } as IUser;
 };
 
+const do_base_password = false;
+const generate_password = do_base_password
+  ? faker.internet.password()
+  : "string";
+
 const createUser = async (isEmailVerified: boolean): Promise<IUser> => {
-  const username = faker.internet.userName();
-  const password = faker.internet.password();
+  const username = generateUniqueUsername();
+  const password = generate_password;
   const hashedPassword = await hashPassword(password);
-  const email = faker.internet.email();
+  const email = generateUniqueEmail();
   const emailToken = generateEmailVerificationToken(email);
 
   return {
@@ -53,11 +84,12 @@ const createUser = async (isEmailVerified: boolean): Promise<IUser> => {
     role: userRoles[0],
   } as IUser;
 };
+
 const createAdminUser = async (isEmailVerified: boolean): Promise<IUser> => {
-  const username = faker.internet.userName();
-  const password = faker.internet.password();
+  const username = generateUniqueUsername();
+  const password = generate_password;
   const hashedPassword = await hashPassword(password);
-  const email = faker.internet.email();
+  const email = generateUniqueEmail();
   const emailToken = generateEmailVerificationToken(email);
 
   return {
@@ -85,9 +117,9 @@ export async function createUsers(amount: number): Promise<{
   adminUsers: IUser[];
   superAdmin: IUser;
 }> {
-  let verifiedUsers = [];
-  let unverifiedUsers = [];
-  let adminUsers = [];
+  let verifiedUsers: IUser[] = [];
+  let unverifiedUsers: IUser[] = [];
+  let adminUsers: IUser[] = [];
   const superAdmin = await createSuperAdmin();
 
   for (let i = 0; i < amount; i++) {

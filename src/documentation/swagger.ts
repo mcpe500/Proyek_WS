@@ -68,7 +68,7 @@ paths["/api/v1/users/plans/{id}"] = editUserPlanById; // /users/plan/edit/:id
 paths["/api/v1/users/plans/{id}/start"] = startUserPlanById; // /users/plan/start/:id
 paths["/api/v1/users/plans/{id}/complete"] = completeUserPlanById;
 
-paths["/api/v1/users/plan/{id}/workout/"] = addWorkoutToExercisePlan;
+paths["/api/v1/users/plan/{id}/workout"] = addWorkoutToExercisePlan;
 paths["/api/v1/news"] = getNewsFilterOrAllNews;
 paths["/api/v1/news/{title}"] = getNewsByTitle;
 paths["/api/v1/exercises/goals"] = getAllGoals;
@@ -108,13 +108,6 @@ const swaggerDocument = {
         bearerFormat: "JWT",
         in: "header",
         name: "authorization",
-      },
-      apiKeyAuth: {
-        type: "http",
-        // scheme: "bearer",
-        // bearerFormat: "JWT",
-        in: "query",
-        name: "x-api-key",
       },
       cookieAuth: {
         type: "apiKey",
