@@ -5,9 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "nodemon ./src/run.ts --config nodemon.json",
-    "build": "rimraf dist && tsc",
-    "ts.check": "tsc --project tsconfig.json",
-    "add-build": "git add dist",
+    "build": "tsc",
     "deploy": "node ./output/run.js",
     "dev": "nodemon ./src/run.ts --config nodemon.json",
     "migrate": "npx sequelize-cli db:migrate",
@@ -69,7 +67,6 @@
     "mysql2": "^3.9.7",
     "nodemailer": "^6.9.13",
     "puppeteer": "^22.11.0",
-    "rimraf": "^5.0.7",
     "sequelize": "^6.37.3",
     "swagger-jsdoc": "^6.2.8",
     "swagger-ui-dist": "^5.17.14",
