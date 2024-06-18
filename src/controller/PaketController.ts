@@ -3,15 +3,24 @@ import Paket from "../models/static/Paket.model";
 import { RESPONSE_STATUS } from "../contracts/enum/ResponseRelated.enum";
 
 export const createPaket = async (req: Request, res: Response) => {
-  const { name, description, limit, price, currency } = req.body;
+  const { idNumber, name, description, limit, price, currency } = req.body;
 
   try {
-    const lastPaket = await Paket.findOne({
-      attributes: ["Paket_id"],
-      order: [["Paket_id", "DESC"]]
-    })
-    const lastPaketId = lastPaket ? parseInt(lastPaket.Paket_id.substring(3)) : 0
-    const id = "PAK" + (lastPaketId + 1).toString().padStart(3, "0");
+    let id;
+    if (idNumber && idNumber !== 0) {
+      id = `PAK${idNumber.toString().padStart(3, '0')}`;
+      const paket = await Paket.findOne({ where: { Paket_id: id } });
+      if (paket) {
+        return res.status(RESPONSE_STATUS.BAD_REQUEST).json({ message: `Paket with id ${id} already exists` });
+      }
+    } else {
+      const lastPaket = await Paket.findOne({
+        attributes: ["Paket_id"],
+        order: [["Paket_id", "DESC"]]
+      })
+      const lastPaketId = lastPaket ? parseInt(lastPaket.Paket_id.substring(3)) : 0
+      id = "PAK" + (lastPaketId + 1).toString().padStart(3, "0");
+    }
 
     const newPaket = await Paket.create({
       Paket_id: id,

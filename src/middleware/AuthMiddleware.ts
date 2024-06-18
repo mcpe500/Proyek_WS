@@ -43,55 +43,19 @@ export const validateAccessToken = async (
   }
 };
 
-export const validateRole = async (role: string) => {
-    return async (req: Request, res: Response, next: NextFunction) => {
-        const { user } = req.body;
-    if (user && user.role != ROLE.SUPER_ADMIN)
+export const validateRole = (role: string) => {
+  return (req: Request, res: Response, next: NextFunction) => {
+    const user = (req as any).user;
+    console.log(user);
+    if (user && user.role != role) {
+      
       return res
         .status(RESPONSE_STATUS.UNAUTHORIZED)
         .json({ msg: `User is not ${role}` });
-    next();
     }
-}
-
-export const validateSuperAdmin = async (
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ) => {
-    const { user } = req.body;
-    if (user && user.role != ROLE.SUPER_ADMIN)
-      return res
-        .status(RESPONSE_STATUS.UNAUTHORIZED)
-        .json({ msg: "User is not super admin" });
     next();
-  };
-
-export const validateAdmin = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
-  const { user } = req.body;
-  if (user && user.role != ROLE.ADMIN)
-    return res
-      .status(RESPONSE_STATUS.UNAUTHORIZED)
-      .json({ msg: "User is not admin" });
-  next();
-};
-
-export const validateUser = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
-  const user = (req as any).user;
-  if (user && user.role == ROLE.USER)
-    return res
-      .status(RESPONSE_STATUS.UNAUTHORIZED)
-      .json({ msg: "Only Customers Are Allowed!" });
-  next();
-};
+  }
+}
 
 export const validateNotSignIn = async (
   req: Request,

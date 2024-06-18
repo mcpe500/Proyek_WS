@@ -80,7 +80,7 @@ export const registerUser = async (req: Request, res: Response) => {
     const respone = {
       username: savedUser.username,
       email: savedUser.email,
-      fullName: savedUser.email,
+      fullName: savedUser.fullName,
       phone: savedUser.phone,
       _id: savedUser._id,
     };

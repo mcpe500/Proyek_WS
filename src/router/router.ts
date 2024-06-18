@@ -26,9 +26,8 @@ import {
 } from "../controller/UserController";
 import {
   validateAccessToken,
-  validateAdmin,
+  validateRole,
   validateNotSignIn,
-  validateUser,
 } from "../middleware/AuthMiddleware";
 import {
   validateBody,
@@ -69,6 +68,9 @@ import { getFilteredNews, getSpecificNews } from "../controller/NewsController";
 import { getNearestGyms } from "../controller/GymsController";
 import { getGymsSchema } from "../validators/Maps.validate";
 import upload from "../middleware/Upload";
+import { ROLE } from "../contracts/enum/UserRelated.enum";
+import { createPaket, deletePaket, updatePaket } from "../controller/PaketController";
+import { paketCreateSchemaJoi, paketEditSchemaJoi } from "../validators/Paket.validate";
 
 const router = Router();
 
@@ -98,66 +100,68 @@ router.post(
 router.get("/auth/verify/:emailVerificationToken", verifyEmail);
 
 // SuperAdmin Routes
-router.post("/superadmin/paket", [valida])
+router.post("/super-admin/paket", [validateAccessToken, validateRole(ROLE.SUPER_ADMIN), validateBody(paketCreateSchemaJoi)], createPaket);
+router.put("/super-admin/paket/:id", [validateAccessToken, validateRole(ROLE.SUPER_ADMIN), validateBody(paketEditSchemaJoi)], updatePaket);
+router.delete("/super-admin/paket/:id", [validateAccessToken, validateRole(ROLE.SUPER_ADMIN)], deletePaket);
 
 // Admin Routes
-router.get("/admin/users", [validateAccessToken, validateAdmin], getAllUser);
+router.get("/admin/users", [validateAccessToken, validateRole(ROLE.ADMIN)], getAllUser);
 router.get(
   "/admin/dashboard",
-  [validateAccessToken, validateAdmin],
+  [validateAccessToken, validateRole(ROLE.ADMIN)],
   adminDashboard
 );
 router.get(
   "/admin/user/profile/:userID",
-  [validateAccessToken, validateAdmin],
+  [validateAccessToken, validateRole(ROLE.ADMIN)],
   getUserProfile
 );
 router.delete(
   "/admin/user/profile/:userID",
-  [validateAccessToken, validateAdmin],
+  [validateAccessToken, validateRole(ROLE.ADMIN)],
   deleteUserProfile
 );
 router.get(
   "/admin/user/profile-picture/:userID",
-  [validateAccessToken, validateAdmin],
+  [validateAccessToken, validateRole(ROLE.ADMIN)],
   getUserProfilePicture
 );
 router.get(
   "/admin/user/packet/:userID",
-  [validateAccessToken, validateAdmin],
+  [validateAccessToken, validateRole(ROLE.ADMIN)],
   getUserPacket
 );
 router.post(
   "/admin/user/packet/:userID",
-  [validateAccessToken, validateAdmin],
+  [validateAccessToken, validateRole(ROLE.ADMIN)],
   addUserPacket
 );
 router.delete(
   "/admin/user/packet/:userID",
-  [validateAccessToken, validateAdmin],
+  [validateAccessToken, validateRole(ROLE.ADMIN)],
   deleteUserPacket
 );
 router.get(
   "/admin/exercise",
-  [validateAccessToken, validateAdmin],
+  [validateAccessToken, validateRole(ROLE.ADMIN)],
   addExercise
 );
 router.put(
   "/admin/user/topup/:userID?",
-  [validateAccessToken, validateAdmin],
+  [validateAccessToken, validateRole(ROLE.ADMIN)],
   topupFromAdmin
 );
 
 // User Routes
-router.put("/users/topup", [validateAccessToken, validateUser], topup);
+router.put("/users/topup", [validateAccessToken, validateRole(ROLE.USER)], topup);
 router.get(
   "/users/dashboard",
-  [validateAccessToken, validateUser],
+  [validateAccessToken, validateRole(ROLE.USER)],
   getDashboard
 );
 router.get(
   "/users/profile-picture",
-  [validateAccessToken, validateUser],
+  [validateAccessToken, validateRole(ROLE.USER)],
   getProfPic
 );
 router.put(
@@ -165,29 +169,29 @@ router.put(
   [
     validateBody(editProfileSchemaJoi), // Check if this works or not (Hansen)
     validateAccessToken,
-    validateUser,
+    validateRole(ROLE.USER),
     upload.single("profilePicture"),
   ],
   editProfile
 );
 router.get(
   "/users/apikey",
-  [validateAccessToken, validateUser],
+  [validateAccessToken, validateRole(ROLE.USER)],
   getApiKey
 );
 router.put(
   "/users/apikey/reset",
-  [validateAccessToken, validateUser, checkAndIncreaseAPIHit(1)],
+  [validateAccessToken, validateRole(ROLE.USER), checkAndIncreaseAPIHit(1)],
   resetApiKey
 ); // TODO : bikin ini pake ApiKey (Hansen)
 router.post(
   "/users/subscribe",
-  [validateAccessToken, validateUser],
+  [validateAccessToken, validateRole(ROLE.USER)],
   subscribePacket
 );
 router.put(
   "/users/renew",
-  [validateAccessToken, validateUser],
+  [validateAccessToken, validateRole(ROLE.USER)],
   renewSubscription
 );
 router.post(
@@ -195,51 +199,51 @@ router.post(
   [
     validateBody(createUserPlanSchemaJoi),
     validateAccessToken, // TODO : Check with hansen mungkin ini error (Should be fine, Hansen)
-    validateUser,
+    validateRole(ROLE.USER),
     checkAndIncreaseAPIHit(1),
   ],
   createExercisePlan
 ); // TODO : bikin ini pake ApiKey (Hansen)
 router.get(
   "/users/plan",
-  [validateAccessToken, validateUser, checkAndIncreaseAPIHit(1)],
+  [validateAccessToken, validateRole(ROLE.USER), checkAndIncreaseAPIHit(1)],
   getAllExercisePlanByUser
 ); // TODO : bikin ini pake ApiKey (Hansen)
 router.get(
   "/users/plan/:id",
-  [validateAccessToken, validateUser, checkAndIncreaseAPIHit(1)],
+  [validateAccessToken, validateRole(ROLE.USER), checkAndIncreaseAPIHit(1)],
   getExercisePlanDetailByUser
 ); // TODO : bikin ini pake ApiKey (Hansen)
 
 // Exercise Plan Routes
 router.put(
   "/users/plan/edit/:id",
-  [validateAccessToken, validateUser, checkAndIncreaseAPIHit(1)],
+  [validateAccessToken, validateRole(ROLE.USER), checkAndIncreaseAPIHit(1)],
   editExercisePlan
 ); // TODO : bikin ini pake ApiKey (Hansen)
 router.post(
   "/users/plan/start/:id",
-  [validateAccessToken, validateUser, checkAndIncreaseAPIHit(1)],
+  [validateAccessToken, validateRole(ROLE.USER), checkAndIncreaseAPIHit(1)],
   startExercisePlan
 ); // TODO : bikin ini pake ApiKey (Hansen)
 router.put(
   "/users/plan/:id/workout/",
-  [validateAccessToken, validateUser, checkAndIncreaseAPIHit(1)],
+  [validateAccessToken, validateRole(ROLE.USER), checkAndIncreaseAPIHit(1)],
   addWorkoutToExercisePlan
 ); // TODO : bikin ini pake ApiKey (Hansen)
 router.get(
   "/users/plan/:id/workout/",
-  [validateAccessToken, validateUser, checkAndIncreaseAPIHit(1)],
+  [validateAccessToken, validateRole(ROLE.USER), checkAndIncreaseAPIHit(1)],
   exercisePlanDetails
 ); // TODO : bikin ini pake ApiKey (Hansen)
 router.post(
   "/users/plan/complete/:id",
-  [validateAccessToken, validateUser, checkAndIncreaseAPIHit(1)],
+  [validateAccessToken, validateRole(ROLE.USER), checkAndIncreaseAPIHit(1)],
   completeExercisePlan
 ); // TODO : bikin ini pake ApiKey (Hansen)
 router.put(
   "/users/plan/cancel/:id",
-  [validateAccessToken, validateUser, checkAndIncreaseAPIHit(1)],
+  [validateAccessToken, validateRole(ROLE.USER), checkAndIncreaseAPIHit(1)],
   cancelExercisePlanByUser
 );
 
