@@ -1,5 +1,4 @@
 /node_modules
-/output
 .env
 package-lock.json
 /src/documentation/swagger_log
