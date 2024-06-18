@@ -69,10 +69,46 @@ export default {
               },
             },
             examples: {
-              dupe: {
-                summary: "Duplicate key",
+              usernameRequired: {
+                summary: "Username missing",
                 value: {
-                  message: "Username or email already exists.",
+                  message: "Username is required",
+                },
+              },
+              emailRequired: {
+                summary: "Email missing",
+                value: {
+                  message: "Email is required",
+                },
+              },
+              emailInvalid: {
+                summary: "Invalid email address",
+                value: {
+                  message: "Email must be a valid email address",
+                },
+              },
+              passwordRequired: {
+                summary: "Password missing",
+                value: {
+                  message: "Password is required",
+                },
+              },
+              fullNameRequired: {
+                summary: "Full name missing",
+                value: {
+                  message: "Full name is required",
+                },
+              },
+              phoneRequired: {
+                summary: "Phone number missing",
+                value: {
+                  message: "Phone number is required",
+                },
+              },
+              phoneInvalid: {
+                summary: "Phone number invalid",
+                value: {
+                  message: "Phone number must be between 10 and 15 digits",
                 },
               },
             },

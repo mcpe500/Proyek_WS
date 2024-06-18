@@ -29,6 +29,14 @@ export default {
                 },
               },
             },
+            examples: {
+              success: {
+                summary: "Email verified successfully",
+                value: {
+                  message: "Email verified successfully.",
+                },
+              },
+            },
           },
         },
       },
@@ -44,6 +52,14 @@ export default {
                 },
               },
             },
+            examples: {
+              invalidToken: {
+                summary: "Invalid or expired email verification token",
+                value: {
+                  message: "Invalid email verification token or your email verification token has expired",
+                },
+              },
+            },
           },
         },
       },
@@ -56,6 +72,14 @@ export default {
               properties: {
                 message: {
                   type: "string",
+                },
+              },
+            },
+            examples: {
+              userNotFound: {
+                summary: "User not found",
+                value: {
+                  message: "User not found",
                 },
               },
             },
