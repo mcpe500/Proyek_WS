@@ -421,7 +421,7 @@ export const topup = async (req: Request, res: Response) => {
 
     return res.status(RESPONSE_STATUS.SUCCESS).json({
       message: "Balance updated successfully.",
-      currentBalance: user.balance,
+      currentBalance: "Rp" + user.balance,
     });
   } catch (error) {
     await session.abortTransaction();
