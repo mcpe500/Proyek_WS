@@ -237,7 +237,7 @@ export const newRefreshToken = async (req: Request, res: Response) => {
     res.cookie("refreshToken", refreshToken, { httpOnly: true });
     return res
       .status(RESPONSE_STATUS.SUCCESS)
-      .json({ message: "Refresh token generated successfully" });
+      .json({ message: "Refresh token generated successfully", refreshToken: newRefreshToken });
   } catch (err) {
     return res
       .status(RESPONSE_STATUS.FORBIDDEN)
