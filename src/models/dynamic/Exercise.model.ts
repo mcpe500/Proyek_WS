@@ -5,7 +5,7 @@ const ExerciseSchema: Schema = new Schema({
   name: { type: String, required: true },
   type: { type: String, required: true },
   targeted_muscle: { type: String, required: true },
-  equipmentRequired: [{ type: String, required: false }],
+  equipmentRequired: { type: String, required: false },
   description: { type: String, required: true },
 });
 
@@ -17,12 +17,7 @@ const ExercisePlanSchema: Schema = new Schema({
       sets: { type: Number, required: true },
       repetitions: { type: Number, required: true },
       restBetweenSetsInSeconds: { type: Number, required: true },
-      equipmentRequired: [
-        {
-          name: { type: String, required: true },
-          description: { type: String, required: true }
-        }
-      ]
+      equipmentRequired: { type: String, required: true }
     }
   ]
 });

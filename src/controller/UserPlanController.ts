@@ -6,7 +6,7 @@ import { PlansStatus } from "../contracts/enum/PlansRelated.enum";
 import { FITNESS_GOALS } from "../contracts/enum/FitnessRelated.enum";
 import { User } from "../models/dynamic/User.model";
 import { Exercise, ExercisePlan } from "../models/dynamic/Exercise.model";
-import mongoose from "mongoose";
+import mongoose, { set } from "mongoose";
 
 // Create Exercise Plan
 export const createExercisePlan = async (req: Request, res: Response) => {
@@ -172,10 +172,14 @@ export const completeExercisePlan = async (req: Request, res: Response) => {
 
 export const addWorkoutToExercisePlan = async (req: Request, res: Response) => {
   const { id } = req.params;
-  const { exerciseId } = req.body;
+  const { exerciseId, sets, repetitions, restBetweenSetsInSeconds } = req.body;
   const user = (req as any).user;
 
   const plan = await Plans.findById(id);
+
+  if (isNaN(sets) || isNaN(repetitions) || isNaN(restBetweenSetsInSeconds)) {
+    return res.status(RESPONSE_STATUS.BAD_REQUEST).json({ msg: "sets, repititions, and restBetweenSetsInSeconds must be a number" });
+  }
 
   if (!plan) {
     return res
@@ -186,16 +190,24 @@ export const addWorkoutToExercisePlan = async (req: Request, res: Response) => {
   if (plan.createdBy != user.username) {
     return res.status(RESPONSE_STATUS.NOT_FOUND).json({ msg: "Not Your Plan" });
   }
-
-  const exercise = await ExercisePlan.findById(exerciseId);
-
-  if (!exercise) {
+  let exercise;
+  try {
+      exercise = await Exercise.findById(exerciseId);
+  } catch (error) {
     return res
       .status(RESPONSE_STATUS.NOT_FOUND)
       .json({ msg: "Exercise not found" });
   }
 
-  plan.exercises.push(exercise);
+  const workout = {
+    name: exercise?.name,
+    description: exercise?.description,
+    sets: sets,
+    repetitions: repetitions,
+    restBetweenSetsInSeconds: restBetweenSetsInSeconds,
+    equipmentRequired: exercise?.equipmentRequired
+  };
+  plan.exercises.push(workout as any);
   await plan.save();
 
   return res
