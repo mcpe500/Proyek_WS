@@ -808,12 +808,17 @@ export const deleteUserProfile = async (req: Request, res: Response) => {
     return res
       .status(RESPONSE_STATUS.NOT_FOUND)
       .json({ message: "User not found" });
-  const subscription = await Subscription.findOne({
+  const subscription = await Subscription.find({
     userId: userID,
     isActive: true,
   });
-  if (subscription) await subscription.updateOne({ isActive: false });
-  await User.deleteOne({ _id: user._id });
+  if (subscription.length > 0) {
+    await Subscription.updateMany(
+      { userId: userID, isActive: true },
+      { $set: { isActive: false } }
+    );
+  }
+  await User.updateOne({ deletedAt: new Date(new Date().getTime())});
   return res
     .status(RESPONSE_STATUS.SUCCESS)
     .json({ message: `User "${user.username}" deleted successfully` });
@@ -993,15 +998,17 @@ export const deleteUserPacket = async (req: Request, res: Response) => {
     return res
       .status(RESPONSE_STATUS.NOT_FOUND)
       .json({ message: "User not found" });
-  const subscription = await Subscription.findOne({
-    userId: userID,
-    isActive: true,
-  });
-  if (!subscription)
-    return res
-      .status(RESPONSE_STATUS.NOT_FOUND)
-      .json({ message: "User doesn't have any subscription" });
-  await subscription.updateOne({ isActive: false });
+      const subscription = await Subscription.find({
+        userId: userID,
+        isActive: true,
+        paketId: { $ne: "PAK001" }
+      });
+      if (subscription.length > 0) {
+        await Subscription.updateMany(
+          { userId: userID, isActive: true },
+          { $set: { isActive: false } }
+        );
+      }
   return res
     .status(RESPONSE_STATUS.SUCCESS)
     .json({ message: "Subscription deleted successfully" });
