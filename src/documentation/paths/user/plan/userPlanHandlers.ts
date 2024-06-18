@@ -71,7 +71,7 @@ export default {
     },
   },
   post: {
-    tags: ["users"],
+    tags: ["plans"],
     summary: "Create a new exercise plan",
     description: "This endpoint creates a new exercise plan for a user.",
     operationId: "createExercisePlan",
