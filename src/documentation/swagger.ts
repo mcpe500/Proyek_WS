@@ -39,6 +39,7 @@ import getUserProfilePicture from "./paths/admin/getUserProfilePicture";
 import topupFromAdmin from "./paths/admin/topupFromAdmin";
 import postPaket from "./paths/super-admin/postPaket";
 import putAndDeletePaket from "./paths/super-admin/putAndDeletePaket";
+import promoteAdmin from "./paths/super-admin/promoteAdmin";
 
 const { window } = new JSDOM();
 const $ = require("jquery")(window);
@@ -82,6 +83,7 @@ paths["/api/v1/admin/user/topup/{userID}"] = topupFromAdmin;
 
 paths["/api/v1/super-admin/paket"] = postPaket;
 paths["/api/v1/super-admin/paket/{id}"] = putAndDeletePaket;
+paths["/api/v1/super-admin/promote/{userID}"] = promoteAdmin;
 
 
 paths["/api/v1/gyms/nearest"] = getNearestGyms;
