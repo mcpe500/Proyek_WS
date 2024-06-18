@@ -9,11 +9,6 @@ export interface IExercise extends Document {
     description: String
 }
 
-export interface IEquipment extends Document {
-  name: string;
-  description: string;
-}
-
 export interface INutritionPlan extends Document {
   id: string;
   name: string;
@@ -55,5 +50,5 @@ export interface IExercisePlan extends Document {
   sets: number;
   repetitions: number;
   restBetweenSetsInSeconds: number;
-  equipmentRequired: IEquipment[];
+  equipmentRequired: string[];
 }

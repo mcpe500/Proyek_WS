@@ -19,7 +19,16 @@ const PlansSchema: Schema = new Schema({
   frequencyPerWeek: { type: Number, required: true },
   restDaysPerWeek: { type: Number, required: true },
   intensity: { type: Number, required: true },
-  exercises: [{ type: Schema.Types.ObjectId, ref: "ExercisePlan" }],
+  exercises: [
+    {
+      name: { type: String, required: true },
+      description: { type: String, required: true },
+      sets: { type: Number, required: true },
+      repetitions: { type: Number, required: true },
+      restBetweenSetsInSeconds: { type: Number, required: true },
+      equipmentRequired: { type: String, required: true }
+    }
+  ],
   nutritionPlan: { type: Schema.Types.ObjectId, ref: "NutritionPlan" },
   createdBy: { type: String, required: true },
   createdDate: { type: Date, required: true, default: Date.now },

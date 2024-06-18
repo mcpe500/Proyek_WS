@@ -1011,7 +1011,7 @@ export const addExercise = async (req: Request, res: Response) => {
     const { offset, limit_per_ten } = req.query;
 
     // Make API call
-    const parsedOffset = Math.floor(Number(offset));
+    let parsedOffset = Math.floor(Number(offset));
     const parsedLimit = Math.floor(Number(limit_per_ten));
 
     if (
@@ -1024,9 +1024,11 @@ export const addExercise = async (req: Request, res: Response) => {
         .status(RESPONSE_STATUS.BAD_REQUEST)
         .json({ msg: "Offset and limit must be non-negative integers." });
     }
-
+    if (offset == undefined) {
+      parsedOffset = 0;
+    }
     const queryParams: any = {};
-    for (let i = parsedOffset; i < parsedOffset + parsedLimit; i++) {
+    for (let i = parsedOffset; i < (parsedOffset + parsedLimit); i++) {
       queryParams.offset = i * 10;
       let exercises: any[] = await Apis.API_NINJA_ApiService.get("", {
         params: queryParams,
@@ -1037,7 +1039,7 @@ export const addExercise = async (req: Request, res: Response) => {
           name: exercise.name,
         });
 
-        // If the exercise does not exist, insert it into the database
+        //If the exercise does not exist, insert it into the database
         if (!existingExercise) {
           const newExercise = new Exercise({
             name: exercise.name,
