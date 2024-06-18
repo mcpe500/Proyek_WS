@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "nodemon ./src/run.ts --config nodemon.json",
-    "build": "tsc && parcel build ./src/run.ts --out-dir dist --target node",
+    "build": "tsc && parcel build ./src/run.ts --out-dir . --target node",
     "deploy": "node ./output/run.js",
     "dev": "nodemon ./src/run.ts --config nodemon.json",
     "migrate": "npx sequelize-cli db:migrate",
