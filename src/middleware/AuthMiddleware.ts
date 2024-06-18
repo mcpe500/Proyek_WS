@@ -25,6 +25,9 @@ export const validateAccessToken = async (
     const { username, email } = decodedToken;
     try {
       const user = await User.findOne({ $or: [{ username }, { email }] });
+      if (user?.deletedAt != null) {
+        return res.status(RESPONSE_STATUS.UNAUTHORIZED).send("Unauthorized");
+      }
       if (user) {
         (req as any).user = user;
         next();

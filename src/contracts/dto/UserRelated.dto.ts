@@ -20,4 +20,5 @@ export interface IUser extends Document {
   isEmailVerified: boolean;
   emailVerificationToken: string;
   role: string;
+  deletedAt: Date;
 }

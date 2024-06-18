@@ -22,6 +22,7 @@ const UserSchema: Schema = new Schema({
   isEmailVerified: { type: Boolean, default: false },
   emailVerificationToken: { type: String },
   role: { type: String, default: "USER" },
+  deletedAt: { type: Date, default: null }
 });
 
 export const User = mongoose.model<IUser>("User", UserSchema);

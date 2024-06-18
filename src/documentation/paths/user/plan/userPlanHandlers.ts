@@ -113,32 +113,7 @@ export default {
               durationInWeeks: { type: "number" },
               frequencyPerWeek: { type: "number" },
               restDaysPerWeek: { type: "number" },
-              intensity: { type: "string" },
-              exercises: {
-                type: "array",
-                items: {
-                  type: "object",
-                  properties: {
-                    name: { type: "string" },
-                    description: { type: "string" },
-                    sets: { type: "number" },
-                    repetitions: { type: "number" },
-                    restBetweenSetsInSeconds: { type: "number" },
-                    equipmentRequired: {
-                      type: "array",
-                      items: {
-                        type: "object",
-                        properties: {
-                          name: { type: "string" },
-                          description: { type: "string" },
-                        },
-                      },
-                    },
-                  },
-                },
-              },
-              nutritionPlan: { type: "object" },
-              createdBy: { type: "string" },
+              intensity: { type: "number" },
             },
           },
         },
@@ -170,30 +145,6 @@ export default {
                     frequencyPerWeek: { type: "number" },
                     restDaysPerWeek: { type: "number" },
                     intensity: { type: "number" },
-                    exercises: {
-                      type: "array",
-                      items: {
-                        type: "object",
-                        properties: {
-                          name: { type: "string" },
-                          description: { type: "string" },
-                          sets: { type: "number" },
-                          repetitions: { type: "number" },
-                          restBetweenSetsInSeconds: { type: "number" },
-                          equipmentRequired: {
-                            type: "array",
-                            items: {
-                              type: "object",
-                              properties: {
-                                name: { type: "string" },
-                                description: { type: "string" },
-                              },
-                            },
-                          },
-                        },
-                      },
-                    },
-                    nutritionPlan: { type: "object" },
                     createdBy: { type: "string" },
                     status: { type: "string" },
                   },
