@@ -61,7 +61,7 @@ export const registerUser = async (req: Request, res: Response) => {
     if (existingUser) {
       return res
         .status(RESPONSE_STATUS.BAD_REQUEST)
-        .json({ msg: "Username or email already exists" });
+        .json({ message: "Username or email already exists" });
     }
 
     const hashedPassword = await hashPassword(password);
@@ -86,7 +86,7 @@ export const registerUser = async (req: Request, res: Response) => {
     };
     await sendVerificationEmail(email, emailToken, username);
     return res.status(RESPONSE_STATUS.CREATED).json({
-      msg: "Register Successful, please verify your email within 24 hours!",
+      message: "Register Successful, please verify your email within 24 hours!",
       user: respone,
     });
   } catch (error) {
@@ -101,7 +101,7 @@ export const loginUser = async (req: Request, res: Response) => {
   if (!user) {
     return res
       .status(RESPONSE_STATUS.BAD_REQUEST)
-      .json({ msg: "Invalid credentials" });
+      .json({ message: "Invalid credentials" });
   }
   if (!user.isEmailVerified) {
     if (!verifyEmailVerificationToken(user.emailVerificationToken)) {
@@ -120,7 +120,7 @@ export const loginUser = async (req: Request, res: Response) => {
   if (!isPasswordValid) {
     return res
       .status(RESPONSE_STATUS.BAD_REQUEST)
-      .json({ msg: "Invalid credentials" });
+      .json({ message: "Invalid credentials" });
   }
   const dataToToken = {
     username: username,
@@ -136,7 +136,7 @@ export const loginUser = async (req: Request, res: Response) => {
 
   res.cookie("refreshToken", refreshToken, { httpOnly: true });
   return res.status(RESPONSE_STATUS.SUCCESS).json({
-    msg: "Logged in successfully",
+    message: "Logged in successfully",
     token: accessToken,
   });
 };
@@ -180,18 +180,18 @@ export const editProfile = async (req: Request, res: Response) => {
     if (!isPasswordValid) {
       return res
         .status(RESPONSE_STATUS.BAD_REQUEST)
-        .json({ msg: "old_password is incorrect" });
+        .json({ message: "old_password is incorrect" });
     }
 
     if (new_password && new_password == "") {
       return res
         .status(RESPONSE_STATUS.BAD_REQUEST)
-        .json({ msg: "new_password must not be empty" });
+        .json({ message: "new_password must not be empty" });
     }
     if (new_password != confirm_password) {
       return res
         .status(RESPONSE_STATUS.BAD_REQUEST)
-        .json({ msg: "confirm_password does not match" });
+        .json({ message: "confirm_password does not match" });
     }
     const hashedPassword = await hashPassword(new_password);
 
@@ -333,7 +333,7 @@ export const getApiKey = async (req: Request, res: Response) => {
     if (!subscriptions.length) {
       return res
         .status(RESPONSE_STATUS.NOT_FOUND)
-        .json({ msg: "No subscriptions found for this user" });
+        .json({ message: "No subscriptions found for this user" });
     }
 
     const activeSubscriptions = subscriptions.filter(
@@ -349,13 +349,13 @@ export const getApiKey = async (req: Request, res: Response) => {
     } else {
       return res
         .status(RESPONSE_STATUS.NOT_FOUND)
-        .json({ msg: "No active API keys found for this user" });
+        .json({ message: "No active API keys found for this user" });
     }
   } catch (error) {
     console.error("Error fetching API keys:", error);
     return res
       .status(RESPONSE_STATUS.INTERNAL_SERVER_ERROR)
-      .json({ msg: "Internal server error" });
+      .json({ message: "Internal server error" });
   }
 };
 
@@ -376,7 +376,7 @@ export const resetApiKey = async (req: Request, res: Response) => {
   } catch (error) {
     return res
       .status(RESPONSE_STATUS.INTERNAL_SERVER_ERROR)
-      .json({ msg: "Internal server error" });
+      .json({ message: "Internal server error" });
   }
 };
 
@@ -600,7 +600,7 @@ export const renewSubscription = async (req: Request, res: Response) => {
     });
     return res
       .status(RESPONSE_STATUS.BAD_REQUEST)
-      .json({ msg: "Your subscription has expired" });
+      .json({ message: "Your subscription has expired" });
   }
 
   if (activeSubscription.paketId == "PAK001") {
@@ -779,7 +779,7 @@ export const getUserProfile = async (req: Request, res: Response) => {
   if (!user)
     return res
       .status(RESPONSE_STATUS.NOT_FOUND)
-      .json({ msg: "User not found" });
+      .json({ message: "User not found" });
   return res.status(RESPONSE_STATUS.SUCCESS).json({
     username: user.username,
     full_name: user.fullName,
@@ -795,7 +795,7 @@ export const getUserProfilePicture = async (req: Request, res: Response) => {
   if (!user)
     return res
       .status(RESPONSE_STATUS.NOT_FOUND)
-      .json({ msg: "User not found" });
+      .json({ message: "User not found" });
   return res.sendFile(user.profilePicture, { root: "." });
 };
 
@@ -805,7 +805,7 @@ export const deleteUserProfile = async (req: Request, res: Response) => {
   if (!user)
     return res
       .status(RESPONSE_STATUS.NOT_FOUND)
-      .json({ msg: "User not found" });
+      .json({ message: "User not found" });
   const subscription = await Subscription.findOne({
     userId: userID,
     isActive: true,
@@ -814,7 +814,7 @@ export const deleteUserProfile = async (req: Request, res: Response) => {
   await User.deleteOne({ _id: user._id });
   return res
     .status(RESPONSE_STATUS.SUCCESS)
-    .json({ msg: `User "${user.username}" deleted successfully` });
+    .json({ message: `User "${user.username}" deleted successfully` });
 };
 
 export const getUserPacket = async (req: Request, res: Response) => {
@@ -823,7 +823,7 @@ export const getUserPacket = async (req: Request, res: Response) => {
   if (!user)
     return res
       .status(RESPONSE_STATUS.NOT_FOUND)
-      .json({ msg: "User not found" });
+      .json({ message: "User not found" });
   const subscription = await Subscription.findOne({
     userId: userID,
     isActive: true,
@@ -831,14 +831,14 @@ export const getUserPacket = async (req: Request, res: Response) => {
   if (!subscription)
     return res
       .status(RESPONSE_STATUS.NOT_FOUND)
-      .json({ msg: "User doesn't have any subscription" });
+      .json({ message: "User doesn't have any subscription" });
   const packet = await Paket.findOne({
     where: { Paket_id: subscription.paketId },
   });
   if (!packet)
     return res
       .status(RESPONSE_STATUS.NOT_FOUND)
-      .json({ msg: "Packet not found" });
+      .json({ message: "Packet not found" });
   return res.status(RESPONSE_STATUS.SUCCESS).json({
     username: user.username,
     nama: user.fullName,
@@ -871,7 +871,7 @@ export const addUserPacket = async (req: Request, res: Response) => {
     if (users.length === 0 || users[0] === null) {
       return res
         .status(RESPONSE_STATUS.NOT_FOUND)
-        .json({ msg: "User not found" });
+        .json({ message: "User not found" });
     }
 
     const transactionDetails = [];
@@ -990,7 +990,7 @@ export const deleteUserPacket = async (req: Request, res: Response) => {
   if (!user)
     return res
       .status(RESPONSE_STATUS.NOT_FOUND)
-      .json({ msg: "User not found" });
+      .json({ message: "User not found" });
   const subscription = await Subscription.findOne({
     userId: userID,
     isActive: true,
@@ -998,11 +998,11 @@ export const deleteUserPacket = async (req: Request, res: Response) => {
   if (!subscription)
     return res
       .status(RESPONSE_STATUS.NOT_FOUND)
-      .json({ msg: "User doesn't have any subscription" });
+      .json({ message: "User doesn't have any subscription" });
   await subscription.updateOne({ isActive: false });
   return res
     .status(RESPONSE_STATUS.SUCCESS)
-    .json({ msg: "Subscription deleted successfully" });
+    .json({ message: "Subscription deleted successfully" });
 };
 
 export const addExercise = async (req: Request, res: Response) => {
@@ -1026,7 +1026,7 @@ export const addExercise = async (req: Request, res: Response) => {
     ) {
       return res
         .status(RESPONSE_STATUS.BAD_REQUEST)
-        .json({ msg: "Offset and limit must be non-negative integers." });
+        .json({ message: "Offset and limit must be non-negative integers." });
     }
 
     const queryParams: any = {};
@@ -1058,11 +1058,11 @@ export const addExercise = async (req: Request, res: Response) => {
 
     return res
       .status(RESPONSE_STATUS.SUCCESS)
-      .json({ msg: "Exercises have been added/updated successfully." });
+      .json({ message: "Exercises have been added/updated successfully." });
   } catch (error) {
     return res
       .status(RESPONSE_STATUS.INTERNAL_SERVER_ERROR)
-      .json({ msg: "Exercises added/updated failed." });
+      .json({ message: "Exercises added/updated failed." });
   }
 };
 
@@ -1074,7 +1074,7 @@ export const topupFromAdmin = async (req: Request, res: Response) => {
   if (!saldo) {
     return res
       .status(RESPONSE_STATUS.BAD_REQUEST)
-      .json({ msg: "Saldo is required" });
+      .json({ message: "Saldo is required" });
   }
 
   const session = await mongoose.startSession();
@@ -1122,7 +1122,7 @@ export const topupFromAdmin = async (req: Request, res: Response) => {
       session.endSession();
 
       return res.status(RESPONSE_STATUS.SUCCESS).json({
-        msg: "Balance updated successfully",
+        message: "Balance updated successfully",
         username: user.username,
         full_name: user.fullName,
         newBalance: user.balance,
@@ -1167,7 +1167,7 @@ export const topupFromAdmin = async (req: Request, res: Response) => {
       session.endSession();
 
       return res.status(RESPONSE_STATUS.SUCCESS).json({
-        msg: "Balance updated for all users successfully",
+        message: "Balance updated for all users successfully",
       });
     } else {
       throw new Error("Invalid userID");
@@ -1176,14 +1176,14 @@ export const topupFromAdmin = async (req: Request, res: Response) => {
     await session.abortTransaction();
     session.endSession();
 
-    const errorMsg =
+    const errormessage =
       error instanceof Error ? error.message : "Internal Server Error";
     const status =
       error.message === "User not found"
         ? RESPONSE_STATUS.NOT_FOUND
         : RESPONSE_STATUS.BAD_REQUEST;
 
-    return res.status(status).json({ msg: errorMsg });
+    return res.status(status).json({ message: errormessage });
   }
 };
 

@@ -39,13 +39,13 @@ export const createExercisePlan = async (req: Request, res: Response) => {
     const savedPlan = await newPlan.save();
 
     return res.status(RESPONSE_STATUS.CREATED).json({
-      msg: "Exercise plan created successfully",
+      message: "Exercise plan created successfully",
       plan: savedPlan,
     });
   } catch (error) {
     return res
       .status(RESPONSE_STATUS.INTERNAL_SERVER_ERROR)
-      .json({ msg: "Internal server error", error });
+      .json({ message: "Internal server error", error });
   }
 };
 // /users/plan/edit
@@ -70,10 +70,10 @@ export const editExercisePlan = async (req: Request, res: Response) => {
     if (!plan) {
       return res
         .status(RESPONSE_STATUS.NOT_FOUND)
-        .json({ msg: "Plan not found" });
+        .json({ message: "Plan not found" });
     }
     if (plan.createdBy != user.username) {
-      return res.status(RESPONSE_STATUS.NOT_FOUND).json({ msg: "Not Your Plan" });
+      return res.status(RESPONSE_STATUS.NOT_FOUND).json({ message: "Not Your Plan" });
     }
 
     if (name) plan.name = name;
@@ -89,13 +89,13 @@ export const editExercisePlan = async (req: Request, res: Response) => {
     const updatedPlan = await plan.save();
 
     return res.status(RESPONSE_STATUS.SUCCESS).json({
-      msg: "Exercise plan updated successfully",
+      message: "Exercise plan updated successfully",
       plan: updatedPlan,
     });
   } catch (error) {
     return res
       .status(RESPONSE_STATUS.INTERNAL_SERVER_ERROR)
-      .json({ msg: "Internal server error", error });
+      .json({ message: "Internal server error", error });
   }
 };
 
@@ -108,21 +108,21 @@ export const startExercisePlan = async (req: Request, res: Response) => {
     if (!plan) {
       return res
         .status(RESPONSE_STATUS.NOT_FOUND)
-        .json({ msg: "Plan not found" });
+        .json({ message: "Plan not found" });
     }
     if (plan.createdBy != user.username) {
-      return res.status(RESPONSE_STATUS.NOT_FOUND).json({ msg: "Not Your Plan" });
+      return res.status(RESPONSE_STATUS.NOT_FOUND).json({ message: "Not Your Plan" });
     }
     // if there's an exercise
     if (plan.exercises.length < 1) {
       return res
         .status(RESPONSE_STATUS.NOT_FOUND)
-        .json({ msg: "No exercise in the plan" });
+        .json({ message: "No exercise in the plan" });
     }
     if (plan.status == PlansStatus.STARTED) {
       return res
         .status(RESPONSE_STATUS.NOT_FOUND)
-        .json({ msg: "Plan already started" });
+        .json({ message: "Plan already started" });
     }
 
     plan.status = PlansStatus.STARTED;
@@ -130,13 +130,13 @@ export const startExercisePlan = async (req: Request, res: Response) => {
     const updatedPlan = await plan.save();
 
     return res.status(RESPONSE_STATUS.SUCCESS).json({
-      msg: "Exercise plan started successfully",
+      message: "Exercise plan started successfully",
       plan: updatedPlan,
     });
   } catch (error) {
     return res
       .status(RESPONSE_STATUS.INTERNAL_SERVER_ERROR)
-      .json({ msg: "Internal server error", error });
+      .json({ message: "Internal server error", error });
   }
 };
 
@@ -150,23 +150,23 @@ export const completeExercisePlan = async (req: Request, res: Response) => {
     if (!plan) {
       return res
         .status(RESPONSE_STATUS.NOT_FOUND)
-        .json({ msg: "Plan not found" });
+        .json({ message: "Plan not found" });
     }
     if (plan.createdBy != user.username) {
-      return res.status(RESPONSE_STATUS.NOT_FOUND).json({ msg: "Not Your Plan" });
+      return res.status(RESPONSE_STATUS.NOT_FOUND).json({ message: "Not Your Plan" });
     }
     plan.status = PlansStatus.COMPLETED;
 
     const updatedPlan = await plan.save();
 
     return res.status(RESPONSE_STATUS.NOT_FOUND).json({
-      msg: "Exercise plan completed successfully",
+      message: "Exercise plan completed successfully",
       plan: updatedPlan,
     });
   } catch (error) {
     return res
       .status(RESPONSE_STATUS.INTERNAL_SERVER_ERROR)
-      .json({ msg: "Internal server error", error });
+      .json({ message: "Internal server error", error });
   }
 };
 
@@ -182,17 +182,17 @@ export const addWorkoutToExercisePlan = async (req: Request, res: Response) => {
   }
 
   if (isNaN(sets) || isNaN(repetitions) || isNaN(restBetweenSetsInSeconds)) {
-    return res.status(RESPONSE_STATUS.BAD_REQUEST).json({ msg: "sets, repititions, and restBetweenSetsInSeconds must be a number" });
+    return res.status(RESPONSE_STATUS.BAD_REQUEST).json({ message: "sets, repititions, and restBetweenSetsInSeconds must be a number" });
   }
 
   if (!plan) {
     return res
       .status(RESPONSE_STATUS.NOT_FOUND)
-      .json({ msg: "Plan not found" });
+      .json({ message: "Plan not found" });
   }
 
   if (plan.createdBy != user.username) {
-    return res.status(RESPONSE_STATUS.NOT_FOUND).json({ msg: "Not Your Plan" });
+    return res.status(RESPONSE_STATUS.NOT_FOUND).json({ message: "Not Your Plan" });
   }
   let exercise;
   try {
@@ -200,7 +200,7 @@ export const addWorkoutToExercisePlan = async (req: Request, res: Response) => {
   } catch (error) {
     return res
       .status(RESPONSE_STATUS.NOT_FOUND)
-      .json({ msg: "Exercise not found" });
+      .json({ message: "Exercise not found" });
   }
 
   const workout = {
@@ -216,7 +216,7 @@ export const addWorkoutToExercisePlan = async (req: Request, res: Response) => {
 
   return res
     .status(RESPONSE_STATUS.NOT_FOUND)
-    .json({ msg: "Exercise added to plan successfully" });
+    .json({ message: "Exercise added to plan successfully" });
 };
 
 export const exercisePlanDetails = async (req: Request, res: Response) => {
@@ -227,11 +227,11 @@ export const exercisePlanDetails = async (req: Request, res: Response) => {
   if (!plan) {
     return res
       .status(RESPONSE_STATUS.NOT_FOUND)
-      .json({ msg: "Plan not found" });
+      .json({ message: "Plan not found" });
   }
   const userFromPlan = await User.findById(plan.createdBy);
   if (userFromPlan?._id != user._id) {
-    return res.status(RESPONSE_STATUS.NOT_FOUND).json({ msg: "Not Your Plan" });
+    return res.status(RESPONSE_STATUS.NOT_FOUND).json({ message: "Not Your Plan" });
   }
   return res.status(RESPONSE_STATUS.NOT_FOUND).json({ plan });
 };
@@ -267,11 +267,11 @@ export const getExercisePlanDetailByUser = async (
   if (!plan) {
     return res
       .status(RESPONSE_STATUS.NOT_FOUND)
-      .json({ msg: "Plan not found" });
+      .json({ message: "Plan not found" });
   }
 
   if (plan.createdBy != user.username) {
-    return res.status(RESPONSE_STATUS.NOT_FOUND).json({ msg: "Not Your Plan" });
+    return res.status(RESPONSE_STATUS.NOT_FOUND).json({ message: "Not Your Plan" });
   }
 
   try {
@@ -306,17 +306,17 @@ export const cancelExercisePlanByUser = async (req: Request, res: Response) => {
   if (!plan) {
     return res
       .status(RESPONSE_STATUS.NOT_FOUND)
-      .json({ msg: "Plan not found" });
+      .json({ message: "Plan not found" });
   }
 
   if (plan.createdBy != user.username) {
-    return res.status(RESPONSE_STATUS.NOT_FOUND).json({ msg: "Not Your Plan" });
+    return res.status(RESPONSE_STATUS.NOT_FOUND).json({ message: "Not Your Plan" });
   }
 
   if (plan.status !== "PENDING" && plan.status !== "STARTED") {
     return res
       .status(RESPONSE_STATUS.BAD_REQUEST)
-      .json({ msg: "Plan status is already completed or cancelled" });
+      .json({ message: "Plan status is already completed or cancelled" });
   }
 
   try {

@@ -31,12 +31,12 @@ export const validateAccessToken = async (
       } else {
         return res
           .status(RESPONSE_STATUS.NOT_FOUND)
-          .json({ msg: "User not found" });
+          .json({ message: "User not found" });
       }
     } catch (error) {
       return res
         .status(RESPONSE_STATUS.INTERNAL_SERVER_ERROR)
-        .json({ msg: "Internal server error" });
+        .json({ message: "Internal server error" });
     }
   } catch (error) {
     return res.status(RESPONSE_STATUS.UNAUTHORIZED).send("Unauthorized");
@@ -51,7 +51,7 @@ export const validateRole = (role: string) => {
       
       return res
         .status(RESPONSE_STATUS.UNAUTHORIZED)
-        .json({ msg: `User is not ${role}` });
+        .json({ message: `User is not ${role}` });
     }
     next();
   }

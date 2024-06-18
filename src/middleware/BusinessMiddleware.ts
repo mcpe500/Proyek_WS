@@ -20,7 +20,7 @@ export const checkAndIncreaseAPIHit = (apiIncreaseCount: number) => {
       });
 
       if (!activeSubscription) {
-        return res.status(RESPONSE_STATUS.NOT_FOUND).json({ msg: "Invalid API Key" });
+        return res.status(RESPONSE_STATUS.NOT_FOUND).json({ message: "Invalid API Key" });
       }
 
       // Check if the subscription has expired
@@ -28,7 +28,7 @@ export const checkAndIncreaseAPIHit = (apiIncreaseCount: number) => {
         await activeSubscription.updateOne({
           isActive: false
         });
-        return res.status(RESPONSE_STATUS.BAD_REQUEST).json({ msg: "Your subscription has expired" });
+        return res.status(RESPONSE_STATUS.BAD_REQUEST).json({ message: "Your subscription has expired" });
       }
 
       // Check API hit limit
@@ -41,7 +41,7 @@ export const checkAndIncreaseAPIHit = (apiIncreaseCount: number) => {
       if (!paket || !paket.Paket_Limit) {
         return res
           .status(RESPONSE_STATUS.BAD_REQUEST)
-          .json({ msg: "Paket not found or invalid" });
+          .json({ message: "Paket not found or invalid" });
       }
 
       // If resetAt is less than current time, reset API Hit
@@ -59,7 +59,7 @@ export const checkAndIncreaseAPIHit = (apiIncreaseCount: number) => {
       if (activeSubscription.apiHit >= paket.Paket_Limit) {
         return res
           .status(RESPONSE_STATUS.BAD_REQUEST)
-          .json({ msg: "API hit limit reached" });
+          .json({ message: "API hit limit reached" });
       }
 
       // Increase API hit and proceed
@@ -71,7 +71,7 @@ export const checkAndIncreaseAPIHit = (apiIncreaseCount: number) => {
       console.error("Error in checkIncreaseAPIHit middleware:", error);
       return res
         .status(RESPONSE_STATUS.INTERNAL_SERVER_ERROR)
-        .json({ msg: "Internal server error" });
+        .json({ message: "Internal server error" });
     }
   };
 };

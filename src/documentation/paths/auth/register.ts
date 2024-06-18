@@ -36,10 +36,25 @@ export default {
             schema: {
               type: "object",
               properties: {
-                msg: { type: "string" },
+                message: { type: "string" },
                 user: { type: "object" },
               },
             },
+            examples: {
+              success: {
+                summary: "Register success",
+                value: {
+                  message: "Register Successful, please verify your email within 24 hours!",
+                  user: {
+                    username: "user123",
+                    email: "user123@example.com",
+                    fullName: "User",
+                    phone: "1234567890123",
+                    _id: "66719b74cbdc36cec79931d6"
+                  }
+                }
+              }
+            }
           },
         },
       },
@@ -50,7 +65,15 @@ export default {
             schema: {
               type: "object",
               properties: {
-                error: { type: "string" },
+                message: { type: "string" },
+              },
+            },
+            examples: {
+              dupe: {
+                summary: "Duplicate key",
+                value: {
+                  message: "Username or email already exists.",
+                },
               },
             },
           },
@@ -63,9 +86,17 @@ export default {
             schema: {
               type: "object",
               properties: {
-                msg: { type: "string" },
+                message: { type: "string" },
               },
             },
+            examples: {
+              error: {
+                summary: "Internal server error",
+                value: {
+                  message: "Internal server error",
+                },
+              }
+            }
           },
         },
       },
