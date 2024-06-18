@@ -48,6 +48,14 @@ export default {
                 },
               },
             },
+            examples: {
+              internalError: {
+                summary: "Internal Server Error",
+                value: {
+                  message: "Internal server error",
+                },
+              },
+            },
           },
         },
       },

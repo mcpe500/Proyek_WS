@@ -56,6 +56,14 @@ export default {
                 },
               },
             },
+            examples: {
+              notFound: {
+                summary: "Goal Not Found",
+                value: {
+                  error: "Goal Not Found!",
+                },
+              },
+            },
           },
         },
       },
@@ -68,6 +76,14 @@ export default {
               properties: {
                 message: {
                   type: "string",
+                },
+              },
+            },
+            examples: {
+              internalError: {
+                summary: "Internal Server Error",
+                value: {
+                  message: "Internal server error",
                 },
               },
             },

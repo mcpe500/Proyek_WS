@@ -53,6 +53,7 @@ export const getExercise = async (req: Request, res: Response) => {
       "quadriceps",
       "traps",
       "triceps",
+      "shoulders"
     ];
 
     const validDifficulty = ["beginner", "intermediate", "expert"];

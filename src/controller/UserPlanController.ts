@@ -240,7 +240,7 @@ export const getAllExercisePlanByUser = async (req: Request, res: Response) => {
   const user = (req as any).user;
   const plans = await Plans.find({
     createdBy: user.username,
-  }).select("_id, name createdDate status");
+  }).select("_id name createdDate status");
 
   try {
     return res.status(RESPONSE_STATUS.SUCCESS).json({ plans: plans });
