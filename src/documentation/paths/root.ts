@@ -15,6 +15,9 @@ export default {
                 message: { type: "string" },
               },
             },
+            example: {
+              message: "This API Service is currently running",
+            }
           },
         },
       },
@@ -27,6 +30,9 @@ export default {
               properties: {
                 msg: { type: "string" },
               },
+            },
+            example: {
+              message: "Internal server error",
             },
           },
         },
