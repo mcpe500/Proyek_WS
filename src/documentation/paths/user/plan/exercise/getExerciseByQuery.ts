@@ -104,7 +104,7 @@ export default {
                         ],
                         description: "Type of exercise",
                       },
-                      targeted_muscle: {
+                      muscle: {
                         type: "string",
                         enum: [
                           "abdominals",
@@ -127,11 +127,20 @@ export default {
                         ],
                         description: "Target muscle",
                       },
-                      equipment_required: {
+                      difficulty: {
+                        type: "string",
+                        enum: [
+                          "beginner",
+                          "intermediate",
+                          "expert",
+                        ],
+                        description: "Exercise difficulty",
+                      },
+                      equipmentRequired: {
                         type: "string",
                         description: "Equipment used",
                       },
-                      description: {
+                      instructions: {
                         type: "string",
                         description: "Instructions for the exercise",
                       },
