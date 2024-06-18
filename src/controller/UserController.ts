@@ -1181,3 +1181,32 @@ export const topupFromAdmin = async (req: Request, res: Response) => {
     return res.status(status).json({ msg: errorMsg });
   }
 };
+
+
+export const promoteToAdmin = async (req: Request, res: Response) => {
+  const { userID } = req.params;
+
+  try {
+    if (userID && !mongoose.Types.ObjectId.isValid(userID)) { 
+      return res.status(RESPONSE_STATUS.BAD_REQUEST).json({ message: "Invalid user ID" });
+    }
+
+    const user = await User.findOne({ _id: userID, isEmailVerified: true });
+
+    if (!user) {
+      return res.status(RESPONSE_STATUS.NOT_FOUND).json({ message: "User not found" });
+    }
+
+    if (user.role !== ROLE.USER) {
+      return res.status(RESPONSE_STATUS.BAD_REQUEST).json({ message: "User role is not customer" });
+    }
+
+    user.role = ROLE.ADMIN;
+    await user.save();
+
+    return res.status(RESPONSE_STATUS.SUCCESS).json({ message: `User ${user.username} promoted to admin successfully` });
+  } catch (error) {
+    console.error(error);
+    return res.status(RESPONSE_STATUS.INTERNAL_SERVER_ERROR).json({ message: "Internal server error" });
+  }
+};

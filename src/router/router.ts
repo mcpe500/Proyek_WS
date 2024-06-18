@@ -23,6 +23,7 @@ import {
   topupFromAdmin,
   getProfPic,
   getUserProfilePicture,
+  promoteToAdmin,
 } from "../controller/UserController";
 import {
   validateAccessToken,
@@ -103,6 +104,7 @@ router.get("/auth/verify/:emailVerificationToken", verifyEmail);
 router.post("/super-admin/paket", [validateAccessToken, validateRole(ROLE.SUPER_ADMIN), validateBody(paketCreateSchemaJoi)], createPaket);
 router.put("/super-admin/paket/:id", [validateAccessToken, validateRole(ROLE.SUPER_ADMIN), validateBody(paketEditSchemaJoi)], updatePaket);
 router.delete("/super-admin/paket/:id", [validateAccessToken, validateRole(ROLE.SUPER_ADMIN)], deletePaket);
+router.put("/super-admin/promote/:userID", [validateAccessToken, validateRole(ROLE.SUPER_ADMIN)], promoteToAdmin);
 
 // Admin Routes
 router.get("/admin/users", [validateAccessToken, validateRole(ROLE.ADMIN)], getAllUser);
