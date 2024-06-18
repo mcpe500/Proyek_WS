@@ -22,7 +22,7 @@ async function runSeed() {
     );
     const createdSuperAdmin = await User.findOne({
       email: "super@example.com",
-    });
+    }).session(session);
     const verifiedUserEmails = verifiedUsers.map((user) => user.email);
     const createdVerifiedUsers = await User.find(
       {
