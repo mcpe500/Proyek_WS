@@ -2,14 +2,14 @@
     "version": 2,
     "builds": [
       {
-        "src": "./dist/run.js",
+        "src": "./run.js",
         "use": "@now/node"
       }
     ],
     "routes": [
       {
         "src": "/(.*)",
-        "dest": "./dist/run.js"
+        "dest": "./run.js"
       }
     ]
   }
