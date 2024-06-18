@@ -62,16 +62,21 @@ import {
   cancelExercisePlanByUser,
 } from "../controller/UserPlanController";
 import { createUserPlanSchemaJoi } from "../validators/Plans.validate";
-import {
-  checkAndIncreaseAPIHit
-} from "../middleware/BusinessMiddleware";
+import { checkAndIncreaseAPIHit } from "../middleware/BusinessMiddleware";
 import { getFilteredNews, getSpecificNews } from "../controller/NewsController";
 import { getNearestGyms } from "../controller/GymsController";
 import { getGymsSchema } from "../validators/Maps.validate";
 import upload from "../middleware/Upload";
 import { ROLE } from "../contracts/enum/UserRelated.enum";
-import { createPaket, deletePaket, updatePaket } from "../controller/PaketController";
-import { paketCreateSchemaJoi, paketEditSchemaJoi } from "../validators/Paket.validate";
+import {
+  createPaket,
+  deletePaket,
+  updatePaket,
+} from "../controller/PaketController";
+import {
+  paketCreateSchemaJoi,
+  paketEditSchemaJoi,
+} from "../validators/Paket.validate";
 
 const router = Router();
 
@@ -94,68 +99,100 @@ router.post(
   generateNewAccessToken
 );
 router.post(
-  "/auth/refresh_token",
+  "/auth/refresh-token",
   validateCookie(validationTokenSchemaJoi),
   newRefreshToken
 );
 router.get("/auth/verify/:emailVerificationToken", verifyEmail);
 
 // SuperAdmin Routes
-router.post("/super-admin/paket", [validateAccessToken, validateRole(ROLE.SUPER_ADMIN), validateBody(paketCreateSchemaJoi)], createPaket);
-router.put("/super-admin/paket/:id", [validateAccessToken, validateRole(ROLE.SUPER_ADMIN), validateBody(paketEditSchemaJoi)], updatePaket);
-router.delete("/super-admin/paket/:id", [validateAccessToken, validateRole(ROLE.SUPER_ADMIN)], deletePaket);
-router.put("/super-admin/promote/:userID", [validateAccessToken, validateRole(ROLE.SUPER_ADMIN)], promoteToAdmin);
+router.post(
+  "/super-admin/packages",
+  [
+    validateAccessToken,
+    validateRole(ROLE.SUPER_ADMIN),
+    validateBody(paketCreateSchemaJoi),
+  ],
+  createPaket
+);
+router.put(
+  "/super-admin/packages/:id",
+  [
+    validateAccessToken,
+    validateRole(ROLE.SUPER_ADMIN),
+    validateBody(paketEditSchemaJoi),
+  ],
+  updatePaket
+);
+router.delete(
+  "/super-admin/packages/:id",
+  [validateAccessToken, validateRole(ROLE.SUPER_ADMIN)],
+  deletePaket
+);
+router.put(
+  "/super-admin/users/:userID/promote",
+  [validateAccessToken, validateRole(ROLE.SUPER_ADMIN)],
+  promoteToAdmin
+);
 
 // Admin Routes
-router.get("/admin/users", [validateAccessToken, validateRole(ROLE.ADMIN)], getAllUser);
+router.get(
+  "/admin/users",
+  [validateAccessToken, validateRole(ROLE.ADMIN)],
+  getAllUser
+);
 router.get(
   "/admin/dashboard",
   [validateAccessToken, validateRole(ROLE.ADMIN)],
   adminDashboard
 );
 router.get(
-  "/admin/user/profile/:userID",
+  "/admin/users/:userID",
   [validateAccessToken, validateRole(ROLE.ADMIN)],
   getUserProfile
 );
 router.delete(
-  "/admin/user/profile/:userID",
+  "/admin/users/:userID",
   [validateAccessToken, validateRole(ROLE.ADMIN)],
   deleteUserProfile
 );
 router.get(
-  "/admin/user/profile-picture/:userID",
+  "/admin/users/:userID/profile-picture",
   [validateAccessToken, validateRole(ROLE.ADMIN)],
   getUserProfilePicture
 );
 router.get(
-  "/admin/user/packet/:userID",
+  "/admin/users/:userID/packages",
   [validateAccessToken, validateRole(ROLE.ADMIN)],
   getUserPacket
 );
 router.post(
-  "/admin/user/packet/:userID",
+  "/admin/users/:userID/packages",
   [validateAccessToken, validateRole(ROLE.ADMIN)],
   addUserPacket
 );
 router.delete(
-  "/admin/user/packet/:userID",
+  "/admin/users/:userID/packages",
   [validateAccessToken, validateRole(ROLE.ADMIN)],
   deleteUserPacket
 );
 router.post(
-  "/admin/exercise",
+  "/admin/exercises",
   [validateAccessToken, validateRole(ROLE.ADMIN)],
   addExercise
 );
 router.put(
-  "/admin/user/topup/:userID?",
+  "/admin/user/topup/:userID?", 
   [validateAccessToken, validateRole(ROLE.ADMIN)],
   topupFromAdmin
 );
 
 // User Routes
-router.put("/users/topup", [validateAccessToken, validateRole(ROLE.USER)], topup);
+router.put(
+  "/users/topup",
+  [validateAccessToken, validateRole(ROLE.USER)],
+  topup
+);
 router.get(
   "/users/dashboard",
   [validateAccessToken, validateRole(ROLE.USER)],
@@ -177,22 +214,22 @@ router.put(
   editProfile
 );
 router.get(
-  "/users/apikey",
+  "/users/api-key",
   [validateAccessToken, validateRole(ROLE.USER)],
   getApiKey
 );
 router.put(
-  "/users/apikey/reset",
+  "/users/api-key/reset",
   [validateAccessToken, validateRole(ROLE.USER), checkAndIncreaseAPIHit(1)],
   resetApiKey
 ); // TODO : bikin ini pake ApiKey (Hansen)
 router.post(
-  "/users/subscribe",
+  "/users/subscription",
   [validateAccessToken, validateRole(ROLE.USER)],
   subscribePacket
 );
 router.put(
-  "/users/renew",
+  "/users/subscription/renew",
   [validateAccessToken, validateRole(ROLE.USER)],
   renewSubscription
 );
@@ -219,12 +256,12 @@ router.get(
 
 // Exercise Plan Routes
 router.put(
-  "/users/plan/edit/:id",
+  "/users/plans/:id",
   [validateAccessToken, validateRole(ROLE.USER), checkAndIncreaseAPIHit(1)],
   editExercisePlan
 ); // TODO : bikin ini pake ApiKey (Hansen)
 router.post(
-  "/users/plan/start/:id",
+  "/users/plans/:id/start",
   [validateAccessToken, validateRole(ROLE.USER), checkAndIncreaseAPIHit(1)],
   startExercisePlan
 ); // TODO : bikin ini pake ApiKey (Hansen)
@@ -250,12 +287,12 @@ router.put(
 );
 
 // Pricing Routes
-router.get("/pricing", getAllPricingPackages);
+router.get("/pricing/packages", getAllPricingPackages);
 
 // Exercise Routes
-router.get("/exercise", [validateAccessToken], getExercise);
-router.get("/exercise/goals", [validateAccessToken], getAllGoals);
-router.get("/exercise/goals/:title", [validateAccessToken], getGoalByTitle);
+router.get("/exercises", [validateAccessToken], getExercise);
+router.get("/exercises/goals", [validateAccessToken], getAllGoals);
+router.get("/exercises/goals/:title", [validateAccessToken], getGoalByTitle);
 
 // News Routes
 // router.get("/news", getAllNews);

@@ -362,10 +362,11 @@ export const getApiKey = async (req: Request, res: Response) => {
 // TODO bikin ini supaya ngereset apikey dari subscription (DONE, Hansen)
 export const resetApiKey = async (req: Request, res: Response) => {
   const user = (req as any).user;
+  const { apiKey } = req.query;
   try {
     let newApiKey = await generateApiKey();
     const updatedSubscribe = await Subscription.findOneAndUpdate(
-      { userId: user._id },
+      { userId: user._id, apiKey: (apiKey as any)},
       { $set: { apiKey: newApiKey } },
       { new: true, useFindAndModify: false } // Returns the updated document
     );
@@ -448,7 +449,7 @@ export const subscribePacket = async (req: Request, res: Response) => {
   session.startTransaction();
 
   try {
-    const transactionDetails = [];
+    const transactionDetails: ITransactionSubscriptionDetail[] = [];
 
     for (const sub of subscriptions) {
       const { paketId, month } = sub;
@@ -644,15 +645,17 @@ export const renewSubscription = async (req: Request, res: Response) => {
     await activeSubscription.save({ session });
 
     // Prepare transaction details
-    const transactionDetails = {
-      transactionDetailType: TransactionDetailType.USER_RENEW,
-      paket_id: activeSubscription.paketId,
-      subscription_id: activeSubscription._id,
-      month: month,
-      price: paket.Paket_price,
-      subtotal: totalCost,
-      message: `User: ${user.username} renewed subscription to ${paket.Paket_name} for ${month} month(s) at Rp${paket.Paket_price} per month.`,
-    };
+    const transactionDetails: ITransactionSubscriptionDetail[] = [
+      {
+        transactionDetailType: TransactionDetailType.USER_RENEW,
+        paket_id: activeSubscription.paketId,
+        subscription_id: activeSubscription._id,
+        month: month,
+        price: paket.Paket_price,
+        subtotal: totalCost,
+        message: `User: ${user.username} renewed subscription to ${paket.Paket_name} for ${month} month(s) at Rp${paket.Paket_price} per month.`,
+      },
+    ];
 
     // Insert transaction log
     const transaction = new Transaction({
@@ -662,7 +665,7 @@ export const renewSubscription = async (req: Request, res: Response) => {
         total: totalCost,
         userId: user._id,
       },
-      details: [transactionDetails],
+      details: transactionDetails,
     });
     await transaction.save({ session });
 
@@ -873,7 +876,7 @@ export const addUserPacket = async (req: Request, res: Response) => {
         .json({ message: "User not found" });
     }
 
-    const transactionDetails = [];
+    const transactionDetails: ITransactionSubscriptionDetail[] = [];
 
     for (const user of users) {
       for (const sub of subscriptions) {
@@ -1013,10 +1016,13 @@ export const addExercise = async (req: Request, res: Response) => {
     // Make API call
     let parsedOffset = Math.floor(Number(offset));
     const parsedLimit = Math.floor(Number(limit_per_ten));
+    if (offset == undefined) {
+      parsedOffset = 0;
+    }
 
     if (
-      isNaN(parsedOffset) ||
-      isNaN(parsedLimit) ||
+      isNaN(parsedOffset) && parsedOffset != 0 ||
+      isNaN(parsedLimit) && parsedLimit != 0 ||
       parsedLimit < 0 ||
       parsedOffset < 0
     ) {
@@ -1024,9 +1030,7 @@ export const addExercise = async (req: Request, res: Response) => {
         .status(RESPONSE_STATUS.BAD_REQUEST)
         .json({ message: "Offset and limit must be non-negative integers." });
     }
-    if (offset == undefined) {
-      parsedOffset = 0;
-    }
+
     const queryParams: any = {};
     for (let i = parsedOffset; i < parsedOffset + parsedLimit; i++) {
       queryParams.offset = i * 10;
@@ -1044,9 +1048,10 @@ export const addExercise = async (req: Request, res: Response) => {
           const newExercise = new Exercise({
             name: exercise.name,
             type: exercise.type,
-            targeted_muscle: exercise.muscle,
+            muscle: exercise.muscle,
+            difficulty: exercise.difficulty,
             equipmentRequired: exercise.equipment ? exercise.equipment : "-",
-            description: exercise.instructions,
+            instructions: exercise.instructions,
           });
           await newExercise.save();
         }
@@ -1211,11 +1216,9 @@ export const promoteToAdmin = async (req: Request, res: Response) => {
     user.role = ROLE.ADMIN;
     await user.save();
 
-    return res
-      .status(RESPONSE_STATUS.SUCCESS)
-      .json({
-        message: `User ${user.username} promoted to admin successfully`,
-      });
+    return res.status(RESPONSE_STATUS.SUCCESS).json({
+      message: `User ${user.username} promoted to admin successfully`,
+    });
   } catch (error) {
     console.error(error);
     return res
