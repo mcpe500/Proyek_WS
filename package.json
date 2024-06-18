@@ -14,7 +14,8 @@
     "rollback": "npx sequelize-cli db:migrate:undo:all",
     "seed:undo": "npx sequelize-cli db:seed:undo:all",
     "test": "jest --detectOpenHandles",
-    "vercel-build": "npm run build && npm run deploy"
+    "vercel-build": "npm run build && npm run deploy",
+    "vercel": "vercel"
   },
   "keywords": [],
   "author": "",
