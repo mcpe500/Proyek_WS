@@ -13,7 +13,8 @@
     "seed:mongo": "ts-node ./src/seeder_mongo/index.seed.ts",
     "rollback": "npx sequelize-cli db:migrate:undo:all",
     "seed:undo": "npx sequelize-cli db:seed:undo:all",
-    "test": "jest --detectOpenHandles"
+    "test": "jest --detectOpenHandles",
+    "vercel-build": "npm run build && npm run deploy"
   },
   "keywords": [],
   "author": "",
