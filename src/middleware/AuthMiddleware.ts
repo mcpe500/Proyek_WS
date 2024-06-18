@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import { verifyAccessToken } from "../utils/AuthUtils";
 import { RESPONSE_STATUS } from "../contracts/enum/ResponseRelated.enum";
+import { ROLE } from "../contracts/enum/UserRelated.enum";
 import { User } from "../models/dynamic/User.model";
 
 export const validateAccessToken = async (
@@ -42,26 +43,50 @@ export const validateAccessToken = async (
   }
 };
 
+export const validateRole = async (role: string) => {
+    return async (req: Request, res: Response, next: NextFunction) => {
+        const { user } = req.body;
+    if (user && user.role != ROLE.SUPER_ADMIN)
+      return res
+        .status(RESPONSE_STATUS.UNAUTHORIZED)
+        .json({ msg: `User is not ${role}` });
+    next();
+    }
+}
+
+export const validateSuperAdmin = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
+    const { user } = req.body;
+    if (user && user.role != ROLE.SUPER_ADMIN)
+      return res
+        .status(RESPONSE_STATUS.UNAUTHORIZED)
+        .json({ msg: "User is not super admin" });
+    next();
+  };
+
 export const validateAdmin = async (
   req: Request,
   res: Response,
   next: NextFunction
 ) => {
   const { user } = req.body;
-  if (user && user.role != "ADMIN")
+  if (user && user.role != ROLE.ADMIN)
     return res
       .status(RESPONSE_STATUS.UNAUTHORIZED)
       .json({ msg: "User is not admin" });
   next();
 };
 
-export const validateIsNotAdmin = async (
+export const validateUser = async (
   req: Request,
   res: Response,
   next: NextFunction
 ) => {
   const user = (req as any).user;
-  if (user && user.role == "ADMIN")
+  if (user && user.role == ROLE.USER)
     return res
       .status(RESPONSE_STATUS.UNAUTHORIZED)
       .json({ msg: "Only Customers Are Allowed!" });

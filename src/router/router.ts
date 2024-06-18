@@ -28,7 +28,7 @@ import {
   validateAccessToken,
   validateAdmin,
   validateNotSignIn,
-  validateIsNotAdmin,
+  validateUser,
 } from "../middleware/AuthMiddleware";
 import {
   validateBody,
@@ -97,6 +97,9 @@ router.post(
 );
 router.get("/auth/verify/:emailVerificationToken", verifyEmail);
 
+// SuperAdmin Routes
+router.post("/superadmin/paket", [valida])
+
 // Admin Routes
 router.get("/admin/users", [validateAccessToken, validateAdmin], getAllUser);
 router.get(
@@ -146,15 +149,15 @@ router.put(
 );
 
 // User Routes
-router.put("/users/topup", [validateAccessToken, validateIsNotAdmin], topup);
+router.put("/users/topup", [validateAccessToken, validateUser], topup);
 router.get(
   "/users/dashboard",
-  [validateAccessToken, validateIsNotAdmin],
+  [validateAccessToken, validateUser],
   getDashboard
 );
 router.get(
   "/users/profile-picture",
-  [validateAccessToken, validateIsNotAdmin],
+  [validateAccessToken, validateUser],
   getProfPic
 );
 router.put(
@@ -162,29 +165,29 @@ router.put(
   [
     validateBody(editProfileSchemaJoi), // Check if this works or not (Hansen)
     validateAccessToken,
-    validateIsNotAdmin,
+    validateUser,
     upload.single("profilePicture"),
   ],
   editProfile
 );
 router.get(
   "/users/apikey",
-  [validateAccessToken, validateIsNotAdmin],
+  [validateAccessToken, validateUser],
   getApiKey
 );
 router.put(
   "/users/apikey/reset",
-  [validateAccessToken, validateIsNotAdmin, checkAndIncreaseAPIHit(1)],
+  [validateAccessToken, validateUser, checkAndIncreaseAPIHit(1)],
   resetApiKey
 ); // TODO : bikin ini pake ApiKey (Hansen)
 router.post(
   "/users/subscribe",
-  [validateAccessToken, validateIsNotAdmin],
+  [validateAccessToken, validateUser],
   subscribePacket
 );
 router.put(
   "/users/renew",
-  [validateAccessToken, validateIsNotAdmin],
+  [validateAccessToken, validateUser],
   renewSubscription
 );
 router.post(
@@ -192,51 +195,51 @@ router.post(
   [
     validateBody(createUserPlanSchemaJoi),
     validateAccessToken, // TODO : Check with hansen mungkin ini error (Should be fine, Hansen)
-    validateIsNotAdmin,
+    validateUser,
     checkAndIncreaseAPIHit(1),
   ],
   createExercisePlan
 ); // TODO : bikin ini pake ApiKey (Hansen)
 router.get(
   "/users/plan",
-  [validateAccessToken, validateIsNotAdmin, checkAndIncreaseAPIHit(1)],
+  [validateAccessToken, validateUser, checkAndIncreaseAPIHit(1)],
   getAllExercisePlanByUser
 ); // TODO : bikin ini pake ApiKey (Hansen)
 router.get(
   "/users/plan/:id",
-  [validateAccessToken, validateIsNotAdmin, checkAndIncreaseAPIHit(1)],
+  [validateAccessToken, validateUser, checkAndIncreaseAPIHit(1)],
   getExercisePlanDetailByUser
 ); // TODO : bikin ini pake ApiKey (Hansen)
 
 // Exercise Plan Routes
 router.put(
   "/users/plan/edit/:id",
-  [validateAccessToken, validateIsNotAdmin, checkAndIncreaseAPIHit(1)],
+  [validateAccessToken, validateUser, checkAndIncreaseAPIHit(1)],
   editExercisePlan
 ); // TODO : bikin ini pake ApiKey (Hansen)
 router.post(
   "/users/plan/start/:id",
-  [validateAccessToken, validateIsNotAdmin, checkAndIncreaseAPIHit(1)],
+  [validateAccessToken, validateUser, checkAndIncreaseAPIHit(1)],
   startExercisePlan
 ); // TODO : bikin ini pake ApiKey (Hansen)
 router.put(
   "/users/plan/:id/workout/",
-  [validateAccessToken, validateIsNotAdmin, checkAndIncreaseAPIHit(1)],
+  [validateAccessToken, validateUser, checkAndIncreaseAPIHit(1)],
   addWorkoutToExercisePlan
 ); // TODO : bikin ini pake ApiKey (Hansen)
 router.get(
   "/users/plan/:id/workout/",
-  [validateAccessToken, validateIsNotAdmin, checkAndIncreaseAPIHit(1)],
+  [validateAccessToken, validateUser, checkAndIncreaseAPIHit(1)],
   exercisePlanDetails
 ); // TODO : bikin ini pake ApiKey (Hansen)
 router.post(
   "/users/plan/complete/:id",
-  [validateAccessToken, validateIsNotAdmin, checkAndIncreaseAPIHit(1)],
+  [validateAccessToken, validateUser, checkAndIncreaseAPIHit(1)],
   completeExercisePlan
 ); // TODO : bikin ini pake ApiKey (Hansen)
 router.put(
   "/users/plan/cancel/:id",
-  [validateAccessToken, validateIsNotAdmin, checkAndIncreaseAPIHit(1)],
+  [validateAccessToken, validateUser, checkAndIncreaseAPIHit(1)],
   cancelExercisePlanByUser
 );
 

@@ -24,9 +24,11 @@ Paket.init(
     },
     Paket_description: {
       type: DataTypes.TEXT,
+      defaultValue: "",
     },
     Paket_Limit: {
       type: DataTypes.INTEGER,
+      allowNull: false,
     },
     Paket_price: {
       type: DataTypes.FLOAT,
@@ -34,7 +36,6 @@ Paket.init(
     },
     Paket_price_currency: {
       type: DataTypes.STRING,
-      allowNull: false,
       defaultValue: "IDR",
     },
   },
