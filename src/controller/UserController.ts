@@ -35,6 +35,7 @@ import {
 } from "../contracts/dto/TransactionRelated.dto";
 import { topupSchema } from "../validators/Topup.validate";
 import mongoose from "mongoose";
+import { ROLE } from "../contracts/enum/UserRelated.enum";
 
 // const UserSchema: Schema = new Schema({
 //   fullName: { type: String, required: true },
@@ -377,35 +378,44 @@ export const topup = async (req: Request, res: Response) => {
       .json({ message: "Invalid amount" });
   }
 
+  const session = await mongoose.startSession();
+  session.startTransaction();
+
   try {
     const transactionHeader: ITransationHeaderUser = {
-        transactionHeaderType: TransactionHeaderType.TOPUP,
-        date: new Date(), // current date make it use best practice
-        total: amount,
-        userId: user._id,
-      };
-      // TODO : Make can do multiple TransactionDetail
-      const transactionDetails: ITransactionTopUpDetail[] = [];
-    
-      transactionDetails.push({
+      transactionHeaderType: TransactionHeaderType.TOPUP,
+      date: new Date(),
+      total: amount,
+      userId: user._id,
+    };
+
+    const transactionDetails: ITransactionTopUpDetail[] = [
+      {
         transactionDetailType: TransactionDetailType.USER_TOPUP,
         subtotal: amount,
-        message: `User : ${user.username}, does action = ${
-          TransactionDetailType.USER_TOPUP
-        } with amount = ${amount}`,
-      });
-      const transaction: ITransaction = {
-        header: transactionHeader,
-        details: transactionDetails,
-      };
-      await Transaction.create(transaction);
-    user.balance += amount;
-    const updatedUser = await user.save();
+        message: `User: ${user.username}, does action = ${TransactionDetailType.USER_TOPUP} with amount = ${amount}`,
+      },
+    ];
 
-    return res
-      .status(RESPONSE_STATUS.SUCCESS)
-      .json({ message: "Balance updated. Current balance: Rp" + user.balance });
+    const transaction: ITransaction = {
+      header: transactionHeader,
+      details: transactionDetails,
+    };
+    await Transaction.create([transaction], { session });
+    user.balance += amount;
+    await user.save({ session });
+
+    await session.commitTransaction();
+    session.endSession();
+
+    return res.status(RESPONSE_STATUS.SUCCESS).json({
+      message: "Balance updated successfully.",
+      currentBalance: user.balance,
+    });
   } catch (error) {
+    await session.abortTransaction();
+    session.endSession();
+
     return res
       .status(RESPONSE_STATUS.INTERNAL_SERVER_ERROR)
       .json({ message: "Internal server error" });
@@ -418,9 +428,9 @@ export const subscribePacket = async (req: Request, res: Response) => {
   const user = (req as any).user;
 
   if (!Array.isArray(subscriptions)) {
-    return res
-      .status(RESPONSE_STATUS.BAD_REQUEST)
-      .json({ message: "Invalid request format. Expected an array of subscriptions." });
+    return res.status(RESPONSE_STATUS.BAD_REQUEST).json({
+      message: "Invalid request format. Expected an array of subscriptions.",
+    });
   }
 
   const session = await mongoose.startSession();
@@ -433,7 +443,10 @@ export const subscribePacket = async (req: Request, res: Response) => {
       const { paketId, month } = sub;
 
       if (!paketId || !month) {
-        throw { status: RESPONSE_STATUS.BAD_REQUEST, message: `Request fields not valid` };
+        throw {
+          status: RESPONSE_STATUS.BAD_REQUEST,
+          message: `Request fields not valid`,
+        };
       }
 
       const paket = await Paket.findOne({
@@ -443,21 +456,33 @@ export const subscribePacket = async (req: Request, res: Response) => {
       });
 
       if (!paket) {
-        throw { status: RESPONSE_STATUS.NOT_FOUND, message: `Paket not found: ${paketId}` };
+        throw {
+          status: RESPONSE_STATUS.NOT_FOUND,
+          message: `Paket not found: ${paketId}`,
+        };
       }
 
       if (paketId === "PAK001") {
-        throw { status: RESPONSE_STATUS.BAD_REQUEST, message: `You can't subscribe to this paket: ${paketId}` };
+        throw {
+          status: RESPONSE_STATUS.BAD_REQUEST,
+          message: `You can't subscribe to this paket: ${paketId}`,
+        };
       }
 
       if (month < 1) {
-        throw { status: RESPONSE_STATUS.BAD_REQUEST, message: `Invalid number of months for paket: ${paketId}` };
+        throw {
+          status: RESPONSE_STATUS.BAD_REQUEST,
+          message: `Invalid number of months for paket: ${paketId}`,
+        };
       }
 
       // Check balance
       const totalCost = paket.Paket_price * parseInt(month);
       if (user.balance < totalCost) {
-        throw { status: RESPONSE_STATUS.BAD_REQUEST, message: "Not enough balance! Please top up first" };
+        throw {
+          status: RESPONSE_STATUS.BAD_REQUEST,
+          message: "Not enough balance! Please top up first",
+        };
       }
 
       // Update balance
@@ -498,8 +523,11 @@ export const subscribePacket = async (req: Request, res: Response) => {
       header: {
         transactionHeaderType: TransactionHeaderType.SUBSCRIBE,
         date: new Date(),
-        total: transactionDetails.reduce((acc, detail) => acc + detail.subtotal, 0),
-        userId: user._id
+        total: transactionDetails.reduce(
+          (acc, detail) => acc + detail.subtotal,
+          0
+        ),
+        userId: user._id,
       },
       details: transactionDetails,
     });
@@ -508,25 +536,22 @@ export const subscribePacket = async (req: Request, res: Response) => {
     await session.commitTransaction();
     session.endSession();
 
-    return res
-      .status(RESPONSE_STATUS.CREATED)
-      .json({
-        message: 'All subscriptions created successfully',
-        transaction: transaction.header,
-        subscriptions: transactionDetails,
-        remainingBalance: `Rp${user.balance}`
-      });
+    return res.status(RESPONSE_STATUS.CREATED).json({
+      message: "All subscriptions created successfully",
+      transaction: transaction.header,
+      subscriptions: transactionDetails,
+      remainingBalance: `Rp${user.balance}`,
+    });
   } catch (error) {
     await session.abortTransaction();
     session.endSession();
 
     // Ensure the error has status and message properties
-    const status = (error as any).status || RESPONSE_STATUS.INTERNAL_SERVER_ERROR;
-    const errorMessage = (error as any).message || 'Internal server error';
+    const status =
+      (error as any).status || RESPONSE_STATUS.INTERNAL_SERVER_ERROR;
+    const errorMessage = (error as any).message || "Internal server error";
 
-    return res
-      .status(status)
-      .json({ message: errorMessage });
+    return res.status(status).json({ message: errorMessage });
   }
 };
 
@@ -657,8 +682,14 @@ export const adminDashboard = async (req: Request, res: Response) => {
     role: { $ne: "ADMIN" },
     isEmailVerified: true,
   }).exec();
-  const transactions = await Transaction.find({ header: { adminId: null}});
-  const totalTransactionAmount = transactions == null ? 0 : transactions.reduce((acc, transaction) => acc + transaction.header.total, 0);
+  const transactions = await Transaction.find({ header: { adminId: null } });
+  const totalTransactionAmount =
+    transactions == null
+      ? 0
+      : transactions.reduce(
+          (acc, transaction) => acc + transaction.header.total,
+          0
+        );
   const subscription = await Subscription.find({ isActive: true }).exec();
   return res.status(RESPONSE_STATUS.SUCCESS).json({
     total_user: users.length,
@@ -759,9 +790,9 @@ export const addUserPacket = async (req: Request, res: Response) => {
   }
 
   if (!Array.isArray(subscriptions)) {
-    return res
-      .status(RESPONSE_STATUS.BAD_REQUEST)
-      .json({ message: "Invalid request format. Expected an array of subscriptions." });
+    return res.status(RESPONSE_STATUS.BAD_REQUEST).json({
+      message: "Invalid request format. Expected an array of subscriptions.",
+    });
   }
 
   const session = await mongoose.startSession();
@@ -774,11 +805,17 @@ export const addUserPacket = async (req: Request, res: Response) => {
       const { paket_id, month } = sub;
 
       if (!paket_id || month === undefined) {
-        throw { status: RESPONSE_STATUS.BAD_REQUEST, message: `Request fields not valid` };
+        throw {
+          status: RESPONSE_STATUS.BAD_REQUEST,
+          message: `Request fields not valid`,
+        };
       }
 
       if (month < 1) {
-        throw { status: RESPONSE_STATUS.BAD_REQUEST, message: `Invalid number of months for paket: ${paket_id}` };
+        throw {
+          status: RESPONSE_STATUS.BAD_REQUEST,
+          message: `Invalid number of months for paket: ${paket_id}`,
+        };
       }
 
       const paket = await Paket.findOne({
@@ -788,7 +825,10 @@ export const addUserPacket = async (req: Request, res: Response) => {
       });
 
       if (!paket) {
-        throw { status: RESPONSE_STATUS.NOT_FOUND, message: `Paket not found: ${paket_id}` };
+        throw {
+          status: RESPONSE_STATUS.NOT_FOUND,
+          message: `Paket not found: ${paket_id}`,
+        };
       }
 
       // Deactivate current active subscription if it exists
@@ -835,7 +875,10 @@ export const addUserPacket = async (req: Request, res: Response) => {
       header: {
         transactionHeaderType: TransactionHeaderType.SUBSCRIBE,
         date: new Date(),
-        total: transactionDetails.reduce((acc, detail) => acc + detail.subtotal, 0),
+        total: transactionDetails.reduce(
+          (acc, detail) => acc + detail.subtotal,
+          0
+        ),
         userId: user._id,
         adminId: admin._id,
       },
@@ -846,27 +889,23 @@ export const addUserPacket = async (req: Request, res: Response) => {
     await session.commitTransaction();
     session.endSession();
 
-    return res
-      .status(RESPONSE_STATUS.CREATED)
-      .json({
-        message: 'All subscriptions created successfully',
-        transaction: transaction.header,
-        subscriptions: transactionDetails,
-      });
+    return res.status(RESPONSE_STATUS.CREATED).json({
+      message: "All subscriptions created successfully",
+      transaction: transaction.header,
+      subscriptions: transactionDetails,
+    });
   } catch (error) {
     await session.abortTransaction();
     session.endSession();
 
     // Ensure the error has status and message properties
-    const status = (error as any).status || RESPONSE_STATUS.INTERNAL_SERVER_ERROR;
-    const errorMessage = (error as any).message || 'Internal server error';
+    const status =
+      (error as any).status || RESPONSE_STATUS.INTERNAL_SERVER_ERROR;
+    const errorMessage = (error as any).message || "Internal server error";
 
-    return res
-      .status(status)
-      .json({ message: errorMessage });
+    return res.status(status).json({ message: errorMessage });
   }
 };
-
 
 export const deleteUserPacket = async (req: Request, res: Response) => {
   const { userID } = req.params;
@@ -947,88 +986,122 @@ export const addExercise = async (req: Request, res: Response) => {
 };
 
 export const topupFromAdmin = async (req: Request, res: Response) => {
-  const { userID } = req.params; // if i empty it
+  const { userID } = req.params;
   const { saldo } = req.body;
   const admin = (req as any).user;
+
+  if (!saldo) {
+    return res
+      .status(RESPONSE_STATUS.BAD_REQUEST)
+      .json({ msg: "Saldo is required" });
+  }
+
+  const session = await mongoose.startSession();
+  session.startTransaction();
+
   try {
     const schema = topupSchema;
     await schema.validateAsync({ saldo });
-  } catch (error) {
-    if (error instanceof Error) {
-      return res
-        .status(RESPONSE_STATUS.BAD_REQUEST)
-        .json({ msg: error.message });
+    if (userID && mongoose.Types.ObjectId.isValid(userID)) {
+      const user = await User.findById(userID).session(session);
+      if (!user) {
+        throw new Error("User not found");
+      }
+      if (user.role === ROLE.ADMIN) {
+        throw new Error("User is admin");
+      }
+
+      user.balance += saldo;
+      await user.save({ session });
+
+      const transactionHeader: ITransationHeaderAdmin = {
+        transactionHeaderType: TransactionHeaderType.TOPUP,
+        date: new Date(),
+        total: saldo,
+        userId: user._id,
+        adminId: admin._id,
+      };
+
+      const transactionDetails: ITransactionTopUpDetail[] = [
+        {
+          transactionDetailType: TransactionDetailType.ADMIN_TOPUP,
+          subtotal: saldo,
+          message: `Admin ${admin.fullName} topped up user ${user.fullName} with saldo ${saldo}`,
+        },
+      ];
+
+      const transaction: ITransaction = {
+        header: transactionHeader,
+        details: transactionDetails,
+      };
+
+      await Transaction.create([transaction], { session });
+
+      await session.commitTransaction();
+      session.endSession();
+
+      return res.status(RESPONSE_STATUS.SUCCESS).json({
+        msg: "Balance updated successfully",
+        username: user.username,
+        full_name: user.fullName,
+        newBalance: user.balance,
+      });
+    } else if (userID === "ALL") {
+      const users = await User.find({
+        role: ROLE.USER,
+        isEmailVerified: true,
+      }).session(session);
+
+      const bulkOps = users.map((user) => ({
+        updateOne: {
+          filter: { _id: user._id },
+          update: { $inc: { balance: saldo } },
+        },
+      }));
+
+      await User.bulkWrite(bulkOps, { session });
+      const transactionHeader: ITransationHeaderAdmin = {
+        transactionHeaderType: TransactionHeaderType.TOPUP,
+        date: new Date(),
+        total: saldo,
+        adminId: admin._id,
+      };
+      const transactionDetails: ITransactionTopUpDetail[] = users.map(
+        (user) => ({
+          transactionDetailType: TransactionDetailType.ADMIN_TOPUP,
+          subtotal: saldo,
+          userId: user._id,
+          message: `Admin ${admin.fullName} topped up user ${user.fullName} with saldo ${saldo}`,
+        })
+      );
+
+      const transaction: ITransaction = {
+        header: transactionHeader,
+        details: transactionDetails,
+      };
+
+      await Transaction.create([transaction], { session });
+
+      await session.commitTransaction();
+      session.endSession();
+
+      return res.status(RESPONSE_STATUS.SUCCESS).json({
+        msg: "Balance updated for all users successfully",
+      });
+    } else {
+      throw new Error("Invalid userID");
     }
-    return res
-      .status(RESPONSE_STATUS.INTERNAL_SERVER_ERROR)
-      .json({ msg: "Validation error" });
-  }
-  if (userID && mongoose.Types.ObjectId.isValid(userID)) {
-    const user = await User.findOne({ _id: userID });
-    if (!user)
-      return res
-        .status(RESPONSE_STATUS.NOT_FOUND)
-        .json({ msg: "User not found" });
-    if (user.role == "ADMIN")
-      return res
-        .status(RESPONSE_STATUS.BAD_REQUEST)
-        .json({ msg: "User is admin" });
-    await User.updateOne({ _id: userID }, { $inc: { balance: saldo } });
+  } catch (error: any) {
+    await session.abortTransaction();
+    session.endSession();
 
-    const transactionHeader: ITransationHeaderAdmin = {
-      transactionHeaderType: TransactionHeaderType.TOPUP,
-      date: new Date(), // current date make it use best practice
-      total: saldo,
-      userId: user._id,
-      adminId: admin._id,
-    };
-    const transactionDetails: ITransactionTopUpDetail[] = [];
+    const errorMsg =
+      error instanceof Error ? error.message : "Internal Server Error";
+    const status =
+      error.message === "User not found"
+        ? RESPONSE_STATUS.NOT_FOUND
+        : RESPONSE_STATUS.BAD_REQUEST;
 
-    transactionDetails.push({
-      transactionDetailType: TransactionDetailType.ADMIN_TOPUP,
-      subtotal: saldo,
-      message: `Admin ${admin.fullName} does action ${TransactionDetailType.ADMIN_TOPUP} topup user ${user.fullName} with saldo ${saldo}`,
-    });
-    const transaction: ITransaction = {
-      header: transactionHeader,
-      details: transactionDetails,
-    };
-    await Transaction.create(transaction);
-    return res.status(RESPONSE_STATUS.SUCCESS).json({
-      msg: "Balance updated successfully",
-      username: user.username,
-      full_name: user.fullName,
-      newBalance: user.balance + parseInt(saldo),
-    });
-  } else {
-    const users = await User.updateMany(
-      { role: { $ne: "ADMIN" }, isEmailVerified: true },
-      { $inc: { balance: saldo } }
-    );
-    console.log(users);
-
-    // const transactionHeader: ITransationHeaderAdmin = {
-    //   transactionHeaderType: TransactionHeaderType.TOPUP,
-    //   date: new Date(), // current date make it use best practice
-    //   total: saldo,
-    //   userId: user._id,
-    //   adminId: admin._id,
-    // };
-    // const transactionDetails: ITransactionTopUpDetail[] = [];
-    // users.forEach((user) => {
-    //   transactionDetails.push({
-    //     transactionDetailType: TransactionDetailType.ADMIN_TOPUP,
-    //     subtotal: saldo,
-    //     message: `Admin ${admin.fullName} does action ${TransactionDetailType.ADMIN_TOPUP} topup user ${user.fullName} with saldo ${saldo}`,
-    //   });
-    // });
-    // const transaction: ITransaction = {
-    //   header: transactionHeader,
-    //   details: transactionDetails,
-    // };
-    // await Transaction.create(transaction);
-    return res
-      .status(RESPONSE_STATUS.SUCCESS)
-      .json({ msg: "Balance updated for all users successfully" });
+    return res.status(status).json({ msg: errorMsg });
   }
 };
