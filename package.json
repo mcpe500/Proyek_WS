@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "nodemon ./src/run.ts --config nodemon.json",
+    "start": "node index.js",
     "build": "tsc && parcel build ./src/run.ts --out-dir . --target node && mv run.js index.js && mv run.js.map index.js.map",
     "deploy": "node ./output/run.js",
     "dev": "nodemon ./src/run.ts --config nodemon.json",
