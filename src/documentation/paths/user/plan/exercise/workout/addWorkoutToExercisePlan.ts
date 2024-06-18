@@ -40,8 +40,17 @@ export default {
                 type: "string",
                 description: "The ID of the exercise to add to the plan",
               },
+              sets: {
+                type: "number"
+              },
+              repetitions: {
+                type: "number"
+              }, 
+              restBetweenSetsInSeconds: {
+                type: "number"
+              }
             },
-            required: ["exerciseId"],
+            required: ["exerciseId", "sets", "repetitions", "restBetweenSetsInSeconds"],
           },
         },
       },
