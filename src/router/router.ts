@@ -206,9 +206,9 @@ router.get(
 router.put(
   "/users/profile",
   [
-    validateBody(editProfileSchemaJoi), // Check if this works or not (Hansen)
     validateAccessToken,
     validateRole(ROLE.USER),
+    validateBody(editProfileSchemaJoi), // Check if this works or not (Hansen)
     upload.single("profilePicture"),
   ],
   editProfile

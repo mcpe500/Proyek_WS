@@ -10,7 +10,7 @@ export const checkAndIncreaseAPIHit = (apiIncreaseCount: number) => {
 
     try {
       if (typeof apiKey !== 'string') {
-        return res.status(400).json({ error: 'Invalid API key format' });
+        return res.status(RESPONSE_STATUS.BAD_REQUEST).json({ error: 'Invalid API key format' });
       }
 
       // Check for active subscription
@@ -20,7 +20,7 @@ export const checkAndIncreaseAPIHit = (apiIncreaseCount: number) => {
       });
 
       if (!activeSubscription) {
-        return res.status(RESPONSE_STATUS.NOT_FOUND).json({ message: "Invalid API Key" });
+        return res.status(RESPONSE_STATUS.BAD_REQUEST).json({ message: "Invalid API Key" });
       }
 
       // Check if the subscription has expired
@@ -28,7 +28,7 @@ export const checkAndIncreaseAPIHit = (apiIncreaseCount: number) => {
         await activeSubscription.updateOne({
           isActive: false
         });
-        return res.status(RESPONSE_STATUS.BAD_REQUEST).json({ message: "Your subscription has expired" });
+        return res.status(RESPONSE_STATUS.FORBIDDEN).json({ message: "Your subscription has expired" });
       }
 
       // Check API hit limit
@@ -40,7 +40,7 @@ export const checkAndIncreaseAPIHit = (apiIncreaseCount: number) => {
 
       if (!paket || !paket.Paket_Limit) {
         return res
-          .status(RESPONSE_STATUS.BAD_REQUEST)
+          .status(RESPONSE_STATUS.NOT_FOUND)
           .json({ message: "Paket not found or invalid" });
       }
 
@@ -58,7 +58,7 @@ export const checkAndIncreaseAPIHit = (apiIncreaseCount: number) => {
       // If API hit equals limit, display error
       if (activeSubscription.apiHit >= paket.Paket_Limit) {
         return res
-          .status(RESPONSE_STATUS.BAD_REQUEST)
+          .status(RESPONSE_STATUS.TOO_MANY_REQUESTS)
           .json({ message: "API hit limit reached" });
       }
 
