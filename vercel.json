@@ -2,14 +2,14 @@
   "version": 2,
   "builds": [
     {
-      "src": "src/run.ts",
+      "src": "src/*",
       "use": "@vercel/node"
     }
   ],
   "routes": [
     {
       "src": "/(.*)",
-      "dest": "/output/run.js"
+      "dest": "/output/*"
     } 
   ],
   "buildCommand": "npm run build",
