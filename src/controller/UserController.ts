@@ -679,10 +679,36 @@ export const getAllUser = async (req: Request, res: Response) => {
 export const adminDashboard = async (req: Request, res: Response) => {
   // const { user } = req as any; // TODO : CHECK IF NECESSARY
   const users = await User.find({
-    role: { $ne: "ADMIN" },
+    role: { $eq: ROLE.USER },
     isEmailVerified: true,
   }).exec();
   const transactions = await Transaction.find({ header: { adminId: null } });
+  // transaction through top up
+  const totalIncome = transactions.reduce(
+    (acc, transaction) =>
+      acc +
+      transaction.details.reduce(
+        (acc, detail) =>
+          detail.transactionDetailType === TransactionDetailType.USER_TOPUP
+            ? acc + detail.subtotal
+            : acc,
+        0
+      ),
+    0
+  );
+  //transaction through subscription
+  const totalSpend = transactions.reduce(
+    (acc, transaction) =>
+      acc +
+      transaction.details.reduce(
+        (acc, detail) =>
+          detail.transactionDetailType === TransactionDetailType.USER_SUBSCRIBE || detail.transactionDetailType === TransactionDetailType.USER_RENEW
+            ? acc + detail.subtotal
+            : acc,
+        0
+      ),
+    0
+  );
   const totalTransactionAmount =
     transactions == null
       ? 0
@@ -698,6 +724,8 @@ export const adminDashboard = async (req: Request, res: Response) => {
     non_free_package_user: subscription.filter(
       (item) => item.paketId != "PAK001"
     ).length,
+    total_income: totalIncome,
+    total_user_spend: totalSpend,
     total_transaction_amount: totalTransactionAmount,
   });
 };
