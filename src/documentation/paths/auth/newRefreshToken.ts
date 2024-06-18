@@ -37,6 +37,15 @@ export default {
                 },
               },
             },
+            examples: {
+              success: {
+                summary: "New refresh token created successfully",
+                value: {
+                  message: "Refresh token generated successfully",
+                  refreshToken: "your-new-refresh-token",
+                },
+              },
+            },
           },
         },
       },
@@ -52,6 +61,32 @@ export default {
                 },
               },
             },
+            examples: {
+              invalidToken: {
+                summary: "Invalid refresh token",
+                value: {
+                  message: "Invalid refresh token",
+                },
+              },
+              tokenNotString: {
+                summary: "Refresh token not a string",
+                value: {
+                  message: "**refreshToken** must be a string",
+                },
+              },
+              tokenEmpty: {
+                summary: "Refresh token empty",
+                value: {
+                  message: "**refreshToken** cannot be empty",
+                },
+              },
+              tokenRequired: {
+                summary: "Refresh token required",
+                value: {
+                  message: "**refreshToken** is a required field",
+                },
+              },
+            },
           },
         },
       },
@@ -64,6 +99,14 @@ export default {
               properties: {
                 message: {
                   type: "string",
+                },
+              },
+            },
+            examples: {
+              userNotFound: {
+                summary: "User not found",
+                value: {
+                  message: "User not found",
                 },
               },
             },

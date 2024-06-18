@@ -69,15 +69,6 @@ export default {
         },
         description: "Exercise difficulty level",
       },
-      {
-        in: "query",
-        name: "page",
-        schema: {
-          type: "integer",
-          default: 0,
-        },
-        description: "Page number for pagination",
-      },
     ],
     responses: {
       "200": {
@@ -92,6 +83,9 @@ export default {
                   items: {
                     type: "object",
                     properties: {
+                      _id: {
+                        type: "string",
+                      },
                       name: {
                         type: "string",
                         description: "Name of the exercise",
@@ -109,7 +103,7 @@ export default {
                         ],
                         description: "Type of exercise",
                       },
-                      muscle: {
+                      targeted_muscle: {
                         type: "string",
                         enum: [
                           "abdominals",
@@ -132,16 +126,11 @@ export default {
                         ],
                         description: "Target muscle",
                       },
-                      equipment: {
+                      equipment_required: {
                         type: "string",
                         description: "Equipment used",
                       },
-                      difficulty: {
-                        type: "string",
-                        enum: ["beginner", "intermediate", "expert"],
-                        description: "Difficulty level",
-                      },
-                      instructions: {
+                      description: {
                         type: "string",
                         description: "Instructions for the exercise",
                       },
