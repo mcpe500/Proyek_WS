@@ -9,6 +9,17 @@ export default {
         bearerAuth: [],
       },
     ],
+    parameters: [
+      {
+        name: "apiKey",
+        in: "query",
+        description: "User's API key",
+        required: true,
+        schema: {
+          type: "string",
+        },
+      },
+    ],
     requestBody: {
       content: {
         "application/json": {

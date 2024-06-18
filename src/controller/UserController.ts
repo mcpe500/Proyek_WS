@@ -617,34 +617,64 @@ export const renewSubscription = async (req: Request, res: Response) => {
       .json({ message: "Not enough balance! Please top up first" });
   }
 
-  // Update balance
+  const session = await mongoose.startSession();
+  session.startTransaction();
+
   try {
+    // Update balance
     user.balance -= totalCost;
-    await user.save();
+    await user.save({ session });
+
+    // Update subscription endDate
+    let endDate = new Date(activeSubscription.endDate);
+    endDate.setMonth(endDate.getMonth() + parseInt(month));
+
+    activeSubscription.endDate = endDate;
+    await activeSubscription.save({ session });
+
+    // Prepare transaction details
+    const transactionDetails = {
+      transactionDetailType: TransactionDetailType.USER_RENEW,
+      paket_id: activeSubscription.paketId,
+      subscription_id: activeSubscription._id,
+      month: month,
+      price: paket.Paket_price,
+      subtotal: totalCost,
+      message: `User: ${user.username} renewed subscription to ${paket.Paket_name} for ${month} month(s) at Rp${paket.Paket_price} per month.`,
+    };
+
+    // Insert transaction log
+    const transaction = new Transaction({
+      header: {
+        transactionHeaderType: TransactionHeaderType.SUBSCRIBE,
+        date: new Date(),
+        total: totalCost,
+        userId: user._id,
+      },
+      details: [transactionDetails],
+    });
+    await transaction.save({ session });
+
+    await session.commitTransaction();
+    session.endSession();
+
+    return res.status(RESPONSE_STATUS.SUCCESS).json({
+      message: "Subscription renewed successfully",
+      transaction: transaction,
+      subscription: activeSubscription,
+      remainingBalance: `Rp${user.balance}`,
+    });
   } catch (error) {
+    await session.abortTransaction();
+    session.endSession();
+
+    console.error(error);
     return res
       .status(RESPONSE_STATUS.INTERNAL_SERVER_ERROR)
       .json({ message: "Internal server error" });
   }
-
-  // Update subscription endDate
-  let endDate = new Date(activeSubscription.endDate);
-  endDate.setMonth(endDate.getMonth() + parseInt(month));
-
-  activeSubscription.endDate = endDate;
-
-  try {
-    await activeSubscription.save();
-  } catch (error) {
-    return res
-      .status(RESPONSE_STATUS.INTERNAL_SERVER_ERROR)
-      .json({ message: "Failed to update subscription" });
-  }
-
-  return res
-    .status(RESPONSE_STATUS.SUCCESS)
-    .json({ subscription: activeSubscription });
 };
+
 
 //admin
 export const getAllUser = async (req: Request, res: Response) => {
@@ -713,9 +743,9 @@ export const adminDashboard = async (req: Request, res: Response) => {
     transactions == null
       ? 0
       : transactions.reduce(
-          (acc, transaction) => acc + transaction.header.total,
-          0
-        );
+        (acc, transaction) => acc + transaction.header.total,
+        0
+      );
   const subscription = await Subscription.find({ isActive: true }).exec();
   return res.status(RESPONSE_STATUS.SUCCESS).json({
     total_user: users.length,
