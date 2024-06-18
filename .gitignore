@@ -1,5 +1,5 @@
 /node_modules
-/output
+/output/
 .env
 package-lock.json
 /src/documentation/swagger_log
