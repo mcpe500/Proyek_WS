@@ -2,26 +2,17 @@
   "version": 2,
   "builds": [
     {
-      "src": "./output/index.js",
+      "src": "src/run.ts",
       "use": "@vercel/node"
     }
   ],
   "routes": [
     {
-      "src": "/api-docs(/.*)?",
-      "dest": "./output/index.js"
-    },
-    {
-      "src": "/location",
-      "dest": "./output/index.js"
-    },
-    {
-      "src": "/api/v1(/.*)?",
-      "dest": "./output/index.js"
-    },
-    {
       "src": "/(.*)",
-      "dest": "./output/index.js"
+      "dest": "/output/run.js"
     }
-  ]
+  ],
+  "buildCommand": "npm run build",
+  "installCommand": "npm install",
+  "outputDirectory": "output"
 }
