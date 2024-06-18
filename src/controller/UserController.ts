@@ -327,21 +327,32 @@ export const verifyEmail = async (req: Request, res: Response) => {
 
 // TODO bikin ini response nya, list of ApiKey dari subscribe yg usernya lagi login (DONE, Hansen)
 export const getApiKey = async (req: Request, res: Response) => {
-  const user = (req as any).user;
-  const subscribe = await Subscription.findOne({ userId: user._id });
-
   try {
-    // Jika pengguna ditemukan, kirimkan API key
-    if ((subscribe as any).apiKey) {
+    const user = (req as any).user;
+    const subscriptions = await Subscription.find({ userId: user._id });
+    if (!subscriptions.length) {
       return res
-        .status(RESPONSE_STATUS.SUCCESS)
-        .json({ apiKey: (subscribe as any).apiKey });
+        .status(RESPONSE_STATUS.NOT_FOUND)
+        .json({ msg: "No subscriptions found for this user" });
+    }
+
+    const activeSubscriptions = subscriptions.filter(
+      (subscription) => subscription.isActive
+    );
+    const apiKeys = activeSubscriptions.map((subscription) => ({
+      paketid: subscription.paketId,
+      apiKey: subscription.apiKey,
+    }));
+
+    if (apiKeys.length) {
+      return res.status(RESPONSE_STATUS.SUCCESS).json({ apiKeys });
     } else {
       return res
         .status(RESPONSE_STATUS.NOT_FOUND)
-        .json({ msg: "API key not found for this user" });
+        .json({ msg: "No active API keys found for this user" });
     }
   } catch (error) {
+    console.error("Error fetching API keys:", error);
     return res
       .status(RESPONSE_STATUS.INTERNAL_SERVER_ERROR)
       .json({ msg: "Internal server error" });
@@ -675,7 +686,6 @@ export const renewSubscription = async (req: Request, res: Response) => {
   }
 };
 
-
 //admin
 export const getAllUser = async (req: Request, res: Response) => {
   const { username, email, fullName, role } = req.query;
@@ -732,7 +742,9 @@ export const adminDashboard = async (req: Request, res: Response) => {
       acc +
       transaction.details.reduce(
         (acc, detail) =>
-          detail.transactionDetailType === TransactionDetailType.USER_SUBSCRIBE || detail.transactionDetailType === TransactionDetailType.USER_RENEW
+          detail.transactionDetailType ===
+            TransactionDetailType.USER_SUBSCRIBE ||
+          detail.transactionDetailType === TransactionDetailType.USER_RENEW
             ? acc + detail.subtotal
             : acc,
         0
@@ -743,9 +755,9 @@ export const adminDashboard = async (req: Request, res: Response) => {
     transactions == null
       ? 0
       : transactions.reduce(
-        (acc, transaction) => acc + transaction.header.total,
-        0
-      );
+          (acc, transaction) => acc + transaction.header.total,
+          0
+        );
   const subscription = await Subscription.find({ isActive: true }).exec();
   return res.status(RESPONSE_STATUS.SUCCESS).json({
     total_user: users.length,

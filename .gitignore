@@ -1,7 +1,7 @@
 /node_modules
+/output
 .env
 package-lock.json
 /src/documentation/swagger_log
 /output/documentation/swagger_log
 /articles
-.vercel
