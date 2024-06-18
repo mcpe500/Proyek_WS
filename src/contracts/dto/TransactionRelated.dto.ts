@@ -14,7 +14,7 @@ export interface ITransationHeaderAdmin {
   transactionHeaderType: TransactionHeaderType;
   date: Date;
   total: number;
-  userId: Types.ObjectId | null | undefined;
+  userId?: Types.ObjectId | null | undefined;
   adminId: Types.ObjectId;
 }
 
