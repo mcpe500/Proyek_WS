@@ -1,5 +1,6 @@
 export default {
   get: {
+    tags: ["exercises"],
     summary: "Get Exercise",
     description: "Get exercise data based on various filters",
     security: [
