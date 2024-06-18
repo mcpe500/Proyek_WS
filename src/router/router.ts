@@ -143,7 +143,7 @@ router.delete(
   [validateAccessToken, validateRole(ROLE.ADMIN)],
   deleteUserPacket
 );
-router.get(
+router.post(
   "/admin/exercise",
   [validateAccessToken, validateRole(ROLE.ADMIN)],
   addExercise

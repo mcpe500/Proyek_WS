@@ -40,6 +40,7 @@ import topupFromAdmin from "./paths/admin/topupFromAdmin";
 import postPaket from "./paths/super-admin/postPaket";
 import putAndDeletePaket from "./paths/super-admin/putAndDeletePaket";
 import promoteAdmin from "./paths/super-admin/promoteAdmin";
+import postExcercise from "./paths/admin/postExcercise";
 
 const { window } = new JSDOM();
 const $ = require("jquery")(window);
@@ -76,6 +77,7 @@ paths["/api/v1/users/plan/cancel/{id}"] = cancelPlanByUser;
 
 paths["/api/v1/admin/users"] = getAllUser;
 paths["/api/v1/admin/dashboard"] = adminDashboard; // GET
+paths["/api/v1/admin/exercise"] = postExcercise;
 paths["/api/v1/admin/user/profile/{userID}"] = getAndDeleteUserProfile; // GET and DELETE
 paths["/api/v1/admin/user/profile-picture/{userID}"] = getUserProfilePicture; // GET and DELETE
 paths["/api/v1/admin/user/packet/{userID}"] = getAndPostAndDeletePacket; // GET and POST and DELETE
