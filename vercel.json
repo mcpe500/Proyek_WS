@@ -10,7 +10,7 @@
     {
       "src": "/(.*)",
       "dest": "/output/run.js"
-    }
+    } 
   ],
   "buildCommand": "npm run build",
   "installCommand": "npm install",
