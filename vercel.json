@@ -1,5 +1,16 @@
 {
-  "version": 2,
-  "builds": [{ "src": "./output/run.js", "use": "@vercel/node" }],
-  "routes": [{ "src": "/(.*)", "dest": "/output" }]
-}
+    "version": 2,
+    "builds": [
+      {
+        "src": "/src/run.ts",
+        "use": "@now/node"
+      }
+    ],
+    "routes": [
+      {
+        "src": "/(.*)",
+        "dest": "/src/run.ts"
+      }
+    ]
+  }
+  
