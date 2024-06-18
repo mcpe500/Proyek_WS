@@ -1148,7 +1148,7 @@ export const topupFromAdmin = async (req: Request, res: Response) => {
         (user) => ({
           transactionDetailType: TransactionDetailType.ADMIN_TOPUP,
           subtotal: saldo,
-          userId: user._id,
+          userId: user._id as mongoose.Types.ObjectId,
           message: `Admin ${admin.fullName} topped up user ${user.fullName} with saldo ${saldo}`,
         })
       );
