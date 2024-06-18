@@ -31,6 +31,9 @@ export default {
                 message: { type: "string" },
               },
             },
+            example: {
+              message: "User JohnDoe promoted to admin successfully",
+            },
           },
         },
       },
@@ -42,6 +45,20 @@ export default {
               type: "object",
               properties: {
                 message: { type: "string" },
+              },
+            },
+            examples: {
+              invalidUserID: {
+                summary: "Invalid user ID",
+                value: {
+                  message: "Invalid user ID",
+                },
+              },
+              userNotCustomer: {
+                summary: "User role is not customer",
+                value: {
+                  message: "User role is not customer",
+                },
               },
             },
           },
@@ -57,6 +74,20 @@ export default {
                 message: { type: "string" },
               },
             },
+            examples: {
+              unauthorized: {
+                summary: "Unauthorized",
+                value: {
+                  message: "Unauthorized",
+                },
+              },
+              wrongRole: {
+                summary: "Wrong role",
+                value: {
+                  message: "User role is not SUPER_USER",
+                },
+              }
+            },
           },
         },
       },
@@ -68,6 +99,14 @@ export default {
               type: "object",
               properties: {
                 message: { type: "string" },
+              },
+            },
+            examples: {
+              userNotFound: {
+                summary: "User not found",
+                value: {
+                  message: "User not found",
+                },
               },
             },
           },
@@ -83,9 +122,17 @@ export default {
                 message: { type: "string" },
               },
             },
+            examples: {
+              internalServerError: {
+                summary: "Internal server error",
+                value: {
+                  message: "Internal server error",
+                },
+              },
+            },
           },
         },
       },
     },
   },
-}
+};

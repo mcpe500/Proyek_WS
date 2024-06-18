@@ -58,43 +58,125 @@ export default {
                 },
               },
             },
+            examples: {
+              created: {
+                summary: "Paket created successfully",
+                value: {
+                  message: "Paket created",
+                  paket: {
+                    Paket_id: "PAK001",
+                    Paket_name: "Basic Paket",
+                    Paket_description: "Basic subscription paket",
+                    Paket_Limit: 50,
+                    Paket_price: 100000,
+                    Paket_price_currency: "IDR",
+                  },
+                },
+              },
+            },
           },
         },
       },
       "400": {
-        description: "Validation error",
+        description: "Bad Request - Validation error or invalid input",
         content: {
           "application/json": {
             schema: {
               type: "object",
               properties: {
-                msg: { type: "string" },
+                message: { type: "string" },
+              },
+            },
+            examples: {
+              validationError: {
+                summary: "Validation error",
+                value: {
+                  message: "Validation error: 'name' is required",
+                },
+              },
+              invalidInput: {
+                summary: "Invalid input",
+                value: {
+                  message: "Invalid input data format",
+                },
+              },
+              duplicateId: {
+                summary: "Duplicate Paket ID",
+                value: {
+                  message: "Paket with id PAK001 already exists",
+                },
+              },
+              invalidIdNumber: {
+                summary: "Invalid ID Number",
+                value: {
+                  message: "Id number should be a type of number",
+                },
+              },
+              invalidLimit: {
+                summary: "Invalid Limit",
+                value: {
+                  message: "Limit should be greater than 0",
+                },
+              },
+              invalidPrice: {
+                summary: "Invalid Price",
+                value: {
+                  message: "Price should be more than or equal to 0",
+                },
+              },
+              missingRequiredFields: {
+                summary: "Missing Required Fields",
+                value: {
+                  message: "Missing required field: name",
+                },
               },
             },
           },
         },
       },
       "401": {
-        description: "Unauthorized",
+        description: "Unauthorized - Authentication failure",
         content: {
           "application/json": {
             schema: {
               type: "object",
               properties: {
-                msg: { type: "string" },
+                message: { type: "string" },
               },
+            },
+            examples: {
+              unauthorized: {
+                summary: "Unauthorized",
+                value: {
+                  message: "Unauthorized",
+                },
+              },
+              wrongRole: {
+                summary: "Wrong role",
+                value: {
+                  message: "User role is not SUPER_USER",
+                },
+              }
             },
           },
         },
       },
       "500": {
-        description: "Internal server error",
+        description: "Internal Server Error - Unexpected server error",
         content: {
           "application/json": {
             schema: {
               type: "object",
               properties: {
-                msg: { type: "string" },
+                message: { type: "string" },
+              },
+            },
+            examples: {
+              internalServerError: {
+                summary: "Internal server error",
+                value: {
+                  message: "Internal server error",
+                },
               },
             },
           },
@@ -102,4 +184,4 @@ export default {
       },
     },
   },
-}
+};
