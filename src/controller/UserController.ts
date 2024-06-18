@@ -448,7 +448,7 @@ export const subscribePacket = async (req: Request, res: Response) => {
   session.startTransaction();
 
   try {
-    const transactionDetails = [];
+    const transactionDetails: ITransactionSubscriptionDetail[] = [];
 
     for (const sub of subscriptions) {
       const { paketId, month } = sub;
@@ -644,15 +644,17 @@ export const renewSubscription = async (req: Request, res: Response) => {
     await activeSubscription.save({ session });
 
     // Prepare transaction details
-    const transactionDetails = {
-      transactionDetailType: TransactionDetailType.USER_RENEW,
-      paket_id: activeSubscription.paketId,
-      subscription_id: activeSubscription._id,
-      month: month,
-      price: paket.Paket_price,
-      subtotal: totalCost,
-      message: `User: ${user.username} renewed subscription to ${paket.Paket_name} for ${month} month(s) at Rp${paket.Paket_price} per month.`,
-    };
+    const transactionDetails: ITransactionSubscriptionDetail[] = [
+      {
+        transactionDetailType: TransactionDetailType.USER_RENEW,
+        paket_id: activeSubscription.paketId,
+        subscription_id: activeSubscription._id,
+        month: month,
+        price: paket.Paket_price,
+        subtotal: totalCost,
+        message: `User: ${user.username} renewed subscription to ${paket.Paket_name} for ${month} month(s) at Rp${paket.Paket_price} per month.`,
+      },
+    ];
 
     // Insert transaction log
     const transaction = new Transaction({
@@ -662,7 +664,7 @@ export const renewSubscription = async (req: Request, res: Response) => {
         total: totalCost,
         userId: user._id,
       },
-      details: [transactionDetails],
+      details: transactionDetails,
     });
     await transaction.save({ session });
 
@@ -873,7 +875,7 @@ export const addUserPacket = async (req: Request, res: Response) => {
         .json({ msg: "User not found" });
     }
 
-    const transactionDetails = [];
+    const transactionDetails: ITransactionSubscriptionDetail[] = [];
 
     for (const user of users) {
       for (const sub of subscriptions) {
@@ -1028,7 +1030,7 @@ export const addExercise = async (req: Request, res: Response) => {
       parsedOffset = 0;
     }
     const queryParams: any = {};
-    for (let i = parsedOffset; i < (parsedOffset + parsedLimit); i++) {
+    for (let i = parsedOffset; i < parsedOffset + parsedLimit; i++) {
       queryParams.offset = i * 10;
       let exercises: any[] = await Apis.API_NINJA_ApiService.get("", {
         params: queryParams,
@@ -1184,31 +1186,40 @@ export const topupFromAdmin = async (req: Request, res: Response) => {
   }
 };
 
-
 export const promoteToAdmin = async (req: Request, res: Response) => {
   const { userID } = req.params;
 
   try {
-    if (userID && !mongoose.Types.ObjectId.isValid(userID)) { 
-      return res.status(RESPONSE_STATUS.BAD_REQUEST).json({ message: "Invalid user ID" });
+    if (userID && !mongoose.Types.ObjectId.isValid(userID)) {
+      return res
+        .status(RESPONSE_STATUS.BAD_REQUEST)
+        .json({ message: "Invalid user ID" });
     }
 
     const user = await User.findOne({ _id: userID, isEmailVerified: true });
 
     if (!user) {
-      return res.status(RESPONSE_STATUS.NOT_FOUND).json({ message: "User not found" });
+      return res
+        .status(RESPONSE_STATUS.NOT_FOUND)
+        .json({ message: "User not found" });
     }
 
     if (user.role !== ROLE.USER) {
-      return res.status(RESPONSE_STATUS.BAD_REQUEST).json({ message: "User role is not customer" });
+      return res
+        .status(RESPONSE_STATUS.BAD_REQUEST)
+        .json({ message: "User role is not customer" });
     }
 
     user.role = ROLE.ADMIN;
     await user.save();
 
-    return res.status(RESPONSE_STATUS.SUCCESS).json({ message: `User ${user.username} promoted to admin successfully` });
+    return res.status(RESPONSE_STATUS.SUCCESS).json({
+      message: `User ${user.username} promoted to admin successfully`,
+    });
   } catch (error) {
     console.error(error);
-    return res.status(RESPONSE_STATUS.INTERNAL_SERVER_ERROR).json({ message: "Internal server error" });
+    return res
+      .status(RESPONSE_STATUS.INTERNAL_SERVER_ERROR)
+      .json({ message: "Internal server error" });
   }
 };
