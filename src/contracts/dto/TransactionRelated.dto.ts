@@ -31,7 +31,7 @@ export interface ITransactionTopUpDetail {
   transactionDetailType: TransactionDetailType;
   subtotal: number;
   message: string;
-  userId?: Types.ObjectId;
+  userId?: Types.ObjectId | null | undefined;
 }
 
 export interface ITransaction {
