@@ -362,10 +362,11 @@ export const getApiKey = async (req: Request, res: Response) => {
 // TODO bikin ini supaya ngereset apikey dari subscription (DONE, Hansen)
 export const resetApiKey = async (req: Request, res: Response) => {
   const user = (req as any).user;
+  const { apiKey } = req.query;
   try {
     let newApiKey = await generateApiKey();
     const updatedSubscribe = await Subscription.findOneAndUpdate(
-      { userId: user._id },
+      { userId: user._id, apiKey: (apiKey as any)},
       { $set: { apiKey: newApiKey } },
       { new: true, useFindAndModify: false } // Returns the updated document
     );
@@ -1013,10 +1014,13 @@ export const addExercise = async (req: Request, res: Response) => {
     // Make API call
     let parsedOffset = Math.floor(Number(offset));
     const parsedLimit = Math.floor(Number(limit_per_ten));
+    if (offset == undefined) {
+      parsedOffset = 0;
+    }
 
     if (
-      isNaN(parsedOffset) ||
-      isNaN(parsedLimit) ||
+      isNaN(parsedOffset) && parsedOffset != 0 ||
+      isNaN(parsedLimit) && parsedLimit != 0 ||
       parsedLimit < 0 ||
       parsedOffset < 0
     ) {
@@ -1024,9 +1028,7 @@ export const addExercise = async (req: Request, res: Response) => {
         .status(RESPONSE_STATUS.BAD_REQUEST)
         .json({ msg: "Offset and limit must be non-negative integers." });
     }
-    if (offset == undefined) {
-      parsedOffset = 0;
-    }
+
     const queryParams: any = {};
     for (let i = parsedOffset; i < parsedOffset + parsedLimit; i++) {
       queryParams.offset = i * 10;
@@ -1044,9 +1046,10 @@ export const addExercise = async (req: Request, res: Response) => {
           const newExercise = new Exercise({
             name: exercise.name,
             type: exercise.type,
-            targeted_muscle: exercise.muscle,
+            muscle: exercise.muscle,
+            difficulty: exercise.difficulty,
             equipmentRequired: exercise.equipment ? exercise.equipment : "-",
-            description: exercise.instructions,
+            instructions: exercise.instructions,
           });
           await newExercise.save();
         }

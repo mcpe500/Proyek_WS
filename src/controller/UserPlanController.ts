@@ -177,6 +177,10 @@ export const addWorkoutToExercisePlan = async (req: Request, res: Response) => {
 
   const plan = await Plans.findById(id);
 
+  if (plan?.status != "PENDING") {
+    return res.status(RESPONSE_STATUS.BAD_REQUEST).json({ msg: "plan has been started/completed/canceled" });
+  }
+
   if (isNaN(sets) || isNaN(repetitions) || isNaN(restBetweenSetsInSeconds)) {
     return res.status(RESPONSE_STATUS.BAD_REQUEST).json({ msg: "sets, repititions, and restBetweenSetsInSeconds must be a number" });
   }
@@ -201,7 +205,7 @@ export const addWorkoutToExercisePlan = async (req: Request, res: Response) => {
 
   const workout = {
     name: exercise?.name,
-    description: exercise?.description,
+    description: exercise?.instructions,
     sets: sets,
     repetitions: repetitions,
     restBetweenSetsInSeconds: restBetweenSetsInSeconds,

@@ -18,14 +18,12 @@ import { ENV } from "../config/environment";
 import { Apis } from "../services/ApiService";
 import Joi from "joi";
 import { FITNESS_GOALS } from "../contracts/enum/FitnessRelated.enum";
+import { Exercise } from "../models/dynamic/Exercise.model";
 
 export const getExercise = async (req: Request, res: Response) => {
   try {
     // Extract body parameters
     const { exercise, type, muscle, difficulty } = req.query;
-
-    // Extract page from body with default value of 0
-    let page = req.query.page ?? 0;
 
     // Define valid types and muscles for validation
     const validTypes = [
@@ -107,32 +105,28 @@ export const getExercise = async (req: Request, res: Response) => {
       }
     }
 
-    // Build query parameters object
-    const queryParams: any = {};
-    if (exercise) queryParams.name = exercise;
-    if (type) queryParams.type = type;
-    if (muscle) queryParams.muscle = muscle;
-    if (difficulty) queryParams.difficulty = difficulty;
-    queryParams.offset = page;
-
-    console.log("Query Parameters:", queryParams);
-
-    // Make API call
-    const response = await Apis.API_NINJA_ApiService.get("", {
-      params: queryParams,
-    });
-
-    console.log("API Response:", response);
+    let exercises;
+    let filter: any = {};
+    if (!exercise && !type && !muscle && !difficulty) {
+      exercises = await Exercise.aggregate([{ $sample: { size: 20 } }]);
+      console.log(exercises)
+  } else {
+      if (exercise) {filter.name = { $regex: exercise, $options: 'i' }}
+      if (type) {filter.type = type}
+      if (muscle) {filter.muscle = muscle}
+      if (difficulty) {filter.difficulty = difficulty}
+      exercises = await Exercise.find(filter);
+  }
 
     // Check for empty response
-    if ((response as any).length < 1) {
+    if ((exercises as any).length < 1) {
       return res
         .status(RESPONSE_STATUS.NOT_FOUND)
         .json({ error: `Exercise Not Found!` });
     }
 
     // Return successful response
-    return res.status(RESPONSE_STATUS.SUCCESS).json({ exercise: response });
+    return res.status(RESPONSE_STATUS.SUCCESS).json({ exercise: exercises });
   } catch (error: any) {
     console.error("Request failed:", error);
     return res.status(RESPONSE_STATUS.NOT_FOUND).json({ error: error.message });
