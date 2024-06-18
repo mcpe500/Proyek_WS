@@ -5,6 +5,11 @@ export default {
     description:
       "This endpoint generates a new access token by validating the provided refresh token.",
     operationId: "generateNewAccessToken",
+    security: [
+      {
+        bearerAuth: [],
+      },
+    ],
     requestBody: {
       description: "Refresh Token required to generate a new access token",
       content: {
