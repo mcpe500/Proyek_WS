@@ -119,10 +119,10 @@ export const startExercisePlan = async (req: Request, res: Response) => {
         .status(RESPONSE_STATUS.NOT_FOUND)
         .json({ message: "No exercise in the plan" });
     }
-    if (plan.status == PlansStatus.STARTED) {
+    if (plan.status != PlansStatus.PENDING) {
       return res
         .status(RESPONSE_STATUS.BAD_REQUEST)
-        .json({ message: "Plan already started" });
+        .json({ message: "Plan already started/deleted/cancelled" });
     }
 
     plan.status = PlansStatus.STARTED;
