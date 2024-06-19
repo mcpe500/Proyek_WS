@@ -1,6 +1,6 @@
 export default {
   get: {
-    tags: ["admin"],
+    tags: ["admins"],
     summary: "Get admin dashboard",
     description: "This endpoint returns the admin dashboard data.",
     operationId: "getAdminDashboard",
