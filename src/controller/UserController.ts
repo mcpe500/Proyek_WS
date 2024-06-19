@@ -132,7 +132,6 @@ export const loginUser = async (req: Request, res: Response) => {
 
   await user.updateOne({
     refreshToken: refreshToken,
-    accessToken: accessToken,
   });
 
   res.cookie("refreshToken", refreshToken, { httpOnly: true });
