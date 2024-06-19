@@ -1208,7 +1208,6 @@ export const promoteToAdmin = async (req: Request, res: Response) => {
     }
 
     const user = await User.findOne({ _id: userID, isEmailVerified: true });
-
     if (!user) {
       return res
         .status(RESPONSE_STATUS.NOT_FOUND)
