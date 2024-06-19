@@ -62,13 +62,13 @@ paths["/api/v1/users/api-key/reset"] = resetUserAPIKey;
 paths["/api/v1/users/subscription"] = subscribeToUserPacket;
 paths["/api/v1/users/subscription/renew"] = renewSubscription;
 paths["/api/v1/exercises"] = getExerciseByQuery;
-paths["/api/v1/users/plan"] = userPlanHandlers;
-paths["/api/v1/users/plan/{id}"] = userPlanByIDHandlers;
+paths["/api/v1/users/plans"] = userPlanHandlers;
+paths["/api/v1/users/plans/{id}"] = userPlanByIDHandlers;
 paths["/api/v1/users/plans/{id}"] = editUserPlanById; // /users/plan/edit/:id
 paths["/api/v1/users/plans/{id}/start"] = startUserPlanById; // /users/plan/start/:id
 paths["/api/v1/users/plans/{id}/complete"] = completeUserPlanById;
 
-paths["/api/v1/users/plan/{id}/workout"] = addWorkoutToExercisePlan;
+paths["/api/v1/users/plans/{id}/workout"] = addWorkoutToExercisePlan;
 paths["/api/v1/news"] = getNewsFilterOrAllNews;
 paths["/api/v1/news/{title}"] = getNewsByTitle;
 paths["/api/v1/exercises/goals"] = getAllGoals;

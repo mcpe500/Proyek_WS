@@ -234,7 +234,7 @@ router.put(
   renewSubscription
 );
 router.post(
-  "/users/plan",
+  "/users/plans",
   [
     validateBody(createUserPlanSchemaJoi),
     validateAccessToken, // TODO : Check with hansen mungkin ini error (Should be fine, Hansen)
@@ -244,12 +244,12 @@ router.post(
   createExercisePlan
 ); // TODO : bikin ini pake ApiKey (Hansen)
 router.get(
-  "/users/plan",
+  "/users/plans",
   [validateAccessToken, validateRole(ROLE.USER), checkAndIncreaseAPIHit(1)],
   getAllExercisePlanByUser
 ); // TODO : bikin ini pake ApiKey (Hansen)
 router.get(
-  "/users/plan/:id",
+  "/users/plans/:id",
   [validateAccessToken, validateRole(ROLE.USER), checkAndIncreaseAPIHit(1)],
   getExercisePlanDetailByUser
 ); // TODO : bikin ini pake ApiKey (Hansen)
@@ -266,22 +266,22 @@ router.post(
   startExercisePlan
 ); // TODO : bikin ini pake ApiKey (Hansen)
 router.put(
-  "/users/plan/:id/workout/",
+  "/users/plans/:id/workout/",
   [validateAccessToken, validateRole(ROLE.USER), checkAndIncreaseAPIHit(1)],
   addWorkoutToExercisePlan
 ); // TODO : bikin ini pake ApiKey (Hansen)
 router.get(
-  "/users/plan/:id/workout/",
+  "/users/plans/:id/workout/",
   [validateAccessToken, validateRole(ROLE.USER), checkAndIncreaseAPIHit(1)],
   exercisePlanDetails
 ); // TODO : bikin ini pake ApiKey (Hansen)
 router.post(
-  "/users/plan/complete/:id",
+  "/users/plans/complete/:id",
   [validateAccessToken, validateRole(ROLE.USER), checkAndIncreaseAPIHit(1)],
   completeExercisePlan
 ); // TODO : bikin ini pake ApiKey (Hansen)
 router.put(
-  "/users/plan/cancel/:id",
+  "/users/plans/cancel/:id",
   [validateAccessToken, validateRole(ROLE.USER), checkAndIncreaseAPIHit(1)],
   cancelExercisePlanByUser
 );
