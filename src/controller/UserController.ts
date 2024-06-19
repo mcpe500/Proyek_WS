@@ -150,7 +150,11 @@ export const getDashboard = async (req: Request, res: Response) => {
 
 export const getProfPic = async (req: Request, res: Response) => {
   const user = (req as any).user;
-  return res.sendFile(path.join(__dirname, "../../", user.profilePicture));
+  // const path
+  return res.sendFile(
+    path.join(__dirname, "../../", user.profilePicture.replace(/\\/g, "/"))
+  );
+  // return res.sendFile(path.join(__dirname, "../../", user.profilePicture));
 };
 
 export const editProfile = async (req: Request, res: Response) => {
@@ -235,9 +239,10 @@ export const newRefreshToken = async (req: Request, res: Response) => {
     const newRefreshToken = createRefreshToken(dataToToken, false);
     await user.updateOne({ refreshToken: newRefreshToken });
     res.cookie("refreshToken", refreshToken, { httpOnly: true });
-    return res
-      .status(RESPONSE_STATUS.SUCCESS)
-      .json({ message: "Refresh token generated successfully", refreshToken: newRefreshToken });
+    return res.status(RESPONSE_STATUS.SUCCESS).json({
+      message: "Refresh token generated successfully",
+      refreshToken: newRefreshToken,
+    });
   } catch (err) {
     return res
       .status(RESPONSE_STATUS.FORBIDDEN)
@@ -798,7 +803,10 @@ export const getUserProfilePicture = async (req: Request, res: Response) => {
     return res
       .status(RESPONSE_STATUS.NOT_FOUND)
       .json({ message: "User not found" });
-  return res.sendFile(path.join(__dirname, "../../", user.profilePicture));
+  return res.sendFile(
+    path.join(__dirname, "../../", user.profilePicture.replace(/\\/g, "/"))
+  );
+  // return res.sendFile(path.join(__dirname, "../../", user.profilePicture));
 };
 
 export const deleteUserProfile = async (req: Request, res: Response) => {
