@@ -94,19 +94,19 @@ export const sendVerificationEmail = async (
   username: string
 ) => {
   let transporter = nodemailer.createTransport({
-    host: "smtp.ethereal.email",
-    port: 587,
-    secure: false,
+    host: ENV.EMAIL_HOST,
+    port: ENV.EMAIL_PORT,
+    secure: true,
     auth: {
-      user: "cara.cassin54@ethereal.email",
-      pass: "sa1eN3haQ3vpTAweud",
+      user: ENV.EMAIL_USER,
+      pass: ENV.EMAIL_PASS,
     },
   });
 
   let mailOptions: SendMailOptions = {
-    from: "cara.cassin54@ethereal.email",
-    to: email, // Use the email parameter
-    subject: "Test Mail",
+    from: "\"No Reply\" <noreply@example.com>",
+    to: email, 
+    subject: "Please verify your email address for WeFit",
   };
   console.log(email, token, username);
 
@@ -114,7 +114,7 @@ export const sendVerificationEmail = async (
     path.join(__dirname, "../templates", "verification_email_template.ejs"),
     {
       name: username,
-      token: `http://localhost:3000/api/v1/auth/verify/${token}`,
+      token: `${ENV.BACKEND_API_URL}:${ENV.PORT}/api/v1/auth/verify/${token}`,
     },
     (err, data) => {
       if (err) {
