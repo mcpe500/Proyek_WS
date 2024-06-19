@@ -21,7 +21,7 @@ export const createExercisePlan = async (req: Request, res: Response) => {
     exercises,
     nutritionPlan,
   } = req.body;
-
+ 
   try {
     const newPlan: IPlans = new Plans({
       name,
