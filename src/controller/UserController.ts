@@ -36,6 +36,7 @@ import {
 import { topupSchema } from "../validators/Topup.validate";
 import mongoose from "mongoose";
 import { ROLE } from "../contracts/enum/UserRelated.enum";
+import path from "path";
 
 // const UserSchema: Schema = new Schema({
 //   fullName: { type: String, required: true },
@@ -149,7 +150,7 @@ export const getDashboard = async (req: Request, res: Response) => {
 
 export const getProfPic = async (req: Request, res: Response) => {
   const user = (req as any).user;
-  return res.sendFile(user.profilePicture, { root: "." });
+  return res.sendFile(path.join(__dirname, "../../", user.profilePicture));
 };
 
 export const editProfile = async (req: Request, res: Response) => {
@@ -797,7 +798,7 @@ export const getUserProfilePicture = async (req: Request, res: Response) => {
     return res
       .status(RESPONSE_STATUS.NOT_FOUND)
       .json({ message: "User not found" });
-  return res.sendFile(user.profilePicture, { root: "." });
+  return res.sendFile(path.join(__dirname, "../../", user.profilePicture));
 };
 
 export const deleteUserProfile = async (req: Request, res: Response) => {

@@ -5,7 +5,7 @@ dotenv.config();
 
 export const ENV: EnvironmentStructure = {
   PORT: parseInt(process.env.PORT || "3000"),
-  BACKEND_API_URL: process.env.BACKEND_API_URL ?? "", 
+  BACKEND_API_URL: process.env.BACKEND_API_URL ?? "",
   SECRET_KEY: process.env.SECRET_KEY ?? "",
   REFRESH_TOKEN_SECRET: process.env.REFRESH_TOKEN_SECRET ?? "",
   ACCESS_TOKEN_SECRET: process.env.ACCESS_TOKEN_SECRET ?? "",
@@ -24,6 +24,10 @@ export const ENV: EnvironmentStructure = {
   DB_STATIC_USERNAME: process.env.DB_STATIC_USERNAME ?? "root",
   DB_STATIC_PASSWORD: process.env.DB_STATIC_PASSWORD ?? "",
   DB_STATIC_DATABASE: process.env.DB_STATIC_DATABASE ?? "db_name",
+  EMAIL_HOST: process.env.EMAIL_HOST ?? "smtp.ethereal.email",
+  EMAIL_PORT: Number(process.env.EMAIL_PORT) ?? 587,
+  EMAIL_USER: process.env.EMAIL_USER ?? "cara.cassin54@ethereal.email",
+  EMAIL_PASS: process.env.EMAIL_PASS ?? "sa1eN3haQ3vpTAweud",
   API_NINJAS_API_KEY: process.env.API_NINJAS_API_KEY ?? "",
   API_GOOGLE_PLACES_API_KEY: process.env.API_GOOGLE_PLACES_API_KEY ?? "",
 };
