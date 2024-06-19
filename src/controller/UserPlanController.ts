@@ -155,6 +155,9 @@ export const completeExercisePlan = async (req: Request, res: Response) => {
     if (plan.createdBy != user.username) {
       return res.status(RESPONSE_STATUS.BAD_REQUEST).json({ message: "Not Your Plan" });
     }
+    if (plan.status != PlansStatus.STARTED) {
+      return res.status(RESPONSE_STATUS.BAD_REQUEST).json({ message: "Plan status is pending/cancelled/completed" });
+    }
     plan.status = PlansStatus.COMPLETED;
 
     const updatedPlan = await plan.save();
