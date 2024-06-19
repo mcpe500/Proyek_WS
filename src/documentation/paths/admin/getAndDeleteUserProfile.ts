@@ -35,6 +35,18 @@ export default {
                 balance: { type: "number" },
               },
             },
+            examples: {
+              success: {
+                summary: "Success",
+                value: {
+                  username: "johndoe",
+                  full_name: "John Doe",
+                  email: "john@example.com",
+                  phone: "1234567890123",
+                  balance: 1000000,
+                },
+              },
+            }
           },
         },
       },
@@ -45,10 +57,22 @@ export default {
             schema: {
               type: "object",
               properties: {
-                msg: {
-                  type: "string",
+                message: { type: "string" },
+              },
+            },
+            examples: {
+              unauthorized: {
+                summary: "Unauthorized",
+                value: {
+                  message: "Unauthorized",
                 },
               },
+              wrongRole: {
+                summary: "Wrong role",
+                value: {
+                  message: "User role is not ADMIN",
+                },
+              }
             },
           },
         },
@@ -60,23 +84,39 @@ export default {
             schema: {
               type: "object",
               properties: {
-                msg: {
+                message: {
                   type: "string",
                 },
               },
             },
+            example: {
+              userNotFound: {
+                summary: "Not Found",
+                value: {
+                  message: "User not found",
+                },
+              },
+            }
           },
         },
       },
       "500": {
-        description: "Internal server error",
+        description: "Internal Server Error",
         content: {
           "application/json": {
             schema: {
               type: "object",
               properties: {
-                msg: {
+                message: {
                   type: "string",
+                },
+              },
+            },
+            examples: {
+              error: {
+                summary: "Internal server error",
+                value: {
+                  message: "Internal server error",
                 },
               },
             },
@@ -114,11 +154,19 @@ export default {
             schema: {
               type: "object",
               properties: {
-                msg: {
+                message: {
                   type: "string",
                 },
               },
             },
+            examples: {
+              success: {
+                summary: "Success",
+                value: {
+                  message: `User johndoe deleted successfully`
+                },
+              },
+            }
           },
         },
       },
@@ -129,10 +177,22 @@ export default {
             schema: {
               type: "object",
               properties: {
-                msg: {
-                  type: "string",
+                message: { type: "string" },
+              },
+            },
+            examples: {
+              unauthorized: {
+                summary: "Unauthorized",
+                value: {
+                  message: "Unauthorized",
                 },
               },
+              wrongRole: {
+                summary: "Wrong role",
+                value: {
+                  message: "User role is not ADMIN",
+                },
+              }
             },
           },
         },
@@ -144,23 +204,39 @@ export default {
             schema: {
               type: "object",
               properties: {
-                msg: {
+                message: {
                   type: "string",
                 },
               },
             },
+            example: {
+              userNotFound: {
+                summary: "Not Found",
+                value: {
+                  message: "User not found",
+                },
+              },
+            }
           },
         },
       },
       "500": {
-        description: "Internal server error",
+        description: "Internal Server Error",
         content: {
           "application/json": {
             schema: {
               type: "object",
               properties: {
-                msg: {
+                message: {
                   type: "string",
+                },
+              },
+            },
+            examples: {
+              error: {
+                summary: "Internal server error",
+                value: {
+                  message: "Internal server error",
                 },
               },
             },
