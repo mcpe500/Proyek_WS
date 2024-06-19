@@ -150,7 +150,6 @@ export const getDashboard = async (req: Request, res: Response) => {
 
 export const getProfPic = async (req: Request, res: Response) => {
   const user = (req as any).user;
-  path.join(__dirname, "../../", user.profilePicture);
   return res.sendFile(path.join(__dirname, "../../", user.profilePicture));
 };
 
@@ -799,7 +798,7 @@ export const getUserProfilePicture = async (req: Request, res: Response) => {
     return res
       .status(RESPONSE_STATUS.NOT_FOUND)
       .json({ message: "User not found" });
-  return res.sendFile(user.profilePicture, { root: "." });
+  return res.sendFile(path.join(__dirname, "../../", user.profilePicture));
 };
 
 export const deleteUserProfile = async (req: Request, res: Response) => {
