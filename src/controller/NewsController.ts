@@ -5,6 +5,7 @@ import { extractArticles } from "../utils/NewsUtils";
 import fs from "fs";
 import path from "path";
 import { INewsSource } from "../contracts/dto/NewsRelated.dto";
+import { RESPONSE_STATUS } from "../contracts/enum/ResponseRelated.enum";
 
 // Utility function to launch a new browser instance
 const launchBrowser = async () => {
@@ -86,7 +87,7 @@ export const getFilteredNews = async (req: Request, res: Response) => {
       await browser.close();
     } catch (error) {
       console.error("An error occurred while extracting news:", error);
-      return res.status(500).send("An error occurred while extracting news.");
+      return res.status(RESPONSE_STATUS.INTERNAL_SERVER_ERROR).send("An error occurred while extracting news.");
     }
 
     return res.json(allArticles);
@@ -142,7 +143,7 @@ export const getFilteredNews = async (req: Request, res: Response) => {
       if (allArticles.length === 0) {
         console.log("No articles found.");
         await browser.close();
-        return res.status(404).send("No articles found.");
+        return res.status(RESPONSE_STATUS.NOT_FOUND).send("No articles found.");
       }
 
       await browser.close();
@@ -150,7 +151,7 @@ export const getFilteredNews = async (req: Request, res: Response) => {
     } catch (error) {
       console.error("An error occurred while setting up the browser:", error);
       return res
-        .status(500)
+        .status(RESPONSE_STATUS.INTERNAL_SERVER_ERROR)
         .send("An error occurred while setting up the browser.");
     }
   }
@@ -305,7 +306,7 @@ export const getSpecificNews = async (req: Request, res: Response) => {
 
       if (!articleUrl) {
         await browser.close();
-        return res.status(404).send("Article not found.");
+        return res.status(RESPONSE_STATUS.NOT_FOUND).send("Article not found.");
       }
 
       await page.goto(articleUrl, {
@@ -342,7 +343,7 @@ export const getSpecificNews = async (req: Request, res: Response) => {
       }
 
       return res
-        .status(500)
+        .status(RESPONSE_STATUS.INTERNAL_SERVER_ERROR)
         .send("An error occurred while extracting the specific news.");
     }
   } catch (error) {}

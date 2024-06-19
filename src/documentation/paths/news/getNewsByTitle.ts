@@ -47,6 +47,9 @@ export default {
                 message: { type: "string" },
               },
             },
+            example: {
+              message: "Article not found."
+            }
           },
         },
       },
@@ -60,6 +63,9 @@ export default {
                 message: { type: "string" },
               },
             },
+            example: {
+              message: "An error occurred while extracting the specific news."
+            }
           },
         },
       },
