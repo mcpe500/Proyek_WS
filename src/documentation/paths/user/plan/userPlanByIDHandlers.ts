@@ -1,3 +1,5 @@
+import { FITNESS_GOALS } from "../../../../contracts/enum/FitnessRelated.enum";
+
 export default {
   get: {
     tags: ["plans"],
@@ -172,7 +174,22 @@ export default {
           schema: {
             type: "object",
             properties: {
-              // Define the properties of the request body here
+              name: { type: "string" },
+              description: { type: "string" },
+              goals: {
+                type: "array",
+                items: {
+                  type: "string",
+                  enum: Object.values(FITNESS_GOALS),
+                },
+                example: (Object.values(FITNESS_GOALS) as any).map(
+                  (fg: any) => fg.code
+                ),
+              },
+              durationInWeeks: { type: "number" },
+              frequencyPerWeek: { type: "number" },
+              restDaysPerWeek: { type: "number" },
+              intensity: { type: "number" },
             },
           },
         },

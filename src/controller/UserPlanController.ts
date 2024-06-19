@@ -76,6 +76,12 @@ export const editExercisePlan = async (req: Request, res: Response) => {
       return res.status(RESPONSE_STATUS.BAD_REQUEST).json({ message: "Not Your Plan" });
     }
 
+    if (plan.status != PlansStatus.PENDING) {
+      return res
+      .status(RESPONSE_STATUS.BAD_REQUEST)
+      .json({ message: "Plan already started/deleted/cancelled" });
+    }
+
     if (name) plan.name = name;
     if (description) plan.description = description;
     if (goals) plan.goals = goals;
@@ -83,8 +89,8 @@ export const editExercisePlan = async (req: Request, res: Response) => {
     if (frequencyPerWeek) plan.frequencyPerWeek = frequencyPerWeek;
     if (restDaysPerWeek) plan.restDaysPerWeek = restDaysPerWeek;
     if (intensity) plan.intensity = intensity;
-    if (exercises) plan.exercises = exercises;
-    if (nutritionPlan) plan.nutritionPlan = nutritionPlan;
+    //if (exercises) plan.exercises = exercises;
+    //if (nutritionPlan) plan.nutritionPlan = nutritionPlan;
 
     const updatedPlan = await plan.save();
 
