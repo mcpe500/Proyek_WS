@@ -124,57 +124,26 @@ export default {
           },
         },
       },
-      "400": {
-        description: "Bad Request",
-        content: {
-          "application/json": {
-            schema: {
-              type: "object",
-              properties: {
-                error: { type: "string" },
-              },
-            },
-          },
-        },
-      },
-      "401": {
-        description: "Unauthorized",
-        content: {
-          "application/json": {
-            schema: {
-              type: "object",
-              properties: {
-                msg: { type: "string" },
-              },
-            },
-          },
-        },
-      },
-      "404": {
-        description: "User not found",
-        content: {
-          "application/json": {
-            schema: {
-              type: "object",
-              properties: {
-                msg: { type: "string" },
-              },
-            },
-          },
-        },
-      },
       "500": {
-        description: "Internal server error",
+        description: "Internal Server Error",
         content: {
           "application/json": {
             schema: {
               type: "object",
               properties: {
-                msg: { type: "string" },
+                message: { type: "string" },
+              },
+            },
+            examples: {
+              internalServerError: {
+                summary: "Internal server error",
+                value: {
+                  message: "Internal server error",
+                },
               },
             },
           },
-        },
+        }
       },
     },
   },
