@@ -40,10 +40,22 @@ export default {
             schema: {
               type: "object",
               properties: {
-                msg: {
-                  type: "string",
+                message: { type: "string" },
+              },
+            },
+            examples: {
+              unauthorized: {
+                summary: "Unauthorized",
+                value: {
+                  message: "Unauthorized",
                 },
               },
+              wrongRole: {
+                summary: "Wrong role",
+                value: {
+                  message: "User role is not ADMIN",
+                },
+              }
             },
           },
         },
@@ -55,23 +67,39 @@ export default {
             schema: {
               type: "object",
               properties: {
-                msg: {
+                message: {
                   type: "string",
                 },
               },
             },
+            example: {
+              userNotFound: {
+                summary: "Not Found",
+                value: {
+                  message: "User not found",
+                },
+              },
+            }
           },
         },
       },
       "500": {
-        description: "Internal server error",
+        description: "Internal Server Error",
         content: {
           "application/json": {
             schema: {
               type: "object",
               properties: {
-                msg: {
+                message: {
                   type: "string",
+                },
+              },
+            },
+            examples: {
+              error: {
+                summary: "Internal server error",
+                value: {
+                  message: "Internal server error",
                 },
               },
             },

@@ -32,6 +32,7 @@ export default {
                 nama: { type: "string" },
                 subscription_start: { type: "string", format: "date-time" },
                 subscription_end: { type: "string", format: "date-time" },
+                apiKey: { type: "string" },
                 packet: { type: "object",
                   properties:{
                     Paket_id: { type: "string" },
@@ -44,6 +45,21 @@ export default {
                  },
               },
             },
+            example: {
+              username: "Verdie85",
+              nama: "Viola Wintheiser-Zemlak",
+              subscription_start: "2024-06-18T16:26:14.431Z",
+              subscription_end: "2024-07-18T16:26:14.431Z",
+              apiKey: "4352e706fcef209f9a174099e1e019b5bde43457ebf85dda30aec3e9de897f67",
+              packet: {
+                Paket_id: "PAK001",
+                Paket_name: "Starter",
+                Paket_description: "Free package with limited rate",
+                Paket_Limit: 15,
+                Paket_price: 0,
+                Paket_price_currency: "IDR"
+              }
+            }
           },
         },
       },
@@ -54,38 +70,78 @@ export default {
             schema: {
               type: "object",
               properties: {
-                msg: {
-                  type: "string",
+                message: { type: "string" },
+              },
+            },
+            examples: {
+              unauthorized: {
+                summary: "Unauthorized",
+                value: {
+                  message: "Unauthorized",
                 },
               },
+              wrongRole: {
+                summary: "Wrong role",
+                value: {
+                  message: "User role is not ADMIN",
+                },
+              }
             },
           },
         },
       },
       "404": {
-        description: "User or Packet not found",
+        description: "User not found",
         content: {
           "application/json": {
             schema: {
               type: "object",
               properties: {
-                msg: {
+                message: {
                   type: "string",
                 },
               },
             },
+            examples: {
+              userNotFound: {
+                summary: "User Not Found",
+                value: {
+                  message: "User not found",
+                },
+              },
+              subscriptionNotFound: {
+                summary: "Subscription Not Found",
+                value: {
+                  message: "User doesn't have any subscription",
+                },
+              },
+              paketNotFound: {
+                summary: "Packet Not Found",
+                value: {
+                  message: "Packet not found",
+                },
+              },
+            }
           },
         },
       },
       "500": {
-        description: "Internal server error",
+        description: "Internal Server Error",
         content: {
           "application/json": {
             schema: {
               type: "object",
               properties: {
-                msg: {
+                message: {
                   type: "string",
+                },
+              },
+            },
+            examples: {
+              error: {
+                summary: "Internal server error",
+                value: {
+                  message: "Internal server error",
                 },
               },
             },
@@ -189,33 +245,73 @@ export default {
             schema: {
               type: "object",
               properties: {
-                msg: { type: "string" },
+                message: { type: "string" },
               },
+            },
+            examples: {
+              unauthorized: {
+                summary: "Unauthorized",
+                value: {
+                  message: "Unauthorized",
+                },
+              },
+              wrongRole: {
+                summary: "Wrong role",
+                value: {
+                  message: "User role is not ADMIN",
+                },
+              }
             },
           },
         },
       },
       "404": {
-        description: "User or Packet not found",
+        description: "User not found",
         content: {
           "application/json": {
             schema: {
               type: "object",
               properties: {
-                msg: { type: "string" },
+                message: {
+                  type: "string",
+                },
               },
             },
+            examples: {
+              userNotFound: {
+                summary: "User Not Found",
+                value: {
+                  message: "User not found",
+                },
+              },
+              paketNotFound: {
+                summary: "Packet Not Found",
+                value: {
+                  message: "Packet not found",
+                },
+              },
+            }
           },
         },
       },
       "500": {
-        description: "Internal server error",
+        description: "Internal Server Error",
         content: {
           "application/json": {
             schema: {
               type: "object",
               properties: {
-                msg: { type: "string" },
+                message: {
+                  type: "string",
+                },
+              },
+            },
+            examples: {
+              error: {
+                summary: "Internal server error",
+                value: {
+                  message: "Internal server error",
+                },
               },
             },
           },
@@ -252,11 +348,19 @@ export default {
             schema: {
               type: "object",
               properties: {
-                msg: {
+                message: {
                   type: "string",
                 },
               },
             },
+            examples: {
+              success: {
+                summary: "Delete Success",
+                value: {
+                  message: "Subscription deleted successfully",
+                },
+              },
+            } 
           },
         },
       },
@@ -267,38 +371,72 @@ export default {
             schema: {
               type: "object",
               properties: {
-                msg: {
-                  type: "string",
+                message: { type: "string" },
+              },
+            },
+            examples: {
+              unauthorized: {
+                summary: "Unauthorized",
+                value: {
+                  message: "Unauthorized",
                 },
               },
+              wrongRole: {
+                summary: "Wrong role",
+                value: {
+                  message: "User role is not ADMIN",
+                },
+              }
             },
           },
         },
       },
       "404": {
-        description: "User or Packet not found",
+        description: "User not found",
         content: {
           "application/json": {
             schema: {
               type: "object",
               properties: {
-                msg: {
+                message: {
                   type: "string",
                 },
               },
             },
+            examples: {
+              userNotFound: {
+                summary: "User Not Found",
+                value: {
+                  message: "User not found",
+                },
+              },
+              paketNotFound: {
+                summary: "Packet Not Found",
+                value: {
+                  message: "Packet not found",
+                },
+              },
+            }
           },
         },
       },
       "500": {
-        description: "Internal server error",
+        description: "Internal Server Error",
         content: {
           "application/json": {
             schema: {
               type: "object",
               properties: {
-                msg: {
+                message: {
                   type: "string",
+                },
+              },
+            },
+            examples: {
+              error: {
+                summary: "Internal server error",
+                value: {
+                  message: "Internal server error",
                 },
               },
             },

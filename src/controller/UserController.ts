@@ -851,6 +851,7 @@ export const getUserPacket = async (req: Request, res: Response) => {
     nama: user.fullName,
     subscription_start: subscription.startDate,
     subscription_end: subscription.endDate,
+    apiKey: subscription.apiKey,
     packet: packet,
   });
 };
@@ -1097,8 +1098,8 @@ export const topupFromAdmin = async (req: Request, res: Response) => {
       if (!user) {
         throw new Error("User not found");
       }
-      if (user.role === ROLE.ADMIN) {
-        throw new Error("User is admin");
+      if (user.role === ROLE.USER) {
+        throw new Error("User is customer");
       }
 
       user.balance += saldo;

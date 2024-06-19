@@ -57,6 +57,9 @@ export default {
                 message: { type: "string" },
               },
             },
+            example: {
+              message: "Article not found."
+            }
           },
         },
       },
@@ -68,6 +71,20 @@ export default {
               type: "object",
               properties: {
                 message: { type: "string" },
+              },
+            },
+            examples: {
+              setupError: {
+                summary: "Setup Error Occured",
+                value: {
+                  message: "An error occurred while setting up the browser.",
+                },
+              },
+              extractError: {
+                summary: "Extract Error",
+                value: {
+                  message: "An error occurred while extracting news.",
+                },
               },
             },
           },

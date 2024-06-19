@@ -154,7 +154,7 @@ export default {
               wrongRole: {
                 summary: "Wrong role",
                 value: {
-                  message: "User role is not SUPER_USER",
+                  message: "User role is not SUPER_ADMIN",
                 },
               }
             },
