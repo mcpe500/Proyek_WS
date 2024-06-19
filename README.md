@@ -53,6 +53,12 @@ DB_STATIC_USERNAME=
 DB_STATIC_PASSWORD=
 DB_STATIC_DATABASE=
 
+# EMAIL
+EMAIL_HOST=
+EMAIL_PORT=
+EMAIL_USER=
+EMAIL_PASS=
+
 API_NINJAS_API_KEY=
 API_GOOGLE_PLACES_API_KEY=
 ```
@@ -61,12 +67,6 @@ API_GOOGLE_PLACES_API_KEY=
 
 ```sh
 npm run dev
-```
-
-## Testing
-
-```sh
-npm run test
 ```
 
 ## Deployment
