@@ -20,7 +20,6 @@ import subscribeToUserPacket from "./paths/user/subscribeToUserPacket";
 import renewSubscription from "./paths/user/renewSubscription";
 import userPlanHandlers from "./paths/user/plan/userPlanHandlers";
 import userPlanByIDHandlers from "./paths/user/plan/userPlanByIDHandlers";
-import editUserPlanById from "./paths/user/plan/editUserPlanById";
 import startUserPlanById from "./paths/user/plan/startUserPlanById";
 import completeUserPlanById from "./paths/user/plan/completeUserPlanById";
 import addWorkoutToExercisePlan from "./paths/user/plan/exercise/workout/addWorkoutToExercisePlan";
@@ -64,7 +63,6 @@ paths["/api/v1/users/subscription/renew"] = renewSubscription;
 paths["/api/v1/exercises"] = getExerciseByQuery;
 paths["/api/v1/users/plans"] = userPlanHandlers;
 paths["/api/v1/users/plans/{id}"] = userPlanByIDHandlers;
-paths["/api/v1/users/plans/{id}"] = editUserPlanById; // /users/plan/edit/:id
 paths["/api/v1/users/plans/{id}/start"] = startUserPlanById; // /users/plan/start/:id
 paths["/api/v1/users/plans/{id}/complete"] = completeUserPlanById;
 

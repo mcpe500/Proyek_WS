@@ -73,7 +73,7 @@ export const editExercisePlan = async (req: Request, res: Response) => {
         .json({ message: "Plan not found" });
     }
     if (plan.createdBy != user.username) {
-      return res.status(RESPONSE_STATUS.NOT_FOUND).json({ message: "Not Your Plan" });
+      return res.status(RESPONSE_STATUS.BAD_REQUEST).json({ message: "Not Your Plan" });
     }
 
     if (name) plan.name = name;
@@ -111,7 +111,7 @@ export const startExercisePlan = async (req: Request, res: Response) => {
         .json({ message: "Plan not found" });
     }
     if (plan.createdBy != user.username) {
-      return res.status(RESPONSE_STATUS.NOT_FOUND).json({ message: "Not Your Plan" });
+      return res.status(RESPONSE_STATUS.BAD_REQUEST).json({ message: "Not Your Plan" });
     }
     // if there's an exercise
     if (plan.exercises.length < 1) {
@@ -121,7 +121,7 @@ export const startExercisePlan = async (req: Request, res: Response) => {
     }
     if (plan.status == PlansStatus.STARTED) {
       return res
-        .status(RESPONSE_STATUS.NOT_FOUND)
+        .status(RESPONSE_STATUS.BAD_REQUEST)
         .json({ message: "Plan already started" });
     }
 
@@ -153,13 +153,13 @@ export const completeExercisePlan = async (req: Request, res: Response) => {
         .json({ message: "Plan not found" });
     }
     if (plan.createdBy != user.username) {
-      return res.status(RESPONSE_STATUS.NOT_FOUND).json({ message: "Not Your Plan" });
+      return res.status(RESPONSE_STATUS.BAD_REQUEST).json({ message: "Not Your Plan" });
     }
     plan.status = PlansStatus.COMPLETED;
 
     const updatedPlan = await plan.save();
 
-    return res.status(RESPONSE_STATUS.NOT_FOUND).json({
+    return res.status(RESPONSE_STATUS.SUCCESS).json({
       message: "Exercise plan completed successfully",
       plan: updatedPlan,
     });
@@ -178,7 +178,7 @@ export const addWorkoutToExercisePlan = async (req: Request, res: Response) => {
   const plan = await Plans.findById(id);
 
   if (plan?.status != "PENDING") {
-    return res.status(RESPONSE_STATUS.BAD_REQUEST).json({ msg: "plan has been started/completed/canceled" });
+    return res.status(RESPONSE_STATUS.BAD_REQUEST).json({ message: "Plan has been started/completed/canceled" });
   }
 
   if (isNaN(sets) || isNaN(repetitions) || isNaN(restBetweenSetsInSeconds)) {
@@ -192,7 +192,7 @@ export const addWorkoutToExercisePlan = async (req: Request, res: Response) => {
   }
 
   if (plan.createdBy != user.username) {
-    return res.status(RESPONSE_STATUS.NOT_FOUND).json({ message: "Not Your Plan" });
+    return res.status(RESPONSE_STATUS.BAD_REQUEST).json({ message: "Not Your Plan" });
   }
   let exercise;
   try {
@@ -215,7 +215,7 @@ export const addWorkoutToExercisePlan = async (req: Request, res: Response) => {
   await plan.save();
 
   return res
-    .status(RESPONSE_STATUS.NOT_FOUND)
+    .status(RESPONSE_STATUS.SUCCESS)
     .json({ message: "Exercise added to plan successfully" });
 };
 
@@ -271,7 +271,7 @@ export const getExercisePlanDetailByUser = async (
   }
 
   if (plan.createdBy != user.username) {
-    return res.status(RESPONSE_STATUS.NOT_FOUND).json({ message: "Not Your Plan" });
+    return res.status(RESPONSE_STATUS.BAD_REQUEST).json({ message: "Not Your Plan" });
   }
 
   try {
@@ -310,7 +310,7 @@ export const cancelExercisePlanByUser = async (req: Request, res: Response) => {
   }
 
   if (plan.createdBy != user.username) {
-    return res.status(RESPONSE_STATUS.NOT_FOUND).json({ message: "Not Your Plan" });
+    return res.status(RESPONSE_STATUS.BAD_REQUEST).json({ message: "Not Your Plan" });
   }
 
   if (plan.status !== "PENDING" && plan.status !== "STARTED") {

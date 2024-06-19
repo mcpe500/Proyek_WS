@@ -43,6 +43,27 @@ export default {
           },
         },
       },
+      "400": {
+        description: "Bad Request",
+        content: {
+          "application/json": {
+            schema: {
+              type: "object",
+              properties: {
+                message: { type: "string" },
+              },
+            },
+            examples: {
+              userMismatch: {
+                summary: "User Mismatch",
+                value: {
+                  message: "Not your plan",
+                },
+              },
+            },
+          },
+        },
+      },
       "401": {
         description: "Unauthorized",
         content: {
@@ -50,20 +71,36 @@ export default {
             schema: {
               type: "object",
               properties: {
-                msg: { type: "string" },
+                message: { type: "string" },
+              },
+            },
+            examples: {
+              unauthorized: {
+                summary: "Unauthorized",
+                value: {
+                  message: "Unauthorized",
+                },
               },
             },
           },
         },
       },
       "404": {
-        description: "Plan not found",
+        description: "Not Found",
         content: {
           "application/json": {
             schema: {
               type: "object",
               properties: {
-                msg: { type: "string" },
+                message: { type: "string" },
+              },
+            },
+            examples: {
+              notFound: {
+                summary: "Plan Not Found",
+                value: {
+                  message: "Plan not found",
+                },
               },
             },
           },
@@ -76,7 +113,16 @@ export default {
             schema: {
               type: "object",
               properties: {
+                message: { type: "string" },
                 error: { type: "string" },
+              },
+            },
+            examples: {
+              internalError: {
+                summary: "Internal Server Error",
+                value: {
+                  message: "Internal server error",
+                },
               },
             },
           },

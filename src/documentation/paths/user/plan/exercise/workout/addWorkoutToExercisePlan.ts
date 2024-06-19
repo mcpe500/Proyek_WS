@@ -63,7 +63,48 @@ export default {
             schema: {
               type: "object",
               properties: {
-                msg: { type: "string" },
+                message: { type: "string" },
+              },
+            },
+            examples: {
+              success: {
+                summary: "Success",
+                value: {
+                  message: "Exercise added to plan successfully",
+                },
+              },
+            }
+          },
+        },
+      },
+      "400": {
+        description: "Bad Request",
+        content: {
+          "application/json": {
+            schema: {
+              type: "object",
+              properties: {
+                message: { type: "string" },
+              },
+            },
+            examples: {
+              userMismatch: {
+                summary: "User Mismatch",
+                value: {
+                  message: "Not your plan",
+                },
+              },
+              fieldError: {
+                summary: "Field Error",
+                value: {
+                  message: "sets, repititions, and restBetweenSetsInSeconds must be a number",
+                },
+              },
+              statusError: {
+                summary: "Status invalid",
+                value: {
+                  message: "Plan has been started/completed/canceled",
+                },
               },
             },
           },
@@ -76,7 +117,15 @@ export default {
             schema: {
               type: "object",
               properties: {
-                msg: { type: "string" },
+                message: { type: "string" },
+              },
+            },
+            examples: {
+              unauthorized: {
+                summary: "Unauthorized",
+                value: {
+                  message: "Unauthorized",
+                },
               },
             },
           },
@@ -89,7 +138,21 @@ export default {
             schema: {
               type: "object",
               properties: {
-                msg: { type: "string" },
+                message: { type: "string" },
+              },
+            },
+            examples: {
+              planNotFound: {
+                summary: "Plan Not Found",
+                value: {
+                  message: "Plan not found",
+                },
+              },
+              exerciseNotFound: {
+                summary: "Exercise Not Found",
+                value: {
+                  message: "Exercise not found",
+                },
               },
             },
           },
@@ -102,7 +165,16 @@ export default {
             schema: {
               type: "object",
               properties: {
-                msg: { type: "string" },
+                message: { type: "string" },
+                error: { type: "string" },
+              },
+            },
+            examples: {
+              internalError: {
+                summary: "Internal Server Error",
+                value: {
+                  message: "Internal server error",
+                },
               },
             },
           },

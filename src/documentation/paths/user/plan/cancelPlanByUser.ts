@@ -64,18 +64,65 @@ export default {
                 },
               },
             },
+            examples: {
+              success: {
+                summary: "Success",
+                value: {
+                  message: "Plan has been cancelled",
+                },
+              },
+            }
           },
         },
       },
       "400": {
-        description: "Plan status is already completed or cancelled.",
+        description: "Bad Request",
         content: {
           "application/json": {
             schema: {
               type: "object",
               properties: {
-                msg: {
-                  type: "string",
+                message: { type: "string" },
+              },
+            },
+            examples: {
+              invalidId: {
+                summary: "Invalid ID",
+                value: {
+                  message: "Invalid ID",
+                },
+              },
+              userMismatch: {
+                summary: "User Mismatch",
+                value: {
+                  message: "Not your plan",
+                },
+              },
+              statusError: {
+                summary: "Status invalid",
+                value: {
+                  message: "Plan is already completed or cancelled",
+                },
+              },
+            },
+          },
+        },
+      },
+      "401": {
+        description: "Unauthorized",
+        content: {
+          "application/json": {
+            schema: {
+              type: "object",
+              properties: {
+                message: { type: "string" },
+              },
+            },
+            examples: {
+              unauthorized: {
+                summary: "Unauthorized",
+                value: {
+                  message: "Unauthorized",
                 },
               },
             },
@@ -83,14 +130,20 @@ export default {
         },
       },
       "404": {
-        description: "Plan not found or not the user's plan.",
+        description: "Not Found",
         content: {
           "application/json": {
             schema: {
               type: "object",
               properties: {
-                msg: {
-                  type: "string",
+                message: { type: "string" },
+              },
+            },
+            examples: {
+              notFound: {
+                summary: "Plan Not Found",
+                value: {
+                  message: "Plan not found",
                 },
               },
             },
@@ -98,14 +151,21 @@ export default {
         },
       },
       "500": {
-        description: "Internal server error.",
+        description: "Internal server error",
         content: {
           "application/json": {
             schema: {
               type: "object",
               properties: {
-                message: {
-                  type: "string",
+                message: { type: "string" },
+                error: { type: "string" },
+              },
+            },
+            examples: {
+              internalError: {
+                summary: "Internal Server Error",
+                value: {
+                  message: "Internal server error",
                 },
               },
             },
