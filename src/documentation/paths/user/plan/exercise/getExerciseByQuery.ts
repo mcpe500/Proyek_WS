@@ -164,6 +164,26 @@ export default {
                 },
               },
             },
+            examples: {
+              invalidType: {
+                summary: "Invalid Type",
+                value: {
+                  error: "Type not valid. Valid types are: cardio, olympic_weightlifting, plyometrics, powerlifting, strength, stretching, strongman",
+                },
+              },
+              invalidMuscle: {
+                summary: "Invalid Muscle",
+                value: {
+                  error: "Muscle not valid. Valid muscles are: abdominals, abductors, adductors, biceps, calves, chest, forearms, glutes, hamstrings, lats, lower_back, middle_back, neck, quadriceps, traps, triceps, shoulders",
+                },
+              },
+              invalidDifficulty: {
+                summary: "Invalid Difficulty",
+                value: {
+                  error: "Difficulty not valid. Valid difficulty levels are: beginner, intermediate, expert",
+                },
+              },
+            },
           },
         },
       },
@@ -174,8 +194,16 @@ export default {
             schema: {
               type: "object",
               properties: {
-                error: {
+                message: {
                   type: "string",
+                },
+              },
+            },
+            examples: {
+              unauthorized: {
+                summary: "Unauthorized",
+                value: {
+                  message: "Unauthorized",
                 },
               },
             },
@@ -194,6 +222,14 @@ export default {
                 },
               },
             },
+            examples: {
+              notFound: {
+                summary: "Exercise Not Found",
+                value: {
+                  error: "Exercise Not Found!",
+                },
+              },
+            },
           },
         },
       },
@@ -204,8 +240,16 @@ export default {
             schema: {
               type: "object",
               properties: {
-                error: {
+                message: {
                   type: "string",
+                },
+              },
+            },
+            examples: {
+              internalError: {
+                summary: "Internal Server Error",
+                value: {
+                  message: "Internal server error",
                 },
               },
             },

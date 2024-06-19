@@ -34,8 +34,8 @@ export default {
                 properties: {
                   _id: { type: "string" },
                   name: { type: "string" },
-                  createdDate: { type: "string", format: "date-time" },
                   status: { type: "string" },
+                  createdDate: { type: "string", format: "date-time" },
                 },
               },
             },
@@ -49,7 +49,15 @@ export default {
             schema: {
               type: "object",
               properties: {
-                msg: { type: "string" },
+                message: { type: "string" },
+              },
+            },
+            examples: {
+              unauthorized: {
+                summary: "Unauthorized",
+                value: {
+                  message: "Unauthorized",
+                },
               },
             },
           },
@@ -63,6 +71,14 @@ export default {
               type: "object",
               properties: {
                 message: { type: "string" },
+              },
+            },
+            examples: {
+              internalError: {
+                summary: "Internal Server Error",
+                value: {
+                  message: "Internal server error",
+                },
               },
             },
           },
@@ -127,11 +143,10 @@ export default {
             schema: {
               type: "object",
               properties: {
-                msg: { type: "string" },
+                message: { type: "string", enum: ["Exercise plan created successfully"] },
                 plan: {
                   type: "object",
                   properties: {
-                    id: { type: "string" },
                     name: { type: "string" },
                     description: { type: "string" },
                     goals: {
@@ -145,8 +160,17 @@ export default {
                     frequencyPerWeek: { type: "number" },
                     restDaysPerWeek: { type: "number" },
                     intensity: { type: "number" },
+                    exercises: {
+                      type: "array",
+                      items: {
+                        type: "object",
+                      },
+                    },
                     createdBy: { type: "string" },
                     status: { type: "string" },
+                    _id: { type: "string" },
+                    createdDate: { type: "string", format: "date-time" },
+                    __v: { type: "number" },
                   },
                 },
               },
@@ -164,6 +188,26 @@ export default {
                 error: { type: "string" },
               },
             },
+            examples: {
+              InvalidGoals: {
+                summary: "Invalid goals provided",
+                value: {
+                  error: "Goals must be one of WEIGHT_LOSS, WEIGHT_GAIN, BODY_BUILDING, MUSCLE_GAIN, ENDURANCE_TRAINING, FLEXIBILITY_IMPROVEMENT, GENERAL_FITNESS, STRESS_RELIEF"
+                }
+              },
+                InvalidDurationInWeeks: {
+                  summary: "Invalid duration in weeks",
+                  value: {
+                    error: "Duration in weeks must be a positive number"
+                  }
+              },
+                InvalidFrequencyPerWeek: {
+                  summary: "Invalid frequency per week",
+                  value: {
+                    error: "Frequency per week must be a positive number"
+                  }
+              },
+            },
           },
         },
       },
@@ -175,6 +219,14 @@ export default {
               type: "object",
               properties: {
                 msg: { type: "string" },
+              },
+            },
+            examples: {
+              unauthorized: {
+                summary: "Unauthorized",
+                value: {
+                  message: "Unauthorized",
+                },
               },
             },
           },
@@ -189,6 +241,14 @@ export default {
               properties: {
                 msg: { type: "string" },
                 error: { type: "string" },
+              },
+            },
+            examples: {
+              internalError: {
+                summary: "Internal Server Error",
+                value: {
+                  message: "Internal server error",
+                },
               },
             },
           },
